@@ -1,0 +1,12 @@
+# Secrets / identifiants — ne jamais commiter
+.env
+.env.*
+*.pem
+*.key
+
+# macOS
+.DS_Store
+
+# Clés SSH éventuelles
+id_rsa
+id_rsa.pub
