@@ -8,6 +8,10 @@
 Ce dépôt contient la conception, le déploiement (Azure CLI) et l'analyse d'une architecture cloud cible
 pour ShopEasy, du diagnostic de l'existant jusqu'à la note de recommandations DSI.
 
+> 📄 **Dossier de rendu à remettre** : [`latex/TP1-ShopEasy-Azure.pdf`](latex/TP1-ShopEasy-Azure.pdf)
+> — **50 pages**, auto-contenu (les 15 ateliers, le quiz, tous les schémas et captures inclus).
+> Source LaTeX : [`latex/TP1-ShopEasy-Azure.tex`](latex/TP1-ShopEasy-Azure.tex).
+
 ---
 
 ## 📂 Structure
@@ -20,10 +24,13 @@ TP1/
 ├── sujets/
 │   ├── Cours_Magistral_TP1_Azure.pdf    ← support de cours
 │   └── TP1_Architecture_Cloud_Azure.pdf ← énoncé du TP
-└── livrables/
-    ├── Atelier-01 … 15 .md              ← les 15 ateliers
-    ├── Quiz.md                          ← quiz de validation
-    └── assets/                          ← captures d'écran (.png)
+├── livrables/
+│   ├── Atelier-01 … 15 .md              ← les 15 ateliers
+│   ├── Quiz.md                          ← quiz de validation
+│   └── assets/                          ← captures d'écran (.png)
+└── latex/
+    ├── TP1-ShopEasy-Azure.tex           ← source LaTeX (dossier complet)
+    └── TP1-ShopEasy-Azure.pdf           ← rendu PDF final (50 pages)
 ```
 
 ---

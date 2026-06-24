@@ -1,0 +1,1752 @@
+% =====================================================================
+%  TP1 — Architecture Cloud Azure pour ShopEasy
+%  Binôme : Louis SCARFONE & Maxence BOURRAGUE — Bloc 4 (Cloud Computing)
+%  Moteur : LuaLaTeX (LuaHBTeX)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Langue & fontes ----------
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{french}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}[Scale=0.80]
+\usepackage{microtype}
+
+% ---------- Respiration (look épuré) ----------
+\usepackage{setspace}
+\setstretch{1.08}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em plus 0.12em minus 0.05em}
+
+% ---------- Géométrie ----------
+\usepackage[a4paper,margin=2.2cm,headheight=16pt,headsep=14pt,footskip=20pt]{geometry}
+
+% ---------- Couleurs (palette Azure) ----------
+\usepackage{xcolor}
+\definecolor{azure}{HTML}{0078D4}
+\definecolor{azuredark}{HTML}{14375E}
+\definecolor{azuremid}{HTML}{2E75B6}
+\definecolor{azurelight}{HTML}{E8F1FB}
+\definecolor{azurepale}{HTML}{F3F8FD}
+\definecolor{okgreen}{HTML}{107C10}
+\definecolor{okgreenbg}{HTML}{E8F5E9}
+\definecolor{warnorange}{HTML}{B5520A}
+\definecolor{warnbg}{HTML}{FBEEDF}
+\definecolor{dangerred}{HTML}{A4262C}
+\definecolor{codebg}{HTML}{F6F8FA}
+\definecolor{codeframe}{HTML}{D8E1EC}
+\definecolor{ink}{HTML}{1B2733}
+\definecolor{rowalt}{HTML}{EBF3FC}
+\color{ink}
+
+% ---------- Divers ----------
+\usepackage{graphicx}
+\graphicspath{{../livrables/assets/}}
+\usepackage{fontawesome5}
+\usepackage{enumitem}
+\setlist{leftmargin=1.4em,topsep=2pt,itemsep=2pt,parsep=0pt}
+\usepackage{needspace}
+\usepackage{fvextra}
+
+% ---------- Emojis (Twemoji couleur) ----------
+\usepackage{twemojis}
+\newcommand{\emo}[1]{\raisebox{-0.14em}{\twemoji{#1}}}
+\newcommand{\eTarget}{\emo{1f3af}}
+\newcommand{\ePackage}{\emo{1f4e6}}
+\newcommand{\eCheck}{\emo{2705}}
+\newcommand{\eWarn}{\emo{26a0}}
+\newcommand{\eBulb}{\emo{1f4a1}}
+\newcommand{\eLock}{\emo{1f512}}
+\newcommand{\eKey}{\emo{1f510}}
+\newcommand{\eRocket}{\emo{1f680}}
+\newcommand{\eChart}{\emo{1f4ca}}
+\newcommand{\eMoney}{\emo{1f4b0}}
+\newcommand{\eGear}{\emo{2699}}
+\newcommand{\eGlobe}{\emo{1f310}}
+\newcommand{\eCamera}{\emo{1f4f8}}
+\newcommand{\ePin}{\emo{1f4cc}}
+\newcommand{\eMag}{\emo{1f50d}}
+\newcommand{\eFlag}{\emo{1f3c1}}
+\newcommand{\eParty}{\emo{1f389}}
+\newcommand{\eShield}{\emo{1f6e1}}
+\newcommand{\eBroom}{\emo{1f9f9}}
+\newcommand{\eFolder}{\emo{1f4c2}}
+\newcommand{\eServer}{\emo{1f5a5}}
+\newcommand{\eDB}{\emo{1f5c4}}
+\newcommand{\eScale}{\emo{2696}}
+\newcommand{\eRed}{\emo{1f534}}
+\newcommand{\eOrange}{\emo{1f7e0}}
+\newcommand{\eYellow}{\emo{1f7e1}}
+\newcommand{\eGreen}{\emo{1f7e2}}
+\newcommand{\eWorld}{\emo{1f30d}}
+\newcommand{\arr}{\ensuremath{\rightarrow}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% ---------- Tableaux (tabularray) ----------
+\usepackage{tabularray}
+\UseTblrLibrary{booktabs}
+\NewDocumentEnvironment{ltable}{m}{%
+  \par\addvspace{4pt}\begin{tblr}{
+    width=\linewidth,
+    colspec={#1},
+    row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\small},
+    row{2-Z}={font=\small},
+    row{even}={bg=rowalt},
+    hline{1,Z}={1.1pt,solid,azuredark},
+    hline{2}={0.5pt,solid,azuredark!45},
+    colsep=7pt, rowsep=4pt,
+    stretch=1.18,
+  }%
+}{%
+  \end{tblr}\par\addvspace{4pt}%
+}
+
+% ---------- Boîtes (tcolorbox) ----------
+\usepackage[most]{tcolorbox}
+\tcbset{
+  boxbase/.style={
+    enhanced, breakable, sharp corners, boxrule=0pt, leftrule=4pt,
+    left=4.5mm, right=4.5mm, top=3.6mm, bottom=3.6mm,
+    before skip=12pt, after skip=12pt,
+    fonttitle=\sffamily\bfseries, coltitle=white,
+    attach boxed title to top left={xshift=0mm,yshift=-2.6mm},
+    boxed title style={sharp corners, boxrule=0pt, left=2.5mm,right=2.5mm,top=0.9mm,bottom=0.9mm},
+  },
+}
+\newtcolorbox{fiche}{boxbase, colback=azurelight, colframe=azure}
+\newtcolorbox{notebox}[1][Point de vigilance]{boxbase, colback=warnbg, colframe=warnorange,
+  colbacktitle=warnorange, title={\eWarn~#1}}
+\newtcolorbox{tipbox}[1][Astuce]{boxbase, colback=azurepale, colframe=azuremid,
+  colbacktitle=azuremid, title={\eBulb~#1}}
+\newtcolorbox{etatbox}[1][État après l'atelier]{boxbase, colback=okgreenbg, colframe=okgreen,
+  colbacktitle=okgreen, title={\eCheck~#1}}
+
+% Bloc code / terminal
+\fvset{breaklines=true, breakanywhere=true, fontsize=\footnotesize,
+  breaksymbolleft=\raisebox{0.1ex}{\scriptsize\textcolor{azure}{$\hookrightarrow$}}}
+\newtcolorbox{codebox}[1]{
+  enhanced, breakable, sharp corners, boxrule=0.7pt,
+  colback=codebg, colframe=codeframe,
+  coltitle=azuredark, colbacktitle=codeframe, fonttitle=\ttfamily\bfseries\scriptsize,
+  title={\faTerminal~~#1}, left=3mm, right=3mm, top=2.6mm, bottom=2.6mm,
+  before skip=12pt, after skip=14pt,
+}
+
+% Capture d'écran encadrée + légende
+\newcommand{\screenshot}[2]{%
+  \par\addvspace{10pt}
+  \begin{center}
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0.7pt, colframe=codeframe, colback=white,
+      left=0.8mm, right=0.8mm, top=0.8mm, bottom=0.8mm, drop fuzzy shadow=black!18]
+    \includegraphics[width=\linewidth]{#1}
+  \end{tcolorbox}\par\vspace{4pt}
+  {\small\itshape\color{black!58}#2}
+  \end{center}\par\addvspace{12pt}
+}
+
+% Carte « chiffre-clé » pour la page de garde
+\newcommand{\statcard}[2]{%
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=3pt, colframe=azure,
+     colback=azurepale, width=0.305\linewidth, halign=center, valign=center, height=2.3cm,
+     left=1mm, right=1mm, top=1mm, bottom=1mm, nobeforeafter]
+     {\sffamily\bfseries\fontsize{22}{24}\selectfont\color{azuredark}#1}\\[1.5mm]
+     {\sffamily\small\color{black!58}#2}
+  \end{tcolorbox}%
+}
+
+% ---------- Sections (titlesec) ----------
+\usepackage{titlesec}
+\titleformat{\section}
+  {\sffamily\LARGE\bfseries\color{azuredark}}
+  {\tcbox[on line, sharp corners, boxrule=0pt, colback=azure, colupper=white,
+     left=2.2mm,right=2.2mm,top=0.6mm,bottom=0.6mm]{\thesection}}
+  {0.7em}{}[\vspace{1mm}{\color{azure}\titlerule[1.6pt]}]
+\titlespacing*{\section}{0pt}{3.6ex plus 0.8ex}{2.0ex}
+\titleformat{\subsection}
+  {\sffamily\large\bfseries\color{azuremid}}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{2.8ex plus 0.5ex}{1.1ex}
+\titleformat{\subsubsection}
+  {\sffamily\bfseries\color{azuredark}}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{1.9ex plus 0.3ex}{0.5ex}
+
+% ---------- En-têtes / pieds (fancyhdr) ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\small\color{azuredark}\textbf{TP1 Azure}~\textcolor{azure}{\textbullet}~ShopEasy}
+\fancyhead[R]{\sffamily\small\color{black!55}\nouppercase{\leftmark}}
+\fancyfoot[C]{\sffamily\small\color{black!55}\thepage}
+\fancyfoot[R]{\sffamily\scriptsize\color{black!42}Bloc 4 · Cloud Computing}
+\fancyfoot[L]{\sffamily\scriptsize\color{black!42}SCARFONE · BOURRAGUE}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrule}{\vspace{-2pt}{\color{azure!70}\rule{\headwidth}{1.1pt}}}
+
+% ---------- Liens ----------
+\usepackage[hidelinks]{hyperref}
+\hypersetup{colorlinks=true, linkcolor=azuredark, urlcolor=azuremid,
+  pdftitle={TP1 Azure - ShopEasy}, pdfauthor={Louis SCARFONE, Maxence BOURRAGUE}}
+
+% Filet décoratif
+\newcommand{\thinrule}{\par\vspace{1mm}{\color{azure!30}\hrule height 0.5pt}\vspace{1mm}}
+
+\begin{document}
+
+% =====================================================================
+%  PAGE DE GARDE
+% =====================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\setlength{\parskip}{0pt}
+\raggedright
+
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, colback=azuredark,
+   width=\linewidth, left=13mm, right=13mm, top=14mm, bottom=14mm,
+   borderline north={5pt}{0pt}{azure}, borderline south={2pt}{0pt}{azure}]
+  \raggedright
+  {\sffamily\bfseries\large\color{azure!75}\faMicrosoft~~MICROSOFT AZURE \quad\textbullet\quad BLOC 4 — CLOUD COMPUTING}
+
+  \vspace{9mm}
+  {\sffamily\bfseries\color{white}\fontsize{37}{42}\selectfont TP1 — Architecture Cloud Azure}
+
+  \vspace{4mm}
+  {\sffamily\color{azurelight}\LARGE pour l'application \textbf{ShopEasy}}
+
+  \vspace{8mm}
+  {\color{azure}\rule{5.2cm}{2.5pt}}
+
+  \vspace{5mm}
+  {\sffamily\color{white}\large Conception, déploiement via Azure CLI et analyse d'une architecture cloud cible.}
+\end{tcolorbox}
+
+\vspace{1.8cm}
+
+\begin{minipage}[t]{0.5\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Binôme}\\[3.5mm]
+  {\large Louis \textsc{Scarfone}}\\[2mm]
+  {\large Maxence \textsc{Bourragué}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Cadre}\\[3.5mm]
+  Mastère Dev Manager Full Stack — RNCP niveau 7\\[2mm]
+  Cas fil rouge : \textbf{ShopEasy}\\[2mm]
+  Azure for Students — région \texttt{swedencentral}
+\end{minipage}
+
+\vspace{1.9cm}
+
+\noindent
+\statcard{15}{ateliers + quiz}\hfill
+\statcard{9}{services Azure}\hfill
+\statcard{$\approx$\,52\,\$}{coût mensuel estimé}
+
+\vfill
+{\sffamily\large\bfseries\color{azuredark}Juin 2026}\hfill
+{\sffamily\color{black!45}Mastère Dev Manager Full Stack}
+\end{titlepage}
+
+% =====================================================================
+%  TABLE DES MATIÈRES
+% =====================================================================
+\thispagestyle{fancy}
+{\sffamily\Huge\bfseries\color{azuredark}Sommaire}
+\vspace{2mm}{\color{azure}\titlerule[1.6pt]}\vspace{4mm}
+\hypersetup{linkcolor=azuredark}
+{\setlength{\parskip}{1pt}\tableofcontents}
+\newpage
+
+
+% #####################################################################
+%  ATELIER 1
+% #####################################################################
+\section{Atelier 1 — Analyse de l'existant}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — identifier les limites de l'architecture actuelle et formuler les premiers besoins techniques.
+
+\textbf{\ePackage~Livrable attendu} — un tableau d'analyse de l'existant et une liste courte des besoins techniques prioritaires.
+\end{fiche}
+
+\subsection{Rappel de l'architecture actuelle}
+ShopEasy héberge une application interne de gestion de commandes (consultation clients, saisie de commandes,
+génération de factures, dépôt de documents justificatifs) sur \textbf{un unique serveur physique}, dans les
+locaux de l'entreprise :
+\begin{itemize}
+  \item Un serveur \textbf{Ubuntu unique} (mono-serveur).
+  \item \textbf{Apache / Nginx} exposant l'application web.
+  \item Application \textbf{PHP ou Node.js} installée \textbf{localement}.
+  \item Base \textbf{MySQL installée sur le même serveur}.
+  \item \textbf{Documents clients} stockés dans un \textbf{répertoire local}.
+  \item \textbf{Sauvegardes manuelles et irrégulières}.
+  \item \textbf{Aucun outil centralisé de supervision}.
+  \item Un \textbf{compte administrateur partagé} par plusieurs personnes.
+\end{itemize}
+
+\subsection{Tableau d'analyse de l'existant}
+\begin{tblr}{
+  width=\linewidth, colspec={Q[l,0.6] X[l,1.2] X[l,1.5]},
+  row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\small},
+  column{1}={bg=azurelight,font=\bfseries},
+  cell{1}{1}={bg=azuredark,fg=white},
+  row{2-Z}={font=\small},
+  hline{1,Z}={1.1pt,azuredark}, hline{2}={0.5pt,azuredark!45},
+  hline{4,6,8,10,12}={0.5pt,azuredark!25},
+  colsep=7pt, rowsep=4pt, stretch=1.2,
+}
+Domaine & Risque / limite identifiée & Impact possible pour l'entreprise \\
+\SetCell[r=2]{m}Disponibilité
+ & \textbf{Point de défaillance unique (SPOF)} : toute l'application repose sur un seul serveur.
+ & Une panne matérielle/OS rend l'application \textbf{totalement indisponible} : plus de prise de commande, plus de facturation. \\
+ & \textbf{Aucune redondance ni répartition de charge} (web + app + base colocalisés).
+ & Aucune tolérance aux pannes ; un incident bloque simultanément les \textbf{trois couches} ; pics de charge non absorbés. \\
+\SetCell[r=2]{m}Sécurité
+ & \textbf{Compte administrateur partagé} entre plusieurs personnes.
+ & \textbf{Perte de traçabilité} (impossible de savoir qui a agi), audit et conformité (RGPD) compromis, révocation difficile. \\
+ & \textbf{Données + documents colocalisés} avec le serveur web, sans segmentation réseau ni chiffrement.
+ & La \textbf{compromission du serveur web donne un accès direct} à la base MySQL et aux documents \arr{} \textbf{fuite de données}. \\
+\SetCell[r=2]{m}Performance
+ & \textbf{Ressources partagées} (CPU/RAM/disque/IO) entre web, applicatif et base sur une seule machine.
+ & \textbf{Contention} des ressources, lenteurs sous charge, dégradation du temps de réponse. \\
+ & \textbf{Pas de scalabilité} : verticale limitée, \textbf{horizontale impossible}.
+ & Impossible d'absorber la \textbf{croissance} ou les \textbf{pics} (campagnes) \arr{} insatisfaction utilisateurs. \\
+\SetCell[r=2]{m}Exploitation
+ & \textbf{Aucune supervision centralisée} (ni métriques, ni logs, ni alertes).
+ & Incidents \textbf{détectés tardivement}, diagnostic à l'aveugle, \textbf{MTTR élevé}. \\
+ & \textbf{Administration 100\,\% manuelle}, non automatisée, non reproductible.
+ & Opérations \textbf{sujettes aux erreurs humaines}, forte \textbf{dépendance aux personnes}. \\
+\SetCell[r=2]{m}Coût
+ & \textbf{Modèle CAPEX} : investissement matériel initial + \textbf{surdimensionnement} pour les pics.
+ & Capital immobilisé, \textbf{capacité payée mais inutilisée} la majeure partie du temps. \\
+ & \textbf{Coûts d'exploitation cachés} (maintenance, matériel, temps humain) \textbf{non mesurés}.
+ & \textbf{Aucune visibilité financière} ni capacité de pilotage / d'optimisation. \\
+\SetCell[r=2]{m}Sauvegarde
+ & \textbf{Sauvegardes manuelles et irrégulières}.
+ & \textbf{RPO non maîtrisé} : perte de données récentes (commandes, factures) probable. \\
+ & \textbf{Pas de stratégie de restauration testée}, sauvegardes vraisemblablement \textbf{locales}.
+ & \textbf{RTO inconnu} ; un sinistre du serveur/site entraîne une \textbf{perte totale} (pas de copie hors-site). \\
+\end{tblr}
+
+\subsection{Réponses aux questions guidées}
+
+\textbf{1. Que se passe-t-il si le serveur physique tombe en panne ?}\\
+Indisponibilité \textbf{totale et immédiate} : l'application web, la base et les documents étant sur la même
+machine, aucune bascule n'est possible. L'activité commerciale s'arrête (plus de commandes, de factures, ni
+d'accès aux dossiers clients). La reprise dépend du délai de réparation matériel et de la qualité des dernières
+sauvegardes — donc d'un \textbf{RPO et d'un RTO aujourd'hui non maîtrisés}.
+
+\textbf{2. Pourquoi la base de données locale représente-t-elle un risque ?}
+\begin{itemize}
+  \item \textbf{Couplage fort} : base et application se partagent CPU/RAM/disque \arr{} contention et SPOF commun.
+  \item \textbf{Sécurité} : la compromission du serveur web donne un accès direct aux données.
+  \item \textbf{Exploitation} : sauvegardes, haute disponibilité, patchs du moteur SQL à la charge de l'entreprise.
+  \item \textbf{Pas d'isolation réseau} : la base n'est pas dans une couche dédiée et protégée.
+\end{itemize}
+
+\textbf{3. Quels problèmes pose l'absence de supervision ?}
+\begin{itemize}
+  \item Détection \textbf{tardive ou nulle} des incidents (on apprend la panne par les utilisateurs).
+  \item Pas de métriques \arr{} \textbf{diagnostic à l'aveugle}, MTTR élevé.
+  \item Impossible d'\textbf{anticiper la saturation} (disque plein, CPU, mémoire).
+  \item Aucune alerte de sécurité (tentatives d'intrusion) ni de coût.
+\end{itemize}
+
+\textbf{4. Quels risques sont liés à un compte administrateur partagé ?}
+\begin{itemize}
+  \item \textbf{Perte de traçabilité / d'imputabilité} \arr{} audit et conformité compromis.
+  \item \textbf{Non-respect du moindre privilège} : tout le monde dispose de tous les droits.
+  \item \textbf{Difficulté de révocation} : un départ impose de changer le secret pour tous.
+  \item \textbf{Surface d'attaque accrue} : secret partagé, pas de MFA individualisé.
+\end{itemize}
+
+\textbf{5. Quels éléments devraient être séparés dans une architecture cloud cible ?}
+\begin{itemize}
+  \item Les \textbf{couches} : réseau / applicatif (web) / données / stockage documentaire.
+  \item La \textbf{segmentation réseau} : subnets distincts (web, data, admin) + filtrage \textbf{NSG}.
+  \item La \textbf{base} \arr{} service managé isolé (Azure SQL Database), non exposé à Internet.
+  \item Les \textbf{documents} \arr{} stockage objet dédié (Storage Account / Blob).
+  \item Les \textbf{identités} \arr{} comptes nominatifs + \textbf{RBAC} (fin du compte partagé).
+  \item La \textbf{disponibilité} \arr{} plusieurs instances derrière un \textbf{répartiteur de charge}.
+  \item La \textbf{supervision} \arr{} plateforme dédiée (Azure Monitor).
+\end{itemize}
+
+\subsection{Besoins techniques prioritaires (synthèse)}
+\begin{enumerate}
+  \item \textbf{Supprimer le SPOF} : redondance applicative ($\geq 2$ instances) derrière un \textbf{répartiteur de charge}.
+  \item \textbf{Séparer les couches} : segmentation réseau (\textbf{VNet + subnets} web/data) et filtrage (\textbf{NSG}).
+  \item \textbf{Externaliser et fiabiliser la base} : base managée (Azure SQL Database), \textbf{non exposée}.
+  \item \textbf{Externaliser les documents} : stockage objet durable (Storage Account / Blob) avec versioning.
+  \item \textbf{Fiabiliser les sauvegardes} : stratégie automatisée et testée (RPO/RTO définis, copie hors-site).
+  \item \textbf{Maîtriser les accès} : identités nominatives + \textbf{RBAC} (moindre privilège).
+  \item \textbf{Superviser} : supervision centralisée avec \textbf{alertes} (Azure Monitor).
+  \item \textbf{Piloter les coûts} : visibilité via \textbf{tags + Cost Management} (passage CAPEX \arr{} OPEX maîtrisé).
+\end{enumerate}
+
+
+% #####################################################################
+%  ATELIER 2
+% #####################################################################
+\section{Atelier 2 — Choix des services Azure}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — associer les besoins métier de ShopEasy aux services Azure pertinents.
+
+\textbf{\ePackage~Livrable attendu} — un tableau besoins/services complété, avec justification technique et qualification IaaS / PaaS / gouvernance.
+\end{fiche}
+
+\subsection{Tableau de choix besoins \texorpdfstring{$\rightarrow$}{->} services}
+\begin{ltable}{Q[l,0.8] Q[l,1.0] X[l,1.7] Q[c,0.7]}
+Besoin & Service Azure choisi & Justification technique & Modèle \\
+Hébergement de l'application & \textbf{Azure Virtual Machines} (2 VM Linux, Nginx) & Migration \textit{lift-and-shift} de l'app PHP/Node.js \textbf{sans refonte} ; contrôle de l'OS ; 2 instances pour la redondance. & \textbf{IaaS} \\
+Répartition de charge & \textbf{Azure Load Balancer} (L4) & Distribue le trafic vers les 2 VM et retire une instance défaillante via sonde \arr{} supprime le SPOF. & IaaS / réseau \\
+Base de données & \textbf{Azure SQL Database} & Base \textbf{managée} : sauvegardes, patchs, HA et chiffrement gérés par Azure ; remplace MySQL ; \textbf{non exposée}. & \textbf{PaaS} \\
+Stockage des documents & \textbf{Azure Storage Account} (Blob) & Stockage objet \textbf{durable}, versioning et cycle de vie ; sort les fichiers du serveur ; accès \textbf{privé}. & \textbf{PaaS} \\
+Isolation réseau & \textbf{Azure Virtual Network} (+ subnets) & Réseau privé \textbf{isolé} ; segmentation web / data / admin. & IaaS / réseau \\
+Filtrage réseau & \textbf{Network Security Groups} & Filtrage L3/L4 par subnet ; n'ouvre que le nécessaire (80/443, 22 restreint, 1433 interne). & IaaS / réseau \\
+Gestion des accès & \textbf{Microsoft Entra ID + RBAC} & Identités \textbf{nominatives} + MFA ; rôles au \textbf{moindre privilège} \arr{} fin du compte partagé. & Gouvernance \\
+Monitoring & \textbf{Azure Monitor} & Métriques + logs, \textbf{alertes actionnables} \arr{} visibilité et détection précoce. & Gouvernance \\
+Suivi des coûts & \textbf{Azure Cost Management} (+ tags) & Coûts réels, budgets et alertes, attribution par \textbf{tags} \arr{} pilotage FinOps. & Gouvernance \\
+\end{ltable}
+
+\subsection{Question de justification — IaaS / PaaS / gouvernance}
+
+\subsubsection{Récapitulatif des qualifications}
+\begin{ltable}{Q[l,0.45] X[l,1]}
+Catégorie & Services concernés \\
+\textbf{IaaS} (infrastructure) & Virtual Machines, Virtual Network, NSG, Load Balancer \\
+\textbf{PaaS} (plateforme managée) & Azure SQL Database, Storage Account \\
+\textbf{Gouvernance} (transverse) & Microsoft Entra ID + RBAC, Azure Monitor, Cost Management \\
+\end{ltable}
+
+\subsubsection{En quoi cela modifie la responsabilité de l'équipe}
+Le choix IaaS / PaaS / gouvernance déplace le curseur du \textbf{modèle de responsabilité partagée} : plus un
+service est managé, plus Azure prend en charge de couches techniques, et plus l'équipe se recentre sur la
+\textbf{valeur métier}.
+\begin{itemize}
+  \item \textbf{IaaS} (VM, VNet, NSG, LB) — Azure gère le matériel ; \textbf{l'équipe reste responsable} de l'OS, des correctifs, du durcissement et du réseau. \arr{} contrôle maximal, charge d'exploitation la plus élevée.
+  \item \textbf{PaaS} (SQL Database, Storage) — Azure gère en plus l'OS, le moteur, les patchs, la HA et les sauvegardes. \textbf{L'équipe se concentre} sur la donnée et la configuration. \arr{} administration fortement réduite.
+  \item \textbf{Gouvernance} (Entra ID/RBAC, Monitor, Cost Management) — Azure fournit l'outil ; \textbf{l'équipe définit les politiques} (rôles, alertes, budgets). \arr{} responsabilité de pilotage et de conformité.
+\end{itemize}
+
+\subsubsection{Lecture pour ShopEasy}
+En partant d'un existant \textbf{100\,\% à sa charge}, ShopEasy bascule vers un mix \textbf{IaaS + PaaS} qui
+transfère à Azure l'administration de la base et du stockage, conserve la maîtrise de la couche applicative le
+temps de la migration, et \textbf{ajoute une gouvernance} (identités, supervision, coûts) qui n'existait pas.
+
+\begin{tipbox}[Suite logique]
+Le TP2 réduira encore la part IaaS (App Service, Infrastructure as Code) une fois la migration stabilisée.
+\end{tipbox}
+
+
+% #####################################################################
+%  ATELIER 3
+% #####################################################################
+\section{Atelier 3 — Architecture cible Azure}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — construire une architecture Azure cible claire et justifiable pour ShopEasy.
+
+\textbf{\ePackage~Livrable attendu} — un schéma d'architecture cible et une légende couvrant composants, flux, zones réseau, exposition Internet, composants internes, sécurité et supervision.
+\end{fiche}
+
+\subsection{Schéma d'architecture cible}
+\screenshot{architecture.png}{Architecture cible : Internet \arr{} Load Balancer \arr{} 2 VM web (\code{snet-web}) ; VM \arr{} SQL Database et Storage en accès privé (\code{snet-data}) ; plan de gouvernance Entra ID/RBAC, Azure Monitor, Cost Management.}
+
+\subsection{Légende — les 7 éléments demandés}
+
+\subsubsection{1. Composants Azure}
+\begin{ltable}{Q[l,0.62] X[l,1]}
+Composant & Rôle \\
+\textbf{Resource Group} \code{rg-shopeasy-dev} & Conteneur logique de toutes les ressources (cycle de vie, droits, coûts). \\
+\textbf{Virtual Network} \code{vnet-shopeasy-dev} & Réseau privé isolé \code{10.10.0.0/16}. \\
+\textbf{Subnets} web / data / admin & Séparation des couches applicative / données / administration. \\
+\textbf{2 × Virtual Machines} & Couche applicative (Nginx + app), redondante. \\
+\textbf{Azure Load Balancer} & Répartiteur de charge frontal avec sonde de santé. \\
+\textbf{Azure SQL Database} & Base relationnelle managée (PaaS). \\
+\textbf{Storage Account} & Stockage objet (Blob) des documents clients. \\
+\textbf{Network Security Groups} & Filtrage réseau par subnet. \\
+\textbf{Entra ID + RBAC} & Identités et droits d'administration. \\
+\textbf{Azure Monitor} & Supervision (métriques, logs, alertes). \\
+\textbf{Azure Cost Management} & Suivi et gouvernance des coûts. \\
+\end{ltable}
+
+\subsubsection{2. Flux principaux}
+\begin{enumerate}
+  \item \textbf{Internet \arr{} Load Balancer} : trafic web HTTP/HTTPS (80/443).
+  \item \textbf{Load Balancer \arr{} VM 01 / 02} : répartition + sonde de santé (port 80).
+  \item \textbf{VM \arr{} Azure SQL Database} : requêtes SQL (port \textbf{1433}, privé, depuis le subnet web).
+  \item \textbf{VM \arr{} Storage Account} : lecture/écriture des documents (HTTPS, privé).
+  \item \textbf{Admin \arr{} VM} : SSH (port 22) \textbf{restreint} (IP admin ou Azure Bastion).
+  \item \textbf{Entra ID / RBAC \arr{} Resource Group} : contrôle des accès.
+  \item \textbf{Toutes ressources \arr{} Azure Monitor} : remontée des métriques et journaux.
+\end{enumerate}
+
+\subsubsection{3. Zones réseau}
+\begin{ltable}{Q[l,0.7] X[l,1] Q[l,0.7]}
+Zone & Contenu & Exposition \\
+\textbf{Frontal public} & Load Balancer (IP publique) & \textbf{Exposé Internet} (80/443) \\
+\code{snet-web} & VM web 01 \& 02 & Interne (via le LB) \\
+\code{snet-data} & Azure SQL Database, Storage (privé) & \textbf{Interne uniquement} \\
+\code{snet-admin} & Azure Bastion (optionnel) & Administration contrôlée \\
+\end{ltable}
+
+\subsubsection{4. Composants exposés à Internet}
+\begin{itemize}
+  \item \textbf{Uniquement le Load Balancer} (80/443) — point d'entrée unique et contrôlé.
+  \item \textit{En TP, les VM ont une IP publique temporaire pour le SSH restreint ; en cible production, on les en prive au profit d'Azure Bastion.}
+\end{itemize}
+
+\subsubsection{5. Composants internes (non exposés)}
+\begin{itemize}
+  \item VM web (joignables seulement via le Load Balancer).
+  \item \textbf{Azure SQL Database} et \textbf{Storage Account} : accès \textbf{privé}, jamais directement depuis Internet.
+\end{itemize}
+
+\subsubsection{6. Éléments de sécurité}
+\begin{itemize}
+  \item \textbf{nsg-web} : autorise 80/443 depuis Internet, 22 depuis l'IP admin uniquement.
+  \item \textbf{nsg-data} : autorise 1433 depuis \code{snet-web} uniquement \arr{} base non exposée.
+  \item \textbf{Entra ID + RBAC} : comptes nominatifs, moindre privilège.
+  \item SQL + Storage en accès privé (Private Endpoint en cible), chiffrement et TLS.
+  \item \textbf{Segmentation réseau} en subnets pour limiter les mouvements latéraux.
+\end{itemize}
+
+\subsubsection{7. Éléments de supervision}
+\begin{itemize}
+  \item \textbf{Azure Monitor} : métriques VM (CPU/mémoire/disque), disponibilité du LB, métriques SQL et Storage, logs d'activité du Resource Group.
+  \item \textbf{Alertes} : CPU élevé, échec des sondes, espace SQL proche de la limite, coût projeté supérieur au budget.
+\end{itemize}
+
+\subsection{Plan d'adressage IP}
+\begin{ltable}{Q[l,0.5] Q[l,0.5] X[l,1]}
+Élément & Plage CIDR & Rôle \\
+\textbf{VNet} & \code{10.10.0.0/16} & Réseau global ShopEasy \\
+\code{snet-web} & \code{10.10.1.0/24} & Machines virtuelles web \\
+\code{snet-data} & \code{10.10.2.0/24} & Services de données / endpoints privés \\
+\code{snet-admin} & \code{10.10.3.0/24} & Accès d'administration / bastion (optionnel) \\
+\end{ltable}
+
+\subsection{Variante « durcissement production »}
+L'architecture ci-dessus est volontairement \textbf{lisible pour le TP}. Pour une mise en production réelle :
+\begin{itemize}
+  \item \textbf{Application Gateway + WAF} (L7) à la place du Load Balancer L4, avec terminaison TLS et HTTPS obligatoire.
+  \item \textbf{Private Endpoint} pour Azure SQL et Storage (suppression de tout accès public).
+  \item \textbf{Suppression des IP publiques des VM} + administration via Azure Bastion.
+  \item \textbf{Déploiement multi-zones} (Availability Zones) des VM et du LB.
+  \item \textbf{MFA} systématique et revue périodique des rôles RBAC.
+  \item \textbf{Sauvegardes formalisées} + tests de restauration ; \textbf{Infrastructure as Code} (Terraform/Bicep) en TP2.
+\end{itemize}
+
+
+% #####################################################################
+%  ATELIER 4
+% #####################################################################
+\section{Atelier 4 — Préparation de l'environnement Azure}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — créer les conteneurs logiques et les conventions de nommage du projet.
+
+\textbf{\ePackage~Livrable attendu} — capture du Resource Group et tableau de convention de nommage complété avec le suffixe.
+\end{fiche}
+
+\subsection{Convention de nommage adoptée}
+Convention retenue : \code{<type>-<application>-<environnement>} (+ suffixe unique pour les ressources à nom
+global). \textbf{Suffixe unique du projet : \code{ls01}} (initiales \textit{Louis Scarfone} + numéro).
+
+\begin{ltable}{Q[l,0.7] Q[l,0.8] X[l,1.2]}
+Ressource & Nom retenu & Remarque \\
+Resource Group & \code{rg-shopeasy-dev} & — \\
+Virtual Network & \code{vnet-shopeasy-dev} & — \\
+Subnet web & \code{snet-web} & VM applicatives \\
+Subnet data & \code{snet-data} & Services de données / endpoints privés \\
+Subnet admin & \code{snet-admin} & Accès d'administration (optionnel) \\
+NSG web & \code{nsg-web} & Filtrage du subnet web \\
+NSG data & \code{nsg-data} & Filtrage du subnet data \\
+Virtual Machine 1 & \code{vm-web-01} & — \\
+Virtual Machine 2 & \code{vm-web-02} & — \\
+\textbf{Storage Account} & \code{stshopeasyls01} & \textbf{Nom global unique}, minuscules, sans tiret \\
+\textbf{Azure SQL Server} & \code{sql-shopeasy-ls01} & \textbf{Nom global unique} \\
+Azure SQL Database & \code{sqldb-shopeasy} & — \\
+\end{ltable}
+
+\subsection{Création du Resource Group (Azure CLI)}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az group create \
+  --name rg-shopeasy-dev \
+  --location swedencentral \
+  --tags projet=shopeasy environnement=dev module=cloud owner="Equipe Cloud" costcenter=Formation
+\end{Verbatim}
+\end{codebox}
+
+\begin{notebox}[Contrainte régionale Azure for Students]
+L'abonnement applique une policy \textit{« Allowed resource deployment regions »} qui restreint les
+déploiements à 5 régions : \code{germanywestcentral}, \code{spaincentral}, \code{swedencentral},
+\code{italynorth}, \code{uaenorth}. \textbf{\code{francecentral} est bloquée.} Après analyse (voir Atelier 7),
+la seule région autorisée où les VM sont réellement déployables est \textbf{\code{swedencentral}} — c'est la
+région retenue pour tout le TP, RG compris.
+\end{notebox}
+
+\subsubsection{Tags de gouvernance appliqués}
+\begin{ltable}{Q[l,0.5] Q[l,0.6] X[l,1]}
+Tag & Valeur & Usage \\
+\code{projet} & \code{shopeasy} & Rattachement applicatif \\
+\code{environnement} & \code{dev} & Distinction dev / prod \\
+\code{module} & \code{cloud} & Contexte pédagogique \\
+\code{owner} & \code{Equipe Cloud} & Responsable / contact \\
+\code{costcenter} & \code{Formation} & Imputation des coûts (FinOps) \\
+\end{ltable}
+
+\subsection{Preuve de création (\code{az group show})}
+\begin{codebox}{json}
+\begin{Verbatim}
+{
+  "location": "swedencentral",
+  "name": "rg-shopeasy-dev",
+  "properties": { "provisioningState": "Succeeded" },
+  "tags": {
+    "costcenter": "Formation", "environnement": "dev", "module": "cloud",
+    "owner": "Equipe Cloud", "projet": "shopeasy"
+  },
+  "type": "Microsoft.Resources/resourceGroups"
+}
+\end{Verbatim}
+\end{codebox}
+
+\screenshot{rg-global-view.png}{Vue d'ensemble du Resource Group \code{rg-shopeasy-dev} (région Sweden Central, abonnement Azure for Students).}
+\screenshot{rg-tags.png}{Les 5 tags de gouvernance appliqués au Resource Group.}
+
+\subsection{Questions de validation}
+
+\textbf{1. Pourquoi regrouper les ressources dans un Resource Group dédié ?}\\
+Un Resource Group matérialise un \textbf{cycle de vie commun} : toutes les ressources de ShopEasy se créent,
+se gèrent, se sécurisent (RBAC au niveau du groupe), se suivent en coût et \textbf{se suppriment ensemble}.
+Cela évite de mélanger des ressources de projets différents et simplifie l'exploitation, les droits et le
+nettoyage de fin de TP (\code{az group delete}).
+
+\textbf{2. Pourquoi ajouter des tags ?}
+\begin{itemize}
+  \item \textbf{Attribuer les coûts} (par application, environnement, centre de coût) dans Cost Management.
+  \item \textbf{Rechercher et filtrer} les ressources.
+  \item \textbf{Automatiser} des actions (extinction des ressources \code{environnement=dev}, Azure Policy).
+  \item \textbf{Identifier le propriétaire} et la criticité.
+\end{itemize}
+
+\textbf{3. Que risque-t-on sans convention de nommage ?}\\
+Un nommage improvisé rend l'environnement \textbf{illisible et difficile à exploiter} : impossible de savoir
+d'un coup d'œil à quoi sert une ressource ni à quel environnement elle appartient. Conséquences : erreurs de
+manipulation, audit et analyse de coûts compliqués, automatisation fragile, et \textbf{collisions sur les noms
+globaux uniques} (Storage, SQL) faute de suffixe.
+
+\begin{etatbox}
+\begin{itemize}
+  \item Resource Group \code{rg-shopeasy-dev} créé en \code{swedencentral}, \code{provisioningState: Succeeded}.
+  \item 5 tags de gouvernance appliqués ; convention de nommage figée (suffixe \code{ls01}).
+  \item \textbf{Prêt pour l'Atelier 5 — création du réseau (VNet + subnets).}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 5
+% #####################################################################
+\section{Atelier 5 — Création du réseau Azure}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — créer un réseau virtuel segmenté pour séparer les composants web et données.
+
+\textbf{\ePackage~Livrable attendu} — capture du Virtual Network et des subnets, avec commentaire sur la segmentation.
+
+\textbf{\eGlobe~Région} — \code{swedencentral} (Stockholm), seule région autorisée où les VM sont déployables.
+\end{fiche}
+
+\subsection{Plan d'adressage}
+\begin{ltable}{Q[l,0.9] Q[l,0.6] Q[c,0.5] X[l,1]}
+Élément & Plage CIDR & Adresses & Rôle \\
+\textbf{VNet} \code{vnet-shopeasy-dev} & \code{10.10.0.0/16} & 65\,536 & Réseau global de ShopEasy \\
+\code{snet-web} & \code{10.10.1.0/24} & 251* & Machines virtuelles web \\
+\code{snet-data} & \code{10.10.2.0/24} & 251* & Services de données / endpoints privés \\
+\code{snet-admin} & \code{10.10.3.0/24} & 251* & Accès d'administration / bastion (optionnel) \\
+\end{ltable}
+{\small * Azure réserve \textbf{5 adresses par subnet} (la 1\textsuperscript{re}, les 3 suivantes et la dernière) \arr{} $256-5 = 251$ utilisables.}
+
+\subsection{Création via Azure CLI}
+\begin{codebox}{bash}
+\begin{Verbatim}
+# 1) VNet + premier subnet (web)
+az network vnet create \
+  --resource-group rg-shopeasy-dev --name vnet-shopeasy-dev \
+  --location swedencentral --address-prefix 10.10.0.0/16 \
+  --subnet-name snet-web --subnet-prefix 10.10.1.0/24
+
+# 2) Subnet data
+az network vnet subnet create -g rg-shopeasy-dev --vnet-name vnet-shopeasy-dev \
+  --name snet-data --address-prefixes 10.10.2.0/24
+
+# 3) Subnet admin
+az network vnet subnet create -g rg-shopeasy-dev --vnet-name vnet-shopeasy-dev \
+  --name snet-admin --address-prefixes 10.10.3.0/24
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Vérification (sortie CLI)}
+\begin{minipage}[t]{0.46\linewidth}
+\begin{ltable}{Q[l] Q[c]}
+VNet & État \\
+\code{vnet-shopeasy-dev} & Succeeded \\
+\end{ltable}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.5\linewidth}
+\begin{ltable}{Q[l] Q[l] Q[c]}
+Subnet & CIDR & État \\
+\code{snet-web} & \code{10.10.1.0/24} & Succeeded \\
+\code{snet-data} & \code{10.10.2.0/24} & Succeeded \\
+\code{snet-admin} & \code{10.10.3.0/24} & Succeeded \\
+\end{ltable}
+\end{minipage}
+
+\screenshot{vnet-overview.png}{Vue d'ensemble du VNet \code{vnet-shopeasy-dev} (\code{10.10.0.0/16}, Sweden Central).}
+\screenshot{vnet-subnets.png}{Les 3 subnets : \code{snet-web}, \code{snet-data}, \code{snet-admin}.}
+
+\subsection{Pourquoi une seule grande plage ne suffit pas ? (segmentation)}
+Mettre toutes les ressources dans \textbf{un seul grand subnet « à plat »} fonctionne techniquement, mais
+c'est une \textbf{mauvaise pratique} professionnelle :
+\begin{itemize}
+  \item \textbf{Sécurité (cloisonnement)} : sans segmentation, une VM web compromise atteint \textbf{directement la base}. En séparant \code{snet-web} et \code{snet-data}, on applique des NSG différents et on \textbf{limite les mouvements latéraux}.
+  \item \textbf{Moindre privilège réseau} : chaque subnet n'autorise que les flux nécessaires (la base n'accepte 1433 que depuis le subnet web).
+  \item \textbf{Lisibilité \& exploitation} : un découpage par fonction (web / données / admin) rend le réseau auditable.
+  \item \textbf{Gouvernance \& évolutivité} : route tables, Private Endpoints ou bastion associés à un subnet précis ; plages réservées pour la croissance.
+  \item \textbf{Conformité} : isoler les données sensibles facilite le respect du RGPD.
+\end{itemize}
+
+\begin{tipbox}[En résumé]
+\textbf{Segmenter, c'est appliquer la défense en profondeur au niveau réseau.} La grande plage \code{/16}
+sert d'espace global cohérent, et les \code{/24} matérialisent les \textbf{zones de confiance} distinctes.
+\end{tipbox}
+
+\begin{etatbox}
+\begin{itemize}
+  \item VNet \code{vnet-shopeasy-dev} (\code{10.10.0.0/16}) créé en \code{swedencentral}.
+  \item 3 subnets \code{Succeeded} : web (10.10.1.0/24), data (10.10.2.0/24), admin (10.10.3.0/24).
+  \item \textbf{Prêt pour l'Atelier 6 — filtrage réseau (NSG).}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 6
+% #####################################################################
+\section{Atelier 6 — Filtrage réseau avec Network Security Groups}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — protéger les flux réseau en limitant les ouvertures inutiles.
+
+\textbf{\ePackage~Livrable attendu} — capture des NSG et des règles, avec justification des ouvertures autorisées.
+\end{fiche}
+
+\subsection{Règles de filtrage retenues}
+\begin{tblr}{
+  width=\linewidth, colspec={Q[l]Q[l]Q[c]Q[c]Q[c]Q[c]Q[l]X[l]},
+  row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\scriptsize},
+  row{2-Z}={font=\scriptsize}, row{even}={bg=rowalt},
+  hline{1,Z}={1.1pt,azuredark}, hline{2}={0.5pt,azuredark!45},
+  colsep=4pt, rowsep=3.2pt, stretch=1.15,
+}
+NSG & Règle & Prio & Sens & Accès & Port & Source & Justification \\
+\code{nsg-web} & \code{allow-http} & 100 & In & Allow & 80 & Internet & Accès HTTP à l'application de test \\
+\code{nsg-web} & \code{allow-https} & 110 & In & Allow & 443 & Internet & Accès HTTPS (cible production) \\
+\code{nsg-web} & \code{allow-ssh-my-ip} & 120 & In & Allow & 22 & \code{<IP>/32} & Administration Linux limitée à l'IP admin \\
+\code{nsg-data} & \code{allow-sql-from-web} & 100 & In & Allow & 1433 & \code{10.10.1.0/24} & Accès SQL uniquement depuis le subnet web \\
+\code{nsg-data} & \code{deny-sql-from-vnet} & 200 & In & \textbf{Deny} & 1433 & \code{VNet} & Bloque 1433 depuis le reste du VNet \\
+\end{tblr}
+
+\begin{notebox}[Confidentialité]
+L'IP publique réelle de l'administrateur est utilisée dans la règle déployée, mais \textbf{masquée ici}
+(\code{<IP>/32}) pour ne pas la divulguer.
+\end{notebox}
+
+\subsubsection{Pourquoi la règle \code{deny-sql-from-vnet} ?}
+Un NSG applique des \textbf{règles par défaut} invisibles, dont \code{AllowVnetInBound} (priorité 65000) qui
+\textbf{autorise tout le trafic interne au VNet}. Sans action, \code{snet-admin} pourrait joindre la base sur
+le 1433. La règle \code{allow-sql-from-web} (prio 100) autorise le subnet web, et \code{deny-sql-from-vnet}
+(prio 200) \textbf{refuse explicitement} le 1433 pour le reste du VNet \arr{} un vrai \textit{« uniquement depuis
+le web »} (moindre privilège réseau).
+
+\subsection{Création via Azure CLI}
+\begin{codebox}{bash}
+\begin{Verbatim}
+# ---- NSG WEB ----
+az network nsg create -g rg-shopeasy-dev -n nsg-web --location swedencentral
+az network nsg rule create -g rg-shopeasy-dev --nsg-name nsg-web \
+  --name allow-http --priority 100 --access Allow --direction Inbound \
+  --protocol Tcp --source-address-prefixes Internet --destination-port-ranges 80
+az network nsg rule create -g rg-shopeasy-dev --nsg-name nsg-web \
+  --name allow-https --priority 110 --access Allow --direction Inbound \
+  --protocol Tcp --source-address-prefixes Internet --destination-port-ranges 443
+az network nsg rule create -g rg-shopeasy-dev --nsg-name nsg-web \
+  --name allow-ssh-my-ip --priority 120 --access Allow --direction Inbound \
+  --protocol Tcp --source-address-prefixes <VOTRE_IP>/32 --destination-port-ranges 22
+
+# ---- NSG DATA ----
+az network nsg create -g rg-shopeasy-dev -n nsg-data --location swedencentral
+az network nsg rule create -g rg-shopeasy-dev --nsg-name nsg-data \
+  --name allow-sql-from-web --priority 100 --access Allow --direction Inbound \
+  --protocol Tcp --source-address-prefixes 10.10.1.0/24 --destination-port-ranges 1433
+az network nsg rule create -g rg-shopeasy-dev --nsg-name nsg-data \
+  --name deny-sql-from-vnet --priority 200 --access Deny --direction Inbound \
+  --protocol Tcp --source-address-prefixes VirtualNetwork --destination-port-ranges 1433
+
+# ---- ASSOCIATION AUX SUBNETS ----
+az network vnet subnet update -g rg-shopeasy-dev --vnet-name vnet-shopeasy-dev \
+  --name snet-web --network-security-group nsg-web
+az network vnet subnet update -g rg-shopeasy-dev --vnet-name vnet-shopeasy-dev \
+  --name snet-data --network-security-group nsg-data
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Vérification — associations subnet \texorpdfstring{$\rightarrow$}{->} NSG}
+\begin{ltable}{Q[l] Q[l] Q[l]}
+Subnet & CIDR & NSG associé \\
+\code{snet-web} & \code{10.10.1.0/24} & \code{nsg-web} \\
+\code{snet-data} & \code{10.10.2.0/24} & \code{nsg-data} \\
+\code{snet-admin} & \code{10.10.3.0/24} & aucun (optionnel) \\
+\end{ltable}
+
+\screenshot{nsg-web-rules.png}{Règles entrantes de \code{nsg-web} (80/443 depuis Internet, 22 depuis l'IP admin) + règles par défaut.}
+\screenshot{nsg-data-rules.png}{Règles entrantes de \code{nsg-data} : \code{allow-sql-from-web} (1433) et \code{deny-sql-from-vnet}.}
+
+\subsection{Questions de sécurité}
+
+\textbf{1. Pourquoi limiter SSH à une adresse IP précise ?}\\
+Ouvrir le port 22 à \code{0.0.0.0/0} l'expose en permanence aux \textbf{scans automatisés} et aux
+\textbf{attaques par force brute}. En restreignant la source à l'IP de l'administrateur, la surface d'attaque
+passe de « tout Internet » à « une IP ». En production, on supprime l'exposition publique du SSH au profit
+d'\textbf{Azure Bastion} + MFA.
+
+\textbf{2. Pourquoi ne pas exposer le port SQL (1433) sur Internet ?}\\
+La base contient les \textbf{données sensibles}. L'exposer en ferait une \textbf{cible privilégiée} : force
+brute, exploitation de vulnérabilités, exfiltration. Le 1433 ne doit être joignable que depuis la couche
+applicative (subnet web), idéalement via \textbf{Private Endpoint}.
+
+\textbf{3. Différence entre une règle entrante et une règle sortante ?}
+\begin{itemize}
+  \item \textbf{Entrante (Inbound)} : filtre le trafic qui \textbf{arrive} vers la ressource (requêtes vers le web, ou du web vers la base).
+  \item \textbf{Sortante (Outbound)} : filtre le trafic qui \textbf{part} de la ressource (appel à un service externe).
+\end{itemize}
+Un NSG évalue les deux sens \textbf{séparément}, par priorité. Par défaut Azure autorise tout l'Outbound et
+restreint l'Inbound. Restreindre l'Outbound limite l'\textbf{exfiltration}.
+
+\textbf{4. Comment cette configuration devrait évoluer en production ?}
+\begin{itemize}
+  \item \textbf{HTTPS obligatoire} + redirection 80\arr{}443, certificats ; \textbf{Application Gateway + WAF}.
+  \item \textbf{Suppression du SSH public} \arr{} Azure Bastion, VM sans IP publique, accès just-in-time.
+  \item \textbf{Private Endpoint} pour Azure SQL \arr{} plus aucune ouverture 1433.
+  \item \textbf{NSG Flow Logs} + Azure Monitor ; règles Outbound restrictives ; revue périodique + MFA.
+\end{itemize}
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{nsg-web} (3 règles) associé à \code{snet-web} ; \code{nsg-data} (2 règles) à \code{snet-data}.
+  \item Base non joignable hors du subnet web ; SSH limité à l'IP admin.
+  \item \textbf{Prêt pour l'Atelier 7 — déploiement des 2 VM web.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 7
+% #####################################################################
+\section{Atelier 7 — Déploiement de machines virtuelles web}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — déployer deux serveurs web simples dans Azure pour représenter la couche applicative.
+
+\textbf{\ePackage~Livrable attendu} — captures des deux VM, de la page web de test et des commandes de vérification.
+\end{fiche}
+
+\begin{notebox}[Adaptation imposée par Azure for Students (région + taille)]
+Le TP demande \code{Standard\_B1s} en \code{francecentral}. \textbf{Aucun des deux n'est utilisable} sur cet
+abonnement. Après analyse :
+\begin{itemize}
+  \item \code{francecentral} bloquée par policy ; \code{germanywestcentral} : tailles x86 \textit{NotAvailableForSubscription}, ARM à quota 0.
+  \item \code{Standard\_B1s} \textit{NotAvailable} dans les 5 régions autorisées ; providers \code{Compute/Storage/Sql} étaient \textbf{NotRegistered} (enregistrés \arr{} quota débloqué).
+\end{itemize}
+\textbf{Solution retenue} (appuyée par la doc Microsoft) : région \textbf{\code{swedencentral}} + taille
+\textbf{\code{Standard\_B2ats\_v2}} (2 vCPU, 1 Go), \textbf{taille officiellement recommandée pour Azure for
+Students} (famille \code{Basv2}, quota 10 vCPU).
+\end{notebox}
+
+\subsection{Création des VM (Azure CLI)}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az vm create \
+  --resource-group rg-shopeasy-dev --name vm-web-01 \
+  --image Ubuntu2204 --size Standard_B2ats_v2 --location swedencentral \
+  --vnet-name vnet-shopeasy-dev --subnet snet-web --nsg nsg-web \
+  --admin-username azureuser --generate-ssh-keys \
+  --public-ip-sku Standard --storage-sku Standard_LRS
+
+# vm-web-02 : idem avec --name vm-web-02
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{Q[l] Q[l] Q[l] Q[l]}
+VM & IP publique & IP privée & Taille \\
+\code{vm-web-01} & \code{20.240.255.137} & \code{10.10.1.4} & \code{Standard\_B2ats\_v2} \\
+\code{vm-web-02} & \code{4.223.107.224} & \code{10.10.1.5} & \code{Standard\_B2ats\_v2} \\
+\end{ltable}
+
+\subsection{Installation de Nginx (SSH)}
+Commandes lancées sur chaque VM (connexion SSH avec la clé générée \code{\textasciitilde/.ssh/id\_rsa}) :
+\begin{codebox}{bash}
+\begin{Verbatim}
+ssh azureuser@<IP_PUBLIQUE>
+sudo apt update
+sudo apt install -y nginx
+echo "ShopEasy - VM Web 0X" | sudo tee /var/www/html/index.html
+sudo systemctl enable nginx
+sudo systemctl restart nginx
+systemctl status nginx --no-pager
+\end{Verbatim}
+\end{codebox}
+
+Sortie réelle de \code{systemctl status} sur \code{vm-web-01} (service \textbf{actif}) :
+\begin{codebox}{console}
+\begin{Verbatim}
+########## sudo apt install -y nginx ##########
+0 upgraded, 20 newly installed, 0 to remove and 7 not upgraded.
+...
+Setting up nginx-common (1.18.0-6ubuntu14.16) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/nginx.service.
+Setting up nginx (1.18.0-6ubuntu14.16) ...
+
+########## page index.html ##########
+ShopEasy - VM Web 01
+
+########## systemctl status nginx ##########
+* nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+     Active: active (running) since Wed 2026-06-24 10:55:29 UTC; 6ms ago
+   Main PID: 4297 (nginx)
+      Tasks: 3 (limit: 1064)
+     Memory: 3.3M
+     CGroup: /system.slice/nginx.service
+             |-4297 "nginx: master process /usr/sbin/nginx ..."
+             |-4298 "nginx: worker process"
+             `-4299 "nginx: worker process"
+\end{Verbatim}
+\end{codebox}
+\textit{La page de \code{vm-web-02} affiche « ShopEasy - VM Web 02 » ; son service Nginx est également}
+\textbf{\textit{active (running)}}\textit{ et }\textbf{\textit{enabled}}.
+
+\subsection{Vérifications (commandes CLI)}
+Les deux VM dans le Resource Group, état \code{VM running} :
+\begin{ltable}{Q[l] Q[l] Q[l] Q[l] Q[c]}
+Nom & Taille & IP publique & IP privée & État \\
+\code{vm-web-01} & \code{Standard\_B2ats\_v2} & \code{20.240.255.137} & \code{10.10.1.4} & VM running \\
+\code{vm-web-02} & \code{Standard\_B2ats\_v2} & \code{4.223.107.224} & \code{10.10.1.5} & VM running \\
+\end{ltable}
+
+Test HTTP de chaque page depuis le poste admin :
+\begin{codebox}{console}
+\begin{Verbatim}
+$ curl http://20.240.255.137
+ShopEasy - VM Web 01
+$ curl http://4.223.107.224
+ShopEasy - VM Web 02
+\end{Verbatim}
+\end{codebox}
+
+\textbf{Réponses aux questions de vérification.} \textbf{(1)} Les deux VM apparaissent dans le Resource Group
+(état \code{VM running}). \textbf{(2)} Nginx est \code{active (running)} + \code{enabled} sur les deux.
+\textbf{(3)} Les pages sont accessibles (\code{curl}, NSG \code{allow-http} 80). \textbf{(4)} Les deux pages
+identifient la VM appelée (« VM Web 01 » / « VM Web 02 »), ce qui servira à vérifier la répartition de charge
+à l'Atelier 8.
+
+\screenshot{vm-web-01-page.png}{Page servie par \code{vm-web-01} (\code{http://20.240.255.137}).}
+\screenshot{vm-web-02-page.png}{Page servie par \code{vm-web-02} (\code{http://4.223.107.224}).}
+\screenshot{vms-in-rg.png}{Les deux VM dans le Resource Group \code{rg-shopeasy-dev}.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item 2 VM \code{Standard\_B2ats\_v2} (Ubuntu 22.04) dans \code{snet-web}, Nginx actif, pages distinctes.
+  \item \textbf{Prêt pour l'Atelier 8 — répartiteur de charge devant les 2 VM.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 8
+% #####################################################################
+\section{Atelier 8 — Répartition de charge}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — comprendre le rôle d'un répartiteur de charge et l'intégrer dans l'architecture cible.
+
+\textbf{\ePackage~Livrable attendu} — capture du répartiteur, du backend pool, de la sonde de santé et du test navigateur.
+
+\textbf{\eGlobe~Région} — \texttt{swedencentral} \quad\textbullet\quad \textbf{Load Balancer} \texttt{lb-shopeasy} (SKU Standard, public).
+\end{fiche}
+
+\subsection{Choix technique}
+\begin{ltable}{Q[l,1.0] X[l,1.5] X[l,1.5]}
+Critère & Azure Load Balancer \textbf{(retenu)} & Application Gateway \\
+Niveau & Couche 4 (TCP/UDP) & Couche 7 (HTTP/HTTPS) \\
+Usage & Répartition réseau simple et efficace & Routage applicatif, terminaison TLS, \textbf{WAF} \\
+Complexité & Plus simple & Plus riche, plus complexe \\
+Cas TP & \eCheck~\textbf{Suffisant} pour une première architecture web & Cible production (sécurité applicative) \\
+\end{ltable}
+
+\noindent On retient \textbf{Azure Load Balancer (Standard, public)}, conforme à l'esprit du TP.
+\textit{Application Gateway + WAF est la cible production} (cf. variante de durcissement à l'Atelier~3).
+
+\subsection{Création via Azure CLI}
+\begin{codebox}{bash}
+\begin{Verbatim}
+# 1) IP publique frontale (Standard, statique)
+az network public-ip create -g rg-shopeasy-dev -n pip-lb-shopeasy \
+  --sku Standard --location swedencentral --allocation-method Static
+
+# 2) Load Balancer + frontend + backend pool
+az network lb create -g rg-shopeasy-dev -n lb-shopeasy \
+  --sku Standard --location swedencentral \
+  --public-ip-address pip-lb-shopeasy \
+  --frontend-ip-name feip-shopeasy \
+  --backend-pool-name bepool-web
+
+# 3) Sonde de sante HTTP sur le port 80 (chemin /)
+az network lb probe create -g rg-shopeasy-dev --lb-name lb-shopeasy \
+  --name probe-http --protocol Http --port 80 --path / --interval 5
+
+# 4) Regle de repartition HTTP (80 -> 80) liee a la sonde
+az network lb rule create -g rg-shopeasy-dev --lb-name lb-shopeasy \
+  --name rule-http --protocol Tcp --frontend-port 80 --backend-port 80 \
+  --frontend-ip-name feip-shopeasy --backend-pool-name bepool-web \
+  --probe-name probe-http
+
+# 5) Rattacher les 2 VM au backend pool (via leurs ipconfig)
+az network nic ip-config address-pool add -g rg-shopeasy-dev \
+  --nic-name vm-web-01VMNic --ip-config-name ipconfigvm-web-01 \
+  --lb-name lb-shopeasy --address-pool bepool-web
+az network nic ip-config address-pool add -g rg-shopeasy-dev \
+  --nic-name vm-web-02VMNic --ip-config-name ipconfigvm-web-02 \
+  --lb-name lb-shopeasy --address-pool bepool-web
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Vérification (sorties CLI réelles)}
+\noindent IP publique du Load Balancer : \texttt{20.91.244.18}. Membres du backend pool : les deux interfaces
+\texttt{vm-web-01VMNic} et \texttt{vm-web-02VMNic}.
+
+\smallskip
+\begin{minipage}[t]{0.48\linewidth}
+\begin{ltable}{Q[l] Q[c] Q[c] Q[c]}
+Sonde & Proto & Port & Chemin \\
+\texttt{probe-http} & Http & 80 & / \\
+\end{ltable}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{ltable}{Q[l] Q[c] Q[c] Q[c]}
+Règle & Proto & Front & Back \\
+\texttt{rule-http} & Tcp & 80 & 80 \\
+\end{ltable}
+\end{minipage}
+
+\subsubsection{Test de répartition (preuve de bascule)} 14 requêtes successives sur l'IP publique du
+Load Balancer, \textbf{réparties 50/50} entre les deux VM :
+\begin{codebox}{console}
+\begin{Verbatim}
+$ for i in $(seq 1 14); do curl -s http://20.91.244.18; done | sort | uniq -c
+   7 ShopEasy - VM Web 01
+   7 ShopEasy - VM Web 02
+\end{Verbatim}
+\end{codebox}
+\begin{tipbox}[Suppression du SPOF]
+Le Load Balancer distribue bien le trafic sur les \textbf{deux} serveurs web : c'est la suppression du
+\textbf{point de défaillance unique} applicatif identifié à l'Atelier~1.
+\end{tipbox}
+
+\subsection{Captures}
+\screenshot{lb-overview.png}{Vue d'ensemble du Load Balancer — IP publique \texttt{20.91.244.18}, SKU Standard.}
+\screenshot{lb-backend-pool.png}{Backend pool \texttt{bepool-web} : \texttt{vm-web-01} (10.10.1.4) et \texttt{vm-web-02} (10.10.1.5).}
+\screenshot{lb-health-probe.png}{Sonde de santé \texttt{probe-http} (HTTP 80, chemin /), utilisée par \texttt{rule-http}.}
+\screenshot{lb-test-browser.png}{Test navigateur : la même IP sert « VM Web 01 » et « VM Web 02 » (bascule).}
+
+\subsection{Analyse (questions du TP)}
+\textbf{1. Que se passe-t-il si une VM devient indisponible ?}\\
+La \textbf{sonde de santé} cesse de recevoir une réponse HTTP 200 sur \texttt{/} pour cette VM et la
+\textbf{retire automatiquement du backend pool}. Le Load Balancer route alors 100\,\% du trafic vers la VM
+saine restante : le service \textbf{reste disponible} (capacité réduite, mais pas d'interruption). Dès que
+la VM répond à nouveau à la sonde, elle est \textbf{réintégrée} automatiquement.
+
+\smallskip\textbf{2. Pourquoi une sonde de santé est-elle nécessaire ?}\\
+Sans sonde, le LB continuerait d'envoyer du trafic vers une instance morte $\rightarrow$ \textbf{erreurs
+pour une partie des utilisateurs}. La sonde vérifie en continu que chaque backend répond réellement, et
+\textbf{ne route que vers les instances saines}. C'est elle qui rend la redondance \textit{effective}.
+
+\smallskip\textbf{3. Quelles limites subsistent malgré le répartiteur de charge ?}
+\begin{itemize}
+  \item \textbf{Pas de protection inter-zone/région} : les 2 VM sont dans la même région, \textbf{sans Availability Zone} (déploiement zonal restreint sur Azure for Students) $\rightarrow$ une panne de datacenter peut toucher les deux.
+  \item \textbf{Pas d'autoscaling} : le nombre de VM est fixe, l'ajout est manuel.
+  \item \textbf{Couche 4 seulement} : pas de terminaison \textbf{TLS} ni de \textbf{WAF} ($\rightarrow$ Application Gateway en production).
+  \item \textbf{Couche données non redondée} ici (une seule base).
+  \item L'application doit rester \textbf{sans état} pour que la répartition soit transparente.
+\end{itemize}
+
+\smallskip\textbf{4. Pourquoi déployer les VM dans plusieurs zones améliore-t-il la disponibilité ?}\\
+Les \textbf{Availability Zones} sont des datacenters \textbf{physiquement séparés} (alimentation,
+refroidissement, réseau indépendants) au sein d'une même région. En plaçant \texttt{vm-web-01} et
+\texttt{vm-web-02} dans \textbf{deux zones distinctes}, une panne touchant un datacenter n'affecte
+\textbf{qu'une seule} VM. \textit{(Point repris à l'Atelier~13.)}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Load Balancer public \texttt{lb-shopeasy} (\texttt{20.91.244.18}) devant les 2 VM, sonde HTTP/80, répartition 50/50 vérifiée.
+  \item Point de défaillance unique applicatif \textbf{levé}.
+  \item \textbf{Prêt pour l'Atelier~9 — stockage documentaire (Storage Account).}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 9
+% #####################################################################
+\section{Atelier 9 — Stockage documentaire avec Azure Storage}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — remplacer le stockage local des documents par un service de stockage objet.
+
+\textbf{\ePackage~Livrable attendu} — capture du Storage Account, des conteneurs, du téléversement de fichiers et réponses aux questions.
+
+\textbf{\eGlobe~Région} — \code{swedencentral} \quad\textbullet\quad \textbf{Storage Account} \code{stshopeasyls01} (suffixe \code{ls01}).
+\end{fiche}
+
+\subsection{Création du Storage Account (Azure CLI)}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az storage account create \
+  --resource-group rg-shopeasy-dev --name stshopeasyls01 \
+  --location swedencentral --sku Standard_LRS --kind StorageV2 \
+  --https-only true --min-tls-version TLS1_2 \
+  --allow-blob-public-access false \
+  --tags projet=shopeasy environnement=dev module=cloud
+\end{Verbatim}
+\end{codebox}
+{\small Résultat : \code{provisioningState: Succeeded}, \code{Https: true}, \code{TLS: TLS1\_2}, \code{AccesPublicBlob: false}.}
+
+\subsection{Sécurité et résilience des données}
+\begin{ltable}{Q[l,0.7] Q[l,0.6] X[l,1]}
+Propriété & Valeur & Apport \\
+\textbf{Chiffrement au repos} & activé (Microsoft) & Données chiffrées par défaut (clés gérées Microsoft) \\
+\textbf{HTTPS obligatoire} & \code{true} & Données chiffrées en transit \\
+\textbf{TLS minimum} & \code{TLS1\_2} & Pas de protocole obsolète \\
+\textbf{Accès public blob} & \code{false} & Impossible de rendre un conteneur public par erreur \\
+\textbf{Versioning des blobs} & \code{true} & Conserve chaque version (anti-écrasement / anti-suppression) \\
+\textbf{Soft-delete blob} & 7 jours & Récupération d'un blob supprimé \\
+\textbf{Soft-delete conteneur} & 7 jours & Récupération d'un conteneur supprimé \\
+\end{ltable}
+{\small Le chiffrement étant \textbf{activé par défaut} sur StorageV2, le point « activer le chiffrement » du TP est satisfait nativement.}
+
+\subsection{Conteneurs et téléversement}
+\begin{codebox}{bash}
+\begin{Verbatim}
+# Conteneurs privés
+for C in factures clients archives; do
+  az storage container create --account-name stshopeasyls01 --name "$C" --public-access off
+done
+
+# Authentification data-plane via variables d'environnement (cle non exposee)
+export AZURE_STORAGE_ACCOUNT=stshopeasyls01
+export AZURE_STORAGE_KEY=<cle du compte>
+
+az storage blob upload -c factures -f facture-2026-001.txt -n facture-2026-001.txt
+az storage blob upload -c clients  -f client-dupont.txt    -n client-dupont.txt
+# ... (5 fichiers de test au total)
+\end{Verbatim}
+\end{codebox}
+
+Contenu vérifié (\code{az storage blob list}) :
+\begin{ltable}{Q[l,0.5] Q[l,1] Q[c,0.4]}
+Conteneur & Blob & Taille (o) \\
+\code{factures} & \code{facture-2026-001.txt} & 69 \\
+\code{factures} & \code{facture-2026-002.txt} & 69 \\
+\code{clients} & \code{client-dupont.txt} & 72 \\
+\code{clients} & \code{client-martin.txt} & 70 \\
+\code{archives} & \code{archive-commandes-2025.txt} & 62 \\
+\end{ltable}
+
+\subsection{Politique de cycle de vie (FinOps) — bonus appliqué}
+\begin{codebox}{json}
+\begin{Verbatim}
+{ "rules": [{ "enabled": true, "name": "archives-tiering", "type": "Lifecycle",
+  "definition": {
+    "filters": { "blobTypes": ["blockBlob"], "prefixMatch": ["archives/"] },
+    "actions": { "baseBlob": {
+      "tierToCool":    { "daysAfterModificationGreaterThan": 30 },
+      "tierToArchive": { "daysAfterModificationGreaterThan": 90 },
+      "delete":        { "daysAfterModificationGreaterThan": 365 } } } } }] }
+\end{Verbatim}
+\end{codebox}
+\begin{tipbox}[Cycle de vie des archives]
+Règle \code{archives-tiering} active sur le préfixe \code{archives/} : \textbf{Hot \arr{} Cool (30 j) \arr{} Archive (90 j) \arr{} suppression (365 j)}. Réduit les coûts sans intervention manuelle.
+\end{tipbox}
+
+\screenshot{storage-account.png}{Storage Account \code{stshopeasyls01} : HTTPS-only, TLS 1.2, accès public désactivé, versioning et soft-delete activés.}
+\screenshot{storage-containers.png}{Les 3 conteneurs privés (\code{factures}, \code{clients}, \code{archives}).}
+\screenshot{storage-blobs.png}{Conteneur \code{factures} avec ses 2 fichiers téléversés.}
+
+\subsection{Questions du TP}
+
+\textbf{Comment ce service remplace-t-il le stockage local du serveur historique ?}\\
+À l'origine, les documents étaient dans un \textbf{répertoire local} de la VM unique : couplés au serveur,
+perdus si le disque tombe, non partagés et non sauvegardés. Le \textbf{Blob Storage} externalise ces fichiers
+dans un service \textbf{durable, redondé, chiffré et indépendant des VM}, accessible via API/SDK. On supprime
+ainsi le couplage et le risque de perte lié au serveur.
+
+\textbf{1. Pourquoi un stockage objet plutôt qu'un disque local de VM ?}
+\begin{itemize}
+  \item \textbf{Durabilité \& redondance} gérées par Azure, vs un disque lié à une seule VM.
+  \item \textbf{Découplage} : les fichiers survivent à la destruction/au redéploiement des VM.
+  \item \textbf{Scalabilité} quasi illimitée, \textbf{paiement à l'usage}, \textbf{accès partagé} par plusieurs instances.
+  \item \textbf{Fonctions intégrées} : versioning, soft-delete, cycle de vie, tags, journaux.
+\end{itemize}
+
+\textbf{2. Pourquoi éviter les conteneurs publics par défaut ?}\\
+Un conteneur public expose les documents à \textbf{tout Internet} sans authentification \arr{} \textbf{fuite de
+données} clients (RGPD). Ici, l'accès public est \textbf{bloqué au niveau du compte}, ce qui empêche même une
+erreur de configuration.
+
+\textbf{3. Quel intérêt a le versioning ?}\\
+Il conserve \textbf{chaque version} d'un blob ; on peut \textbf{restaurer} un document écrasé ou corrompu.
+Couplé au soft-delete, il protège contre les suppressions accidentelles ou malveillantes (ransomware).
+
+\textbf{4. Quelle politique de cycle de vie pour les archives ?}\\
+Celle appliquée ci-dessus : \textbf{Cool à 30 j}, \textbf{Archive à 90 j}, \textbf{suppression à 365 j} —
+réduction des coûts automatique tout en respectant une durée de rétention.
+
+\begin{etatbox}
+\begin{itemize}
+  \item Storage Account \code{stshopeasyls01} : HTTPS-only, TLS 1.2, accès public bloqué, chiffré, versioning + soft-delete.
+  \item 3 conteneurs privés avec 5 fichiers de test ; lifecycle \code{archives-tiering} active.
+  \item \textbf{Prêt pour l'Atelier 10 — base de données managée (Azure SQL Database).}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 10
+% #####################################################################
+\section{Atelier 10 — Base de données managée (Azure SQL Database)}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — comparer une base installée sur serveur avec une base managée Azure SQL Database.
+
+\textbf{\ePackage~Livrable attendu} — capture de la base créée et tableau comparatif complété.
+
+\textbf{\eGlobe~Région} — \code{swedencentral} \quad\textbullet\quad serveur \code{sql-shopeasy-ls01} \quad\textbullet\quad base \code{sqldb-shopeasy}.
+\end{fiche}
+
+\subsection{Architecture attendue}
+La base de données \textbf{ne doit pas être exposée librement sur Internet}. En production, on privilégie
+\textbf{règles réseau limitées}, \textbf{Private Endpoint}, \textbf{identités managées} (Entra ID) et
+politiques de sécurité adaptées. Pour ce TP, le serveur est créé avec un \textbf{pare-feu fermé} (aucune règle
+= aucun accès entrant).
+
+\subsection{Création (Azure CLI)}
+\begin{codebox}{bash}
+\begin{Verbatim}
+# Serveur logique SQL (mot de passe admin fort genere)
+az sql server create -g rg-shopeasy-dev --name sql-shopeasy-ls01 \
+  --location swedencentral --admin-user shopeasyadmin \
+  --admin-password '<MOT_DE_PASSE_FORT>'
+
+# Base managee, niveau Basic (test)
+az sql db create -g rg-shopeasy-dev --server sql-shopeasy-ls01 \
+  --name sqldb-shopeasy --service-objective Basic --backup-storage-redundancy Local
+\end{Verbatim}
+\end{codebox}
+\begin{notebox}[Identifiants]
+À conserver hors dépôt Git : admin \code{shopeasyadmin}, mot de passe \textbf{fort généré} (non publié).
+Serveur : \code{sql-shopeasy-ls01.database.windows.net}.
+\end{notebox}
+
+{\small Sorties CLI : serveur \code{Ready} ; base \code{sqldb-shopeasy} — \code{Tier: Basic}, \code{DTU: 5}, \code{MaxSize: 2 Go}, \code{Etat: Online}.}
+
+\subsection{Sécurité — base non exposée}
+\begin{codebox}{console}
+\begin{Verbatim}
+=== Regles de pare-feu du serveur SQL ===
+  Nombre de regles : 0   (0 regle = aucune IP autorisee = base NON exposee a Internet)
+=== Acces reseau public + TLS ===
+  { "AccesPublic": "Enabled", "TLS_min": "1.2" }
+\end{Verbatim}
+\end{codebox}
+\begin{itemize}
+  \item \textbf{Aucune règle de pare-feu} \arr{} le point de terminaison public existe mais \textbf{rejette toutes les IP}.
+  \item Pour se connecter en test, on ajouterait \textbf{temporairement} une règle limitée à l'IP admin, documentée et supprimée après validation.
+  \item \textbf{Cible production} : \code{publicNetworkAccess=Disabled} + \textbf{Private Endpoint} dans \code{snet-data}.
+\end{itemize}
+
+\screenshot{sql-database.png}{Base \code{sqldb-shopeasy} : serveur \code{sql-shopeasy-ls01}, tier Basic, statut Online.}
+
+\subsection{Tableau comparatif — SQL sur VM vs Azure SQL Database}
+\begin{ltable}{Q[l,0.6] X[l,1] X[l,1]}
+Critère & Base sur VM (IaaS) & Azure SQL Database (PaaS) \\
+\textbf{Administration OS} & À la charge du client (OS + moteur SQL) & \textbf{Aucune} — Azure gère OS et moteur \\
+\textbf{Sauvegardes} & À concevoir et opérer & \textbf{Automatiques} (point-in-time restore) \\
+\textbf{Mises à jour} & À planifier et appliquer & \textbf{Automatiques} et transparentes \\
+\textbf{Haute disponibilité} & À construire (cluster, réplication) & \textbf{Intégrée} (SLA jusqu'à 99,99 \%) \\
+\textbf{Sécurité} & Durcissement à la charge du client & \textbf{TDE} par défaut, pare-feu, Entra ID, audit \\
+\textbf{Coût} & VM + licence + disque + exploitation & Paiement du \textbf{service} (DTU/vCore) \\
+\textbf{Flexibilité} & Contrôle total (version, OS) & Périmètre base, mais \textbf{scaling rapide} \\
+\end{ltable}
+
+\textbf{Synthèse.} Pour ShopEasy, \textbf{Azure SQL Database} supprime l'essentiel de l'administration (OS,
+sauvegardes, HA, patchs) identifiée comme un risque à l'Atelier 1, au prix d'un contrôle moindre sur la
+plateforme — un compromis pertinent pour une PME sans équipe DBA dédiée.
+
+\begin{etatbox}
+\begin{itemize}
+  \item Serveur \code{sql-shopeasy-ls01} + base \code{sqldb-shopeasy} (Basic) \textbf{Online}, \textbf{pare-feu fermé}.
+  \item Tableau comparatif VM vs PaaS complété.
+  \item \textbf{Prêt pour l'Atelier 11 — supervision (Azure Monitor).}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 11
+% #####################################################################
+\section{Atelier 11 — Supervision avec Azure Monitor}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — mettre en place une première lecture opérationnelle de l'infrastructure.
+
+\textbf{\ePackage~Livrable attendu} — capture des métriques, de l'alerte et tableau d'indicateurs.
+\end{fiche}
+
+\subsection{Métriques d'une VM (CPU)}
+\begin{codebox}{bash}
+\begin{Verbatim}
+VMID=$(az vm show -g rg-shopeasy-dev -n vm-web-01 --query id -o tsv)
+az monitor metrics list --resource "$VMID" \
+  --metric "Percentage CPU" --interval PT5M --aggregation Average Maximum
+\end{Verbatim}
+\end{codebox}
+Sortie réelle (\code{vm-web-01}, \% CPU — VM au repos servant une page statique) :
+\begin{ltable}{Q[l] Q[c] Q[c]}
+Heure (UTC) & CPU moyen & CPU max \\
+11:47 & 0,244 & 0,92 \\
+11:52 & 0,168 & 0,22 \\
+11:57 & 0,172 & 0,23 \\
+12:02 & 0,168 & 0,22 \\
+12:07 & 0,168 & 0,23 \\
+12:12 & 0,169 & 0,22 \\
+\end{ltable}
+
+\subsection{Création d'une alerte CPU}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az monitor metrics alert create --name alert-cpu-vm-web-01 \
+  --resource-group rg-shopeasy-dev --scopes "$VMID" \
+  --condition "avg Percentage CPU > 80" \
+  --window-size 5m --evaluation-frequency 1m --severity 2 \
+  --description "CPU moyen de vm-web-01 superieur a 80% pendant 5 minutes"
+\end{Verbatim}
+\end{codebox}
+{\small L'alerte \code{alert-cpu-vm-web-01} (severity 2, fenêtre 5 min, évaluation 1 min) est \textbf{active}. Le provider \code{microsoft.insights} s'est auto-enregistré à cette occasion.}
+
+\subsection{Logs d'activité du Resource Group}
+Synthèse des opérations réalisées pendant le TP (50 événements administratifs) :
+\begin{ltable}{X[l,1] Q[c,0.3] Q[c,0.2]}
+Opération (action) & Statut & Nb \\
+\code{Microsoft.Storage/.../listKeys} & Succeeded & 5 \\
+\code{Microsoft.Sql/servers/databases/write} & Succeeded & 3 \\
+\code{Microsoft.Network/loadBalancers/write} & Succeeded & 3 \\
+\code{Microsoft.Sql/servers/write} & Succeeded & 1 \\
+\code{Microsoft.Network/networkSecurityGroups/write} & Succeeded & 2 \\
+\code{Microsoft.Network/networkInterfaces/write} & Succeeded & 2 \\
+\code{Microsoft.Storage/.../managementPolicies/write} & Succeeded & 1 \\
+\end{ltable}
+{\small Le journal d'activité \textbf{retrace l'historique} de tout ce qui a été fait, par qui et avec quel résultat (traçabilité / audit).}
+
+\screenshot{monitor-vm-metrics.png}{Métriques de \code{vm-web-01} : graphique \code{Percentage CPU} (avec le pic d'installation).}
+\screenshot{monitor-alert.png}{Règle d'alerte \code{alert-cpu-vm-web-01} : condition \code{Percentage CPU > 80}, severity 2.}
+
+\subsection{Tableau d'indicateurs}
+\begin{ltable}{Q[l,0.55] Q[l,0.55] X[l,1.1]}
+Indicateur & Seuil proposé & Pourquoi le surveiller ? \\
+\textbf{CPU VM} & $> 80\,\%$ pendant 5 min & Détecter une \textbf{saturation} \arr{} dégradation des temps de réponse \\
+\textbf{Disponibilité HTTP} & échec sonde LB & Détecter une \textbf{VM/backend HS} \arr{} indisponibilité du service \\
+\textbf{Espace disque} & $> 85\,\%$ utilisé & Éviter le \textbf{disque plein} (OS/app qui plante) \\
+\textbf{Échecs de connexion} & $>$ seuil / minute & Détecter erreurs ou \textbf{tentatives d'intrusion} (brute force) \\
+\textbf{Coût journalier} & $>$ budget / 30 & Alerter sur un \textbf{dépassement budgétaire} (FinOps) \\
+\end{ltable}
+
+\textbf{Trois indicateurs supplémentaires utiles en production :}
+\begin{enumerate}
+  \item \textbf{Latence applicative (P95)} \arr{} reflète l'expérience utilisateur réelle.
+  \item \textbf{Santé des backends du Load Balancer} (Dip availability) \arr{} détecter une bascule.
+  \item \textbf{DTU / connexions / deadlocks Azure SQL} \arr{} santé de la couche données.
+\end{enumerate}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Métriques CPU consultées, alerte \code{alert-cpu-vm-web-01} active, logs d'activité analysés.
+  \item Tableau d'indicateurs + 3 indicateurs production proposés.
+  \item \textbf{Prêt pour l'Atelier 12 — estimation et optimisation des coûts (FinOps).}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 12
+% #####################################################################
+\section{Atelier 12 — Estimation et optimisation des coûts (FinOps)}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — produire une première estimation budgétaire et identifier des optimisations FinOps simples.
+
+\textbf{\ePackage~Livrable attendu} — une estimation de coût et trois recommandations FinOps.
+\end{fiche}
+
+\subsection{Méthode et source des prix}
+Le \textbf{coût réel} (Cost Management) n'apparaît qu'après \textbf{24-48 h} sur un abonnement récent. Les prix
+ci-dessous sont \textbf{vérifiés en direct} via l'\textbf{API officielle Azure Retail Prices}
+(\code{prices.azure.com}, juin 2026), en pay-as-you-go USD, hypothèse \textbf{24/7} (730 h/mois).
+
+\begin{ltable}{X[l,1.2] Q[l,0.9]}
+Ressource déployée (vérifiée en CLI) & Prix unitaire officiel \\
+2 × VM \code{Standard\_B2ats\_v2} (Linux) & \textbf{0,00972 \$/h} \\
+2 × disque OS Standard HDD S4 (32 Go) LRS & \textbf{1,536 \$/mois} \\
+1 × Load Balancer Standard (5 règles incluses) & \textbf{0,025 \$/h} (+ 0,005 \$/Go) \\
+3 × IP publique Standard static & \textbf{0,005 \$/h} \\
+1 × Azure SQL Database Basic (5 DTU) & \textbf{0,161 \$/jour} \\
+1 × règle d'alerte Azure Monitor & $\approx$ 0,10 \$/mois \\
+Storage Account StorageV2 LRS (faible volume) & négligeable \\
+\end{ltable}
+
+\subsection{Tableau de coûts (prix réels, 24/7)}
+\begin{ltable}{Q[l,0.7] Q[l,0.7] Q[c,0.4] X[l,1.2]}
+Ressource & Calcul & \$/mois & Optimisation possible \\
+\textbf{VM web 1} & 0,00972 × 730 & \textbf{7,10} & Désallouer hors usage (\code{az vm deallocate}) \\
+\textbf{VM web 2} & 0,00972 × 730 & \textbf{7,10} & Idem ; autoscale en production \\
+\textbf{Disques} & 2 × 1,536 & \textbf{3,07} & Taille adaptée ; suppression au nettoyage \\
+\textbf{Load Balancer} & 0,025 × 730 & \textbf{18,25} & App Gateway seulement si L7/WAF ; arrêt hors usage \\
+\textbf{IP publiques (3)} & 3 × 0,005 × 730 & \textbf{10,95} & Retirer les IP des VM (Bastion) \arr{} 1 seule \\
+\textbf{Azure SQL Database} & 0,161 × 30,4 & \textbf{4,90} & Serverless auto-pause / niveau adapté \\
+\textbf{Storage Account} & faible volume & \textbf{<\,0,10} & Lifecycle (déjà appliquée), LRS (pas GRS) \\
+\textbf{Monitoring} & 1 alerte & \textbf{0,10} & Métriques de plateforme gratuites \\
+\textbf{Total} & & \textbf{$\approx$\,51,5} & ($\approx 0$ si tout désalloué/supprimé hors TP) \\
+\end{ltable}
+
+\begin{notebox}[Postes les plus coûteux]
+Le \textbf{Load Balancer (18,25 \$)}, les \textbf{IP publiques (10,95 \$)} et le \textbf{compute des 2 VM
+(14,20 \$)} — le LB et les IP facturent \textbf{même à trafic nul}. Désallouer les VM annule leur coût compute
+($\approx$ 14 \$/mois économisés). \textit{Prix vérifiés via l'API Azure Retail Prices (juin 2026).}
+\end{notebox}
+
+\subsection{Trois recommandations FinOps}
+\begin{enumerate}
+  \item \textbf{Arrêter le compute hors usage.} \code{az vm deallocate} stoppe la facturation compute ; en fin de TP, \code{az group delete} supprime d'un coup les postes qui coûtent à vide (LB, IP, base).
+  \item \textbf{Réduire les ressources facturées en permanence.} Supprimer les IP publiques des VM (3 \arr{} 1), garder LRS (pas de géo-redondance en dev), conserver la lifecycle policy.
+  \item \textbf{Dimensionner et piloter.} Niveaux adaptés (SQL Basic ou Serverless auto-pause), gouvernance via \textbf{tags + budgets/alertes} Cost Management.
+\end{enumerate}
+
+\subsection{Questions FinOps du TP}
+
+\textbf{1. Quelles ressources coûtent même inutilisées ?}\\
+Les \textbf{IP publiques statiques}, le \textbf{Load Balancer}, les \textbf{disques managés}, la \textbf{base
+SQL provisionnée} et le \textbf{Storage} facturent en continu. Le compute des VM ne coûte que si la VM est
+allumée (une VM \textbf{désallouée} ne facture plus de compute, mais son disque OS reste facturé).
+
+\textbf{2. Que peut-on arrêter hors période de formation ?}\\
+\textbf{Désallouer les VM} (gain principal) ; éventuellement supprimer le Load Balancer et les IP publiques
+(recréables par script). SQL Basic et Storage sont peu coûteux : à laisser ou supprimer via le RG.
+
+\textbf{3. Pourquoi les tags pour analyser les coûts ?}\\
+Ils permettent d'\textbf{attribuer} la dépense (application, environnement, équipe), de \textbf{filtrer} dans
+Cost Management et de définir des \textbf{budgets ciblés}.
+
+\textbf{4. Réduire vs optimiser les coûts ?}\\
+\textbf{Réduire} = baisser la dépense, parfois au détriment du service. \textbf{Optimiser} = meilleur rapport
+\textbf{valeur/coût} (bon dimensionnement, suppression du gaspillage) \textbf{sans dégrader la valeur métier}.
+La cible FinOps est l'\textbf{optimisation}.
+
+\screenshot{cost-analysis.png}{Cost Management \arr{} Cost analysis sur \code{rg-shopeasy-dev} : peu de données (la facturation ne remonte qu'après 24-48 h).}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Estimation $\approx$ \textbf{51,5 \$/mois} (24/7) ; postes principaux identifiés (LB, IP, compute).
+  \item 3 recommandations FinOps + réponses aux 4 questions.
+  \item \textbf{Prêt pour l'Atelier 13 — analyse de disponibilité.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 13
+% #####################################################################
+\section{Atelier 13 — Analyse de disponibilité}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — évaluer la robustesse de l'architecture face à des incidents simples.
+
+\textbf{\ePackage~Livrable attendu} — tableau d'analyse d'incidents et proposition d'évolution de l'architecture.
+\end{fiche}
+
+\subsection{Scénarios d'incident}
+\begin{ltable}{Q[l,0.7] X[l,1.2] Q[l,0.6] X[l,1.3]}
+Scénario & Impact & Utilisateurs & Solution technique \\
+\textbf{Une VM web tombe en panne} & La sonde du LB la retire ; le service continue sur l'autre VM (capacité ÷ 2). \textbf{Pas d'interruption}. & Aucun en temps normal & \textbf{Déjà couvert} (2 VM + LB + sonde). 3\textsuperscript{e} instance / autoscale pour la capacité, multi-zone pour la résilience \\
+\textbf{Le répartiteur est mal configuré} & Sonde/règle/backend erronés \arr{} trafic mal routé ou \textbf{rejeté}, même si les VM sont saines & Tous & Vérifier sonde/règle/backend ; \textbf{IaC} reproductible ; alertes sur la santé du LB ; tester après chaque changement \\
+\textbf{La base devient indisponible} & L'app ne peut plus lire/écrire (commandes, factures) \arr{} \textbf{erreurs fonctionnelles} malgré un web up & Tous (données) & SLA \textbf{HA}, \textbf{PITR}, \textbf{failover group} / géo-réplication, monitoring SQL + alertes \\
+\textbf{Le Storage est mal configuré} & Documents \textbf{inaccessibles} ou \textbf{exposés} (si public) \arr{} perte d'accès ou fuite & Tous (documents) & Accès privé (déjà), versioning + soft-delete (déjà), \textbf{Private Endpoint} + RBAC, alertes \\
+\textbf{Une zone est indisponible} & Les 2 VM étant \textbf{sans zone}, risque de \textbf{perte simultanée} & Tous & \textbf{Déploiement multi-zone} des VM + LB zone-redundant ; base et stockage redondés zone/région \\
+\end{ltable}
+
+\subsection{Synthèse — l'architecture suffit-elle pour une application critique ?}
+\textbf{Non, pas en l'état.} Points forts déjà acquis :
+\begin{itemize}
+  \item redondance applicative (2 VM + Load Balancer avec sonde) \arr{} plus de SPOF applicatif ;
+  \item \textbf{services managés} pour la base et les documents \arr{} administration et durabilité déléguées ;
+  \item segmentation réseau + NSG, supervision de base (métriques + alerte).
+\end{itemize}
+Limites pour du \textbf{critique} : pas de \textbf{multi-zone} ; base SQL \textbf{Basic} sans HA avancée ;
+stockage \textbf{LRS} ; \textbf{aucun test de reprise} formalisé ; IP publiques sur les VM.
+
+\textbf{Évolutions nécessaires (par priorité) :}
+\begin{enumerate}
+  \item \textbf{Résilience multi-zone} : VM réparties sur $\geq 2$ zones + Load Balancer zone-redundant.
+  \item \textbf{Données hautement disponibles} : SQL avec HA (Standard/Premium ou GP) + \textbf{failover group} géo + PITR testé ; stockage \textbf{ZRS/GRS} + Private Endpoint.
+  \item \textbf{Sauvegarde \& reprise} : politique formalisée + \textbf{tests de restauration} réguliers (DR drills), \textbf{RPO/RTO} définis.
+  \item \textbf{Supervision avancée} : alertes santé LB, DTU SQL, disponibilité HTTP ; Application Insights.
+  \item \textbf{Sécurité \& exploitation} : Application Gateway + WAF, Azure Bastion, \textbf{Infrastructure as Code} + pipeline CI/CD.
+\end{enumerate}
+
+\begin{etatbox}
+\begin{itemize}
+  \item 5 scénarios d'incident analysés (impact, utilisateurs, solution).
+  \item Verdict + feuille de route d'évolution vers une cible critique.
+  \item \textbf{Prêt pour l'Atelier 14 — analyse de sécurité.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 14
+% #####################################################################
+\section{Atelier 14 — Analyse de sécurité}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — identifier les risques de sécurité et proposer des mesures correctives adaptées à Azure.
+
+\textbf{\ePackage~Livrable attendu} — matrice de risques et plan d'actions sécurité classé par priorité.
+\end{fiche}
+
+\subsection{Matrice de risques}
+\begin{tblr}{
+  width=\linewidth, colspec={Q[l,0.6] X[l,0.9] Q[c,0.4] X[l,1.2] Q[c,0.2]},
+  row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\scriptsize},
+  row{2-Z}={font=\scriptsize}, row{even}={bg=rowalt},
+  hline{1,Z}={1.1pt,azuredark}, hline{2}={0.5pt,azuredark!45},
+  colsep=4pt, rowsep=3.4pt, stretch=1.15,
+}
+Risque & Impact & Prob. & Mesure corrective & État \\
+\textbf{SSH ouvert à Internet} & Intrusion, force brute, compromission de VM & Élevée & NSG SSH limité à l'IP admin ; cible : Bastion, pas d'IP publique, MFA & \eCheck \\
+\textbf{Compte admin partagé} & Perte de traçabilité, audit impossible & Moyenne & Comptes nominatifs Entra ID + RBAC moindre privilège + MFA & \eWarn \\
+\textbf{Stockage public} & Fuite de documents clients (RGPD) & Faible & \code{allow-blob-public-access=false} + Private Endpoint + RBAC & \eCheck \\
+\textbf{Base exposée} & Vol / altération des données métier & Faible & 0 règle de pare-feu ; Private Endpoint + auth Entra ID + auditing & \eCheck \\
+\textbf{Absence de logs/alertes} & Incidents non détectés & Moyenne & Azure Monitor (métriques + alerte) + logs + Defender & \eCheck \\
+\textbf{Droits excessifs (Owner)} & Erreur ou compromission à fort impact & Moyenne & RBAC ciblés (Reader/Contributor), revue, PIM & \eWarn \\
+\textbf{Chiffrement / TLS faible} & Interception, données en clair & Faible & HTTPS-only + TLS 1.2, chiffrement au repos (TDE/SSE) & \eCheck \\
+\end{tblr}
+{\small \eCheck~déjà en place dans le TP \qquad \eWarn~à mettre en place (gouvernance).}
+
+\subsection{Plan d'actions sécurité (par priorité)}
+
+\textbf{\eRed~Priorité 1 — Gouvernance des accès (immédiat, faible coût)}
+\begin{itemize}
+  \item \textbf{Comptes nominatifs} Entra ID (fin du compte partagé) + \textbf{MFA} généralisé.
+  \item \textbf{RBAC au moindre privilège} : limiter \code{Owner}, attribuer \code{Reader}/\code{Contributor} ; revue périodique.
+  \item Vérifier les NSG : SSH restreint, SQL 1433 depuis le subnet web uniquement.
+\end{itemize}
+
+\textbf{\eOrange~Priorité 2 — Réduction de la surface d'exposition (court terme)}
+\begin{itemize}
+  \item \textbf{Azure Bastion} + suppression des IP publiques des VM.
+  \item \textbf{Private Endpoint} pour Azure SQL et Storage.
+  \item \textbf{HTTPS obligatoire} + \textbf{Application Gateway / WAF} en frontal.
+\end{itemize}
+
+\textbf{\eYellow~Priorité 3 — Détection, résilience et hygiène (moyen terme)}
+\begin{itemize}
+  \item \textbf{Microsoft Defender for Cloud} + \textbf{NSG Flow Logs} + auditing Azure SQL.
+  \item \textbf{Sauvegardes formalisées} + tests de restauration (RPO/RTO).
+  \item \textbf{Suppression des ressources inutiles} et \textbf{Infrastructure as Code}.
+\end{itemize}
+
+\subsection{Synthèse}
+Le modèle est celui de la \textbf{responsabilité partagée} : Azure sécurise l'infrastructure, \textbf{ShopEasy
+reste responsable} de la configuration, des identités, des accès et des données. Les bases sont posées (NSG
+restrictifs, base et stockage non exposés, TLS/chiffrement, supervision) ; les chantiers prioritaires restants
+sont la \textbf{gouvernance des identités} (comptes nominatifs, MFA, moindre privilège) et la \textbf{réduction
+de l'exposition} (Bastion, Private Endpoint, WAF).
+
+\begin{etatbox}
+\begin{itemize}
+  \item Matrice de risques (impact, probabilité, mesure, état réel) et plan d'actions priorisé P1/P2/P3.
+  \item \textbf{Prêt pour l'Atelier 15 — note de recommandations DSI.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 15 — NOTE DSI
+% #####################################################################
+\section{Atelier 15 — Note de recommandations DSI}
+
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=4pt, colback=azurepale, colframe=azuredark,
+   left=4.5mm,right=4.5mm,top=3.6mm,bottom=3.6mm, before skip=10pt, after skip=12pt]
+\textbf{Destinataire} — Direction des Systèmes d'Information (DSI)\\[2pt]
+\textbf{Objet} — proposition d'architecture cloud cible pour l'application de gestion de commandes ShopEasy\\[2pt]
+\textbf{Auteurs (binôme)} — Louis \textsc{Scarfone} \& Maxence \textsc{Bourragué}
+\end{tcolorbox}
+
+\subsection{Contexte et enjeux}
+ShopEasy exploite une application interne de gestion de commandes hébergée sur \textbf{un serveur physique
+unique} (Apache/Nginx + PHP/Node.js + MySQL colocalisés, documents en local, sauvegardes manuelles, aucune
+supervision, compte administrateur partagé). Cette situation présente des \textbf{risques majeurs} : point de
+défaillance unique, sécurité faible, exploitation artisanale, coûts non maîtrisés. La direction souhaite une
+première proposition Azure améliorant la \textbf{disponibilité}, \textbf{séparant les couches}, \textbf{réduisant
+les risques d'administration} et offrant une \textbf{visibilité financière}.
+
+\subsection{Architecture cible proposée}
+\screenshot{architecture.png}{Architecture cible : Internet \arr{} Load Balancer \arr{} 2 VM web (\code{snet-web}) ; VM \arr{} SQL Database et Storage en accès privé (\code{snet-data}) ; gouvernance Entra ID/RBAC, Azure Monitor, Cost Management.}
+L'architecture \textbf{sépare les couches} (réseau, applicatif, données, stockage), supprime le \textbf{point de
+défaillance unique applicatif} (2 VM + répartiteur de charge) et \textbf{n'expose à Internet que le Load
+Balancer}. La base et les documents sont en \textbf{accès privé}.
+
+\subsection{Services Azure retenus et leur rôle}
+\begin{ltable}{Q[l,0.7] X[l,1.2] Q[c,0.4]}
+Service & Rôle & Modèle \\
+Resource Group & Cycle de vie commun, droits, coûts & Gouvernance \\
+Virtual Network + subnets & Réseau privé isolé, segmentation web/data/admin & IaaS \\
+Network Security Groups & Filtrage des flux (80/443, 22, 1433) & IaaS \\
+2 × Virtual Machines (\code{B2ats\_v2}) & Couche applicative redondante (Nginx) & IaaS \\
+Azure Load Balancer & Répartition de charge + sonde de santé & IaaS \\
+Azure SQL Database (Basic) & Base relationnelle managée, non exposée & PaaS \\
+Storage Account (Blob) & Documents clients durables, privés, versionnés & PaaS \\
+Microsoft Entra ID + RBAC & Identités et droits (moindre privilège) & Gouvernance \\
+Azure Monitor & Métriques, logs, alertes & Gouvernance \\
+Cost Management + tags & Suivi et pilotage des coûts & Gouvernance \\
+\end{ltable}
+
+\subsection{Gains attendus}
+\begin{itemize}
+  \item \textbf{Disponibilité} : redondance applicative + LB \arr{} plus de panne bloquante sur une VM.
+  \item \textbf{Sécurité} : couches cloisonnées, base et stockage non exposés, SSH restreint, chiffrement/TLS.
+  \item \textbf{Exploitation} : services managés (base, stockage), supervision centralisée et alertes.
+  \item \textbf{Données} : durabilité, versioning, soft-delete, sauvegardes intégrées de la base.
+  \item \textbf{Coûts} : passage en \textbf{OPEX}, visibilité par tags, leviers d'optimisation.
+\end{itemize}
+
+\subsection{Sécurité — mesures et risques résiduels}
+\textbf{En place :} NSG restrictifs (SSH limité, SQL interne au subnet web), base \textbf{sans accès public}
+(0 règle de pare-feu), \textbf{stockage public bloqué}, \textbf{TLS 1.2} + chiffrement au repos, supervision et
+alerte. \textbf{Risques résiduels :} compte d'administration à rendre nominatif (+ MFA, RBAC) ; IP publiques
+des VM à supprimer (\arr{} Bastion) ; passage en \textbf{Private Endpoint} pour SQL et Storage ; HTTPS/WAF via
+Application Gateway.
+
+\subsection{Disponibilité — niveau obtenu et améliorations}
+\textbf{Obtenu :} tolérance à la panne d'\textbf{une} VM, base et stockage managés et redondés localement.
+\textbf{Limites \& améliorations :} déploiement \textbf{mono-zone} (contrainte Azure for Students) \arr{} cible
+\textbf{multi-zone} ; base \textbf{Basic} \arr{} niveau supérieur + failover ; stockage \textbf{LRS} \arr{}
+ZRS/GRS ; \textbf{tests de restauration} et objectifs RPO/RTO à formaliser.
+
+\subsection{Coûts (FinOps)}
+Estimation \textbf{vérifiée via l'API Azure Retail Prices} (juin 2026, pay-as-you-go, 24/7) :
+\begin{ltable}{X[l,1] Q[c,0.4]}
+Poste & Coût (\$/mois) \\
+2 × VM \code{B2ats\_v2} & 14,20 \\
+Load Balancer Standard & 18,25 \\
+3 × IP publique Standard & 10,95 \\
+Base SQL Basic & 4,90 \\
+2 × disque HDD S4 & 3,07 \\
+Storage + Monitoring & $\approx$ 0,12 \\
+\textbf{Total} & \textbf{$\approx$ 51,5} \\
+\end{ltable}
+\textbf{Recommandations FinOps :} désallouer les VM hors usage ; supprimer les ressources qui facturent à vide
+(LB, IP) hors période d'activité ; réduire les IP publiques (3 \arr{} 1) ; dimensionner les niveaux ; piloter
+via tags + budgets/alertes.
+
+\subsection{Plan d'action priorisé}
+\begin{ltable}{Q[l,0.4] X[l,1.4]}
+Échéance & Actions \\
+\textbf{Court terme} & Comptes nominatifs + MFA, RBAC moindre privilège ; budgets/alertes de coût ; HTTPS ; désallocation/nettoyage des ressources de test. \\
+\textbf{Moyen terme} & Azure Bastion + suppression des IP publiques ; Private Endpoint SQL/Storage ; Application Gateway + WAF ; multi-zone ; SQL HA + failover ; sauvegardes testées ; supervision avancée. \\
+\textbf{Long terme} & Infrastructure as Code (Terraform/Bicep) + pipeline CI/CD ; éventuelle bascule vers App Service (PaaS). \\
+\end{ltable}
+
+\subsection{Limites de la proposition}
+Architecture \textbf{volontairement progressive et pédagogique} : mono-zone, niveaux minimaux (Basic/LRS), VM
+avec IP publiques pour faciliter le TP, accès aux données par pare-feu plutôt que Private Endpoint. Elle
+\textbf{démontre les briques fondamentales} mais \textbf{n'est pas une cible de production critique} : les
+évolutions du plan d'action sont nécessaires avant une mise en production.
+
+\begin{notebox}[Contraintes d'environnement (Azure for Students)]
+Régions restreintes par policy (déploiement en \textbf{Sweden Central}), tailles de VM limitées
+(\textbf{\code{Standard\_B2ats\_v2}} au lieu de \code{B1s}), déploiement zonal indisponible, providers à
+enregistrer manuellement — éléments à anticiper pour une souscription d'entreprise.
+\end{notebox}
+
+\subsection*{Conclusion}
+La migration proposée transforme un serveur unique fragile en une architecture \textbf{segmentée, redondée,
+supervisée et au coût maîtrisé}, en s'appuyant sur des services Azure adaptés à chaque besoin. Elle répond aux
+objectifs de la DSI tout en traçant une \textbf{feuille de route claire} vers une cible de production sécurisée
+et hautement disponible.
+
+
+% #####################################################################
+%  QUIZ
+% #####################################################################
+\section{Quiz de validation}
+
+\begin{enumerate}[leftmargin=2.2em]
+\item \textbf{Quel service Azure permet de créer un réseau privé logique ?}\\ Azure Virtual Network (VNet).
+\item \textbf{Quel service Azure permet de créer une machine virtuelle ?}\\ Azure Virtual Machines.
+\item \textbf{Différence entre une région et une zone de disponibilité ?}\\ Une \textbf{région} est une zone géographique ; une \textbf{zone de disponibilité} est un ensemble de datacenters physiquement séparés au sein d'une région.
+\item \textbf{À quoi sert un Resource Group ?}\\ À regrouper des ressources partageant un cycle de vie, pour les administrer, taguer, suivre en coût et supprimer ensemble.
+\item \textbf{Pourquoi utiliser plusieurs subnets ?}\\ Pour séparer les rôles (web/data/admin) et appliquer des règles de sécurité différentes par couche.
+\item \textbf{À quoi sert un Network Security Group ?}\\ À filtrer le trafic réseau entrant et sortant (port, protocole, source/destination).
+\item \textbf{Pourquoi ne pas ouvrir SSH à tout Internet ?}\\ Pour réduire la surface d'attaque (scans et force brute) ; on le limite à l'IP admin ou via Azure Bastion.
+\item \textbf{Quel service remplace le stockage local de documents ?}\\ Azure Storage Account (Blob Storage).
+\item \textbf{Quel service remplace une base SQL installée sur un serveur ?}\\ Azure SQL Database (base managée / PaaS).
+\item \textbf{Pourquoi utiliser un répartiteur de charge ?}\\ Pour distribuer le trafic et réduire l'impact de la panne d'un serveur (suppression du SPOF applicatif).
+\item \textbf{Différence entre Azure Load Balancer et Application Gateway ?}\\ Load Balancer = couche 4 (TCP/UDP) ; Application Gateway = couche 7 (HTTP/HTTPS) avec WAF, terminaison TLS, routage par chemin.
+\item \textbf{Que signifie PaaS ?}\\ Platform as a Service (plateforme managée : Azure gère l'OS/runtime, le client gère le code et les données).
+\item \textbf{Azure SQL Database est-il IaaS ou PaaS ?}\\ PaaS.
+\item \textbf{Pourquoi utiliser Azure Monitor ?}\\ Pour collecter métriques et logs, déclencher des alertes et obtenir une visibilité opérationnelle.
+\item \textbf{Que surveiller sur une VM web ?}\\ CPU, mémoire, disque, disponibilité HTTP, erreurs, activité réseau.
+\item \textbf{Que permet Azure Cost Management ?}\\ Suivre, analyser et optimiser les coûts (budgets, alertes, répartition par tags).
+\item \textbf{Pourquoi taguer les ressources ?}\\ Pour identifier propriétaire/projet/environnement/centre de coût et filtrer, attribuer et analyser les coûts.
+\item \textbf{Quel risque pose un compte administrateur partagé ?}\\ Perte de traçabilité et droits trop larges (audit et conformité compromis).
+\item \textbf{Pourquoi éviter un Storage Account public par défaut ?}\\ Risque d'exposition de données sensibles (fuite RGPD).
+\item \textbf{Quelle mesure réduit l'impact d'une panne de VM ?}\\ Plusieurs VM derrière un répartiteur de charge (avec sonde de santé).
+\item \textbf{Pourquoi séparer la couche web et la couche données ?}\\ Pour réduire les mouvements latéraux en cas de compromission et appliquer la segmentation.
+\item \textbf{Quelle information doit apparaître dans une note DSI ?}\\ Architecture, coûts, risques, gains et plan d'action.
+\item \textbf{Citez deux optimisations de coût.}\\ Arrêt/désallocation des VM inutilisées et choix de tailles adaptées (+ tags, budgets, réservations).
+\item \textbf{Citez deux mesures de sécurité prioritaires.}\\ RBAC + moindre privilège (avec MFA) et NSG restrictifs (+ chiffrement, suppression des accès publics).
+\item \textbf{Quelle évolution permettrait d'automatiser le déploiement ?}\\ L'Infrastructure as Code (Terraform ou Bicep), idéalement avec un pipeline CI/CD.
+\end{enumerate}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=4pt, colback=okgreenbg, colframe=okgreen,
+   left=4.5mm,right=4.5mm,top=3.6mm,bottom=3.6mm]
+{\sffamily\bfseries\color{okgreen}\eParty~Fin du dossier} — les 15 ateliers et le quiz de validation sont
+complets : analyse de l'existant, choix des services, architecture cible, déploiement Azure CLI (réseau,
+VM, load balancer, stockage, base SQL, supervision), FinOps, disponibilité, sécurité et note DSI.
+\end{tcolorbox}
+
+\end{document}

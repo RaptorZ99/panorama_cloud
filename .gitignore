@@ -19,3 +19,11 @@ id_rsa.pub
 # Divers
 *.log
 *.tmp
+
+# Artefacts de build LaTeX
+*.aux
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
