@@ -1,0 +1,2120 @@
+% =====================================================================
+%  TP2 — Infrastructure as Code avec Terraform sur Azure (ShopEasy)
+%  Binôme : Louis SCARFONE & Maxence BOURRAGUE — Bloc 4 (Cloud Computing)
+%  Moteur : LuaLaTeX (LuaHBTeX)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Langue & fontes ----------
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{french}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}[Scale=0.80]
+\usepackage{microtype}
+\emergencystretch=3em  % absorbe les débordements de texte (code inline en fin de ligne)
+
+% ---------- Respiration (look épuré) ----------
+\usepackage{setspace}
+\setstretch{1.08}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em plus 0.12em minus 0.05em}
+
+% ---------- Géométrie ----------
+\usepackage[a4paper,margin=2.2cm,headheight=16pt,headsep=14pt,footskip=20pt]{geometry}
+
+% ---------- Couleurs (palette Azure) ----------
+\usepackage{xcolor}
+\definecolor{azure}{HTML}{0078D4}
+\definecolor{azuredark}{HTML}{14375E}
+\definecolor{azuremid}{HTML}{2E75B6}
+\definecolor{azurelight}{HTML}{E8F1FB}
+\definecolor{azurepale}{HTML}{F3F8FD}
+\definecolor{okgreen}{HTML}{107C10}
+\definecolor{okgreenbg}{HTML}{E8F5E9}
+\definecolor{warnorange}{HTML}{B5520A}
+\definecolor{warnbg}{HTML}{FBEEDF}
+\definecolor{dangerred}{HTML}{A4262C}
+\definecolor{codebg}{HTML}{F6F8FA}
+\definecolor{codeframe}{HTML}{D8E1EC}
+\definecolor{ink}{HTML}{1B2733}
+\definecolor{rowalt}{HTML}{EBF3FC}
+\color{ink}
+
+% ---------- Divers ----------
+\usepackage{graphicx}
+\graphicspath{{../livrables/assets/}}
+\usepackage{fontawesome5}
+\usepackage{enumitem}
+\setlist{leftmargin=1.4em,topsep=2pt,itemsep=2pt,parsep=0pt}
+\usepackage{needspace}
+\usepackage{fvextra}
+
+% ---------- Emojis (Twemoji couleur) ----------
+\usepackage{twemojis}
+\newcommand{\emo}[1]{\raisebox{-0.14em}{\twemoji{#1}}}
+\newcommand{\eTarget}{\emo{1f3af}}
+\newcommand{\ePackage}{\emo{1f4e6}}
+\newcommand{\eCheck}{\emo{2705}}
+\newcommand{\eWarn}{\emo{26a0}}
+\newcommand{\eBulb}{\emo{1f4a1}}
+\newcommand{\eLock}{\emo{1f512}}
+\newcommand{\eKey}{\emo{1f510}}
+\newcommand{\eRocket}{\emo{1f680}}
+\newcommand{\eChart}{\emo{1f4ca}}
+\newcommand{\eMoney}{\emo{1f4b0}}
+\newcommand{\eGear}{\emo{2699}}
+\newcommand{\eGlobe}{\emo{1f310}}
+\newcommand{\eCamera}{\emo{1f4f8}}
+\newcommand{\ePin}{\emo{1f4cc}}
+\newcommand{\eMag}{\emo{1f50d}}
+\newcommand{\eFlag}{\emo{1f3c1}}
+\newcommand{\eParty}{\emo{1f389}}
+\newcommand{\eShield}{\emo{1f6e1}}
+\newcommand{\eBroom}{\emo{1f9f9}}
+\newcommand{\eFolder}{\emo{1f4c2}}
+\newcommand{\eServer}{\emo{1f5a5}}
+\newcommand{\eDB}{\emo{1f5c4}}
+\newcommand{\eScale}{\emo{2696}}
+\newcommand{\eRed}{\emo{1f534}}
+\newcommand{\eOrange}{\emo{1f7e0}}
+\newcommand{\eYellow}{\emo{1f7e1}}
+\newcommand{\eGreen}{\emo{1f7e2}}
+\newcommand{\eWorld}{\emo{1f30d}}
+\newcommand{\arr}{\ensuremath{\rightarrow}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% ---------- Tableaux (tabularray) ----------
+\usepackage{tabularray}
+\UseTblrLibrary{booktabs}
+\NewDocumentEnvironment{ltable}{m}{%
+  \par\addvspace{4pt}\begin{tblr}{
+    width=\linewidth,
+    colspec={#1},
+    row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\small},
+    row{2-Z}={font=\small},
+    row{even}={bg=rowalt},
+    hline{1,Z}={1.1pt,solid,azuredark},
+    hline{2}={0.5pt,solid,azuredark!45},
+    colsep=7pt, rowsep=4pt,
+    stretch=1.18,
+  }%
+}{%
+  \end{tblr}\par\addvspace{4pt}%
+}
+
+% ---------- Boîtes (tcolorbox) ----------
+\usepackage[most]{tcolorbox}
+\tcbset{
+  boxbase/.style={
+    enhanced, breakable, sharp corners, boxrule=0pt, leftrule=4pt,
+    left=4.5mm, right=4.5mm, top=3.6mm, bottom=3.6mm,
+    before skip=12pt, after skip=12pt,
+    fonttitle=\sffamily\bfseries, coltitle=white,
+    attach boxed title to top left={xshift=0mm,yshift=-2.6mm},
+    boxed title style={sharp corners, boxrule=0pt, left=2.5mm,right=2.5mm,top=0.9mm,bottom=0.9mm},
+  },
+}
+\newtcolorbox{fiche}{boxbase, colback=azurelight, colframe=azure}
+\newtcolorbox{notebox}[1][Point de vigilance]{boxbase, colback=warnbg, colframe=warnorange,
+  colbacktitle=warnorange, title={\eWarn~#1}}
+\newtcolorbox{tipbox}[1][Astuce]{boxbase, colback=azurepale, colframe=azuremid,
+  colbacktitle=azuremid, title={\eBulb~#1}}
+\newtcolorbox{etatbox}[1][État après l'atelier]{boxbase, colback=okgreenbg, colframe=okgreen,
+  colbacktitle=okgreen, title={\eCheck~#1}}
+
+% Bloc code / terminal
+\fvset{breaklines=true, breakanywhere=true, fontsize=\footnotesize,
+  breaksymbolleft=\raisebox{0.1ex}{\scriptsize\textcolor{azure}{$\hookrightarrow$}}}
+\newtcolorbox{codebox}[1]{
+  enhanced, breakable, sharp corners, boxrule=0.7pt,
+  colback=codebg, colframe=codeframe,
+  coltitle=azuredark, colbacktitle=codeframe, fonttitle=\ttfamily\bfseries\scriptsize,
+  title={\faTerminal~~#1}, left=3mm, right=3mm, top=2.6mm, bottom=2.6mm,
+  before skip=12pt, after skip=14pt,
+}
+
+% Capture d'écran encadrée + légende
+\newcommand{\screenshot}[2]{%
+  \par\addvspace{10pt}
+  \begin{center}
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0.7pt, colframe=codeframe, colback=white,
+      left=0.8mm, right=0.8mm, top=0.8mm, bottom=0.8mm, drop fuzzy shadow=black!18]
+    \includegraphics[width=\linewidth]{#1}
+  \end{tcolorbox}\par\vspace{4pt}
+  {\small\itshape\color{black!58}#2}
+  \end{center}\par\addvspace{12pt}
+}
+
+% Carte « chiffre-clé » pour la page de garde
+\newcommand{\statcard}[2]{%
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=3pt, colframe=azure,
+     colback=azurepale, width=0.305\linewidth, halign=center, valign=center, height=2.3cm,
+     left=1mm, right=1mm, top=1mm, bottom=1mm, nobeforeafter]
+     {\sffamily\bfseries\fontsize{22}{24}\selectfont\color{azuredark}#1}\\[1.5mm]
+     {\sffamily\small\color{black!58}#2}
+  \end{tcolorbox}%
+}
+
+% ---------- Sections (titlesec) ----------
+\usepackage{titlesec}
+\titleformat{\section}
+  {\sffamily\LARGE\bfseries\color{azuredark}}
+  {\tcbox[on line, sharp corners, boxrule=0pt, colback=azure, colupper=white,
+     left=2.2mm,right=2.2mm,top=0.6mm,bottom=0.6mm]{\thesection}}
+  {0.7em}{}[\vspace{1mm}{\color{azure}\titlerule[1.6pt]}]
+\titlespacing*{\section}{0pt}{3.6ex plus 0.8ex}{2.0ex}
+\titleformat{\subsection}
+  {\sffamily\large\bfseries\color{azuremid}}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{2.8ex plus 0.5ex}{1.1ex}
+\titleformat{\subsubsection}
+  {\sffamily\bfseries\color{azuredark}}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{1.9ex plus 0.3ex}{0.5ex}
+
+% ---------- En-têtes / pieds (fancyhdr) ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\small\color{azuredark}\textbf{TP2 Terraform}~\textcolor{azure}{\textbullet}~ShopEasy}
+\fancyhead[R]{\sffamily\small\color{black!55}\nouppercase{\leftmark}}
+\fancyfoot[C]{\sffamily\small\color{black!55}\thepage}
+\fancyfoot[R]{\sffamily\scriptsize\color{black!42}Bloc 4 · Cloud Computing}
+\fancyfoot[L]{\sffamily\scriptsize\color{black!42}SCARFONE · BOURRAGUE}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrule}{\vspace{-2pt}{\color{azure!70}\rule{\headwidth}{1.1pt}}}
+
+% ---------- Liens ----------
+\usepackage[hidelinks]{hyperref}
+\hypersetup{colorlinks=true, linkcolor=azuredark, urlcolor=azuremid,
+  pdftitle={TP2 Terraform - ShopEasy}, pdfauthor={Louis SCARFONE, Maxence BOURRAGUE}}
+
+% Filet décoratif
+\newcommand{\thinrule}{\par\vspace{1mm}{\color{azure!30}\hrule height 0.5pt}\vspace{1mm}}
+
+\begin{document}
+
+% =====================================================================
+%  PAGE DE GARDE
+% =====================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\setlength{\parskip}{0pt}
+\raggedright
+
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, colback=azuredark,
+   width=\linewidth, left=13mm, right=13mm, top=14mm, bottom=14mm,
+   borderline north={5pt}{0pt}{azure}, borderline south={2pt}{0pt}{azure}]
+  \raggedright
+  {\sffamily\bfseries\large\color{azure!75}\faMicrosoft~~MICROSOFT AZURE \quad\textbullet\quad BLOC 4 — CLOUD COMPUTING}
+
+  \vspace{9mm}
+  {\sffamily\bfseries\color{white}\fontsize{37}{42}\selectfont TP2 — Infrastructure as Code}
+
+  \vspace{4mm}
+  {\sffamily\color{azurelight}\LARGE avec \textbf{Terraform} pour l'application \textbf{ShopEasy}}
+
+  \vspace{8mm}
+  {\color{azure}\rule{5.2cm}{2.5pt}}
+
+  \vspace{5mm}
+  {\sffamily\color{white}\large Automatiser le déploiement d'une architecture Azure reproductible, versionnée et maîtrisée par le coût.}
+\end{tcolorbox}
+
+\vspace{1.8cm}
+
+\begin{minipage}[t]{0.5\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Binôme}\\[3.5mm]
+  {\large Louis \textsc{Scarfone}}\\[2mm]
+  {\large Maxence \textsc{Bourragué}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Cadre}\\[3.5mm]
+  Mastère Dev Manager Full Stack — RNCP niveau 7\\[2mm]
+  Cas fil rouge : \textbf{ShopEasy}\\[2mm]
+  Azure for Students — région \texttt{swedencentral}
+\end{minipage}
+
+\vspace{1.9cm}
+
+\noindent
+\statcard{14}{ateliers + quiz}\hfill
+\statcard{21}{ressources Terraform}\hfill
+\statcard{$\approx$\,46,5\,\$}{coût mensuel estimé}
+
+\vfill
+{\sffamily\large\bfseries\color{azuredark}Juin 2026}\hfill
+{\sffamily\color{black!45}Mastère Dev Manager Full Stack}
+\end{titlepage}
+
+% =====================================================================
+%  TABLE DES MATIÈRES
+% =====================================================================
+\thispagestyle{fancy}
+{\sffamily\Huge\bfseries\color{azuredark}Sommaire}
+\vspace{2mm}{\color{azure}\titlerule[1.6pt]}\vspace{4mm}
+\hypersetup{linkcolor=azuredark}
+{\setlength{\parskip}{1pt}\tableofcontents}
+\newpage
+
+
+% #####################################################################
+%  ATELIER 1
+% #####################################################################
+\section{Atelier 1 — Initialisation du projet Terraform}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — poser les fondations d'un projet Terraform propre, lisible et sécurisé pour ShopEasy.
+
+\textbf{\ePackage~Livrable attendu} — l'arborescence du projet et le fichier \code{.gitignore}, avec la justification de la non-publication du \code{terraform.tfstate}.
+\end{fiche}
+
+Le TP1 a conçu et déployé manuellement (Azure CLI) l'architecture cible de ShopEasy. Le TP2 reprend cette
+architecture mais la décrit en \textbf{Infrastructure as Code} avec \textbf{Terraform} : l'infrastructure
+devient un ensemble de fichiers \code{.tf} versionnés, relus, appliqués puis détruits de façon reproductible.
+Cet atelier met en place le squelette du projet ; aucune ressource Azure n'est encore créée.
+
+\subsection{Vérification de l'environnement}
+L'environnement local est vérifié avant toute initialisation :
+\begin{codebox}{bash}
+\begin{Verbatim}
+terraform version
+git --version
+az version --query '"azure-cli"' -o tsv
+az account show --query '{name:name, state:state, user:user.name}' -o json
+\end{Verbatim}
+\end{codebox}
+
+\begin{codebox}{console}
+\begin{Verbatim}
+Terraform v1.15.7
+on darwin_arm64
+
+git version 2.50.1 (Apple Git-155)
+
+2.87.0
+
+{ "name": "Azure for Students", "state": "Enabled", "user": "louis.scarfone@efrei.net" }
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{Q[l,0.7] Q[l,0.8] Q[l,0.8] Q[c,0.3]}
+Prérequis & Attendu & Constaté & État \\
+Terraform CLI & $\geq$ 1.6 & \textbf{v1.15.7} & \eCheck \\
+Azure CLI & présent + connecté & \textbf{2.87.0}, session active & \eCheck \\
+Git & présent & \textbf{2.50.1} & \eCheck \\
+Abonnement Azure & formation, actif & \textbf{Azure for Students}, \textit{Enabled} & \eCheck \\
+Clé SSH publique & \code{\textasciitilde/.ssh/id\_rsa.pub} & présente (générée au TP1) & \eCheck \\
+\end{ltable}
+
+{\small Terraform n'était pas installé au départ : ajouté via \code{brew install hashicorp/tap/terraform}
+— le tap officiel HashiCorp, requis depuis le passage de Terraform sous licence \textbf{BSL}.}
+
+\subsection{Arborescence du projet}
+\begin{codebox}{bash}
+\begin{Verbatim}
+mkdir -p tp2-terraform-azure/templates
+cd tp2-terraform-azure
+touch versions.tf providers.tf variables.tf locals.tf \
+      network.tf security.tf compute.tf loadbalancer.tf \
+      storage.tf outputs.tf terraform.tfvars templates/cloud-init.yml
+\end{Verbatim}
+\end{codebox}
+
+\begin{codebox}{text}
+\begin{Verbatim}
+tp2-terraform-azure/
+|-- .gitignore           exclusions Git (state, secrets, cache)
+|-- versions.tf          versions Terraform + providers requis
+|-- providers.tf         configuration du provider azurerm
+|-- variables.tf         variables d'entree (parametrage du projet)
+|-- locals.tf            valeurs calculees (prefixe de nommage, tags communs)
+|-- network.tf           Resource Group, VNet, subnet
+|-- security.tf          Network Security Group + regles + association
+|-- compute.tf           IP publiques, interfaces reseau, 2 VM Linux (cloud-init)
+|-- loadbalancer.tf      IP publique LB, Load Balancer, backend pool, sonde, regle
+|-- storage.tf           suffixe aleatoire, Storage Account, container Blob
+|-- outputs.tf           sorties exposees apres deploiement
+|-- terraform.tfvars     valeurs concretes (IGNORE par git -- contient l'IP admin)
+`-- templates/
+    `-- cloud-init.yml   script d'installation Nginx au premier demarrage des VM
+\end{Verbatim}
+\end{codebox}
+
+Le projet est découpé par \textbf{responsabilité} (réseau / sécurité / calcul / stockage / sorties) plutôt
+qu'en un seul fichier \code{main.tf}. Ce découpage améliore la lisibilité et la maintenabilité : chaque
+fichier regroupe un type de ressources cohérent et peut être relu indépendamment. Les fichiers \code{.tf}
+sont créés vides à ce stade et seront complétés atelier par atelier.
+
+\subsubsection{Rôle de chaque fichier}
+\begin{ltable}{Q[l,0.5] X[l,1]}
+Fichier & Rôle \\
+\code{versions.tf} & Version minimale de Terraform + providers requis (\code{azurerm}, \code{random}) avec contraintes de version. \\
+\code{providers.tf} & Configuration du provider \code{azurerm} (bloc \code{features \{\}}). \\
+\code{variables.tf} & Paramètres configurables : projet, environnement, région, admin, clé SSH, CIDR SSH. \\
+\code{locals.tf} & Valeurs internes réutilisables : préfixe de nommage, tags communs. \\
+\code{network.tf} & Resource Group + Virtual Network + subnet applicatif. \\
+\code{security.tf} & NSG, règles entrantes (HTTP, SSH restreint) et association au subnet. \\
+\code{compute.tf} & IP publiques, interfaces réseau et 2 VM Linux provisionnées par cloud-init. \\
+\code{loadbalancer.tf} & IP publique + Load Balancer L4 (frontend, backend pool, sonde, règle). \\
+\code{storage.tf} & Suffixe aléatoire + Storage Account privé + container Blob versionné. \\
+\code{outputs.tf} & Sorties utiles (nom du RG, IP du LB, IP des VM, nom du Storage). \\
+\code{terraform.tfvars} & Valeurs concrètes de l'environnement \code{dev} (exclu du dépôt). \\
+\code{templates/cloud-init.yml} & Configuration cloud-init (installation et démarrage Nginx, page de test). \\
+\end{ltable}
+
+\subsection{Fichier \code{.gitignore}}
+\begin{codebox}{gitignore}
+\begin{Verbatim}
+# Repertoire de travail Terraform (providers telecharges, cache, plugins)
+.terraform/
+
+# Fichiers de STATE : peuvent contenir des donnees sensibles en clair
+*.tfstate
+*.tfstate.*
+
+# Variables converties en JSON (peuvent embarquer des valeurs sensibles)
+*.tfvars.json
+
+# Valeurs concretes d'environnement : terraform.tfvars contient le CIDR SSH
+# = IP publique reelle de l'admin. Seul l'exemple anonymise est versionne.
+terraform.tfvars
+
+# Fichier de verrouillage des providers (choix du TP : non versionne)
+.terraform.lock.hcl
+
+# Logs de crash Terraform
+crash.log
+crash.*.log
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{Q[l,0.45] X[l,1]}
+Motif ignoré & Raison \\
+\code{.terraform/} & Cache local volumineux (binaires des providers), recréé par \code{terraform init}. \\
+\code{*.tfstate} & Le state peut contenir des secrets en clair et l'inventaire complet de l'infrastructure (cf. §4). \\
+\code{*.tfvars.json} & Variables au format JSON pouvant contenir des valeurs sensibles. \\
+\code{terraform.tfvars} & Contient l'IP publique réelle de l'administrateur — seul l'exemple anonymisé est versionné (§5). \\
+\code{.terraform.lock.hcl} & Fichier de verrouillage des providers — non versionné selon le choix du TP (§5). \\
+\code{crash.*.log} & Journaux de crash temporaires, sans valeur de suivi. \\
+\end{ltable}
+
+\subsection{Point de contrôle — pourquoi ne jamais publier \code{terraform.tfstate}}
+Le fichier \code{terraform.tfstate} est une représentation JSON de toutes les ressources gérées par Terraform
+et de leurs attributs. Le publier dans un dépôt non sécurisé est dangereux pour quatre raisons :
+\begin{enumerate}
+  \item \textbf{Présence possible de secrets en clair.} Terraform stocke les attributs renvoyés par Azure, y compris des valeurs sensibles : clés d'accès Storage, mots de passe admin, chaînes de connexion, tokens SAS. Même si aucun secret n'est dans les \code{.tf}, il peut se retrouver dans le state.
+  \item \textbf{Exposition de l'inventaire complet} de l'infrastructure (noms, identifiants, IP, plages de subnets, règles réseau) — une cartographie de reconnaissance pour un attaquant.
+  \item \textbf{Rôle de source de vérité.} S'il est exposé, corrompu ou modifié, Terraform peut détruire ou recréer des ressources par erreur, ou perdre la trace de ce qu'il gère.
+  \item \textbf{Incompatibilité avec le travail d'équipe en local} : conflits de fusion et absence de verrouillage \arr{} corruption du fichier.
+\end{enumerate}
+La solution professionnelle consiste à externaliser le state dans un \textbf{backend distant} (Storage
+Account Azure dédié) avec chiffrement, RBAC et verrouillage — objet de l'Atelier 12. En attendant, le
+\code{.gitignore} garantit que le state ne quitte jamais le poste local.
+
+\subsection{Protection des valeurs sensibles}
+\textbf{Exclusion de \code{terraform.tfvars}.} Le \code{.gitignore} fourni par le TP n'exclut pas
+\code{terraform.tfvars}. Or ce fichier contiendra \code{allowed\_ssh\_cidr} = l'IP publique réelle de
+l'administrateur. Conformément à la règle du cours (« ne jamais mettre de valeur sensible dans un fichier
+versionné ») et à la pratique du TP1 (masquage de l'IP), \code{terraform.tfvars} est exclu du dépôt ; un
+\code{terraform.tfvars.example} anonymisé est versionné à sa place (Atelier 3).
+
+\textbf{Fichier \code{.terraform.lock.hcl}.} Le TP demande de l'ignorer. En projet d'équipe réel, HashiCorp
+recommande plutôt de le versionner pour figer les versions de providers et garantir des déploiements
+identiques. Le choix du TP est suivi ici, la bonne pratique étant notée.
+
+\subsection{Capture}
+\screenshot{tp2-arborescence.png}{Arborescence du projet \code{tp2-terraform-azure} dans l'éditeur : 10 fichiers \code{.tf}, \code{templates/cloud-init.yml} et \code{.gitignore}.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Arborescence \code{tp2-terraform-azure/} créée : \textbf{10 fichiers \code{.tf}} (vides), \code{terraform.tfvars}, \code{templates/cloud-init.yml} et \code{.gitignore}.
+  \item Environnement validé : Terraform v1.15.7, Azure CLI 2.87.0 (\textit{Azure for Students}), Git 2.50.1.
+  \item \code{.gitignore} en place : state, secrets et \code{terraform.tfvars} (IP admin) exclus du dépôt ; point de contrôle \code{tfstate} traité.
+  \item \textit{Région \code{francecentral} et taille \code{B1s} du TP non disponibles sur Azure for Students \arr{} adaptées en \code{swedencentral} et \code{B2ats\_v2} (Ateliers 3 et 6).}
+  \item \textbf{Prêt pour l'Atelier 2 — déclaration des providers.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 2
+% #####################################################################
+\section{Atelier 2 — Déclaration des providers}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — déclarer la version de Terraform et les providers requis, puis initialiser le projet.
+
+\textbf{\ePackage~Livrable attendu} — \code{versions.tf}, \code{providers.tf} et le résultat de \code{terraform validate}.
+\end{fiche}
+
+\subsection{\code{versions.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+terraform {
+  required_version = ">= 1.6.0"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
+  }
+}
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{Q[l,0.5] X[l,1]}
+Élément & Signification \\
+\code{required\_version = ">= 1.6.0"} & Le projet exige Terraform 1.6 ou plus (version installée : 1.15.7). \\
+\code{azurerm} & Provider standard pour Azure : RG, VNet, NSG, VM, Load Balancer, Storage. \\
+\code{random} & Génère un suffixe aléatoire pour rendre le nom du Storage Account globalement unique (Atelier 8). \\
+\code{version = "\textasciitilde> 4.0"} & Opérateur pessimiste : autorise \code{>= 4.0.0} et \code{< 5.0.0} (toutes les \code{4.x}). \\
+\code{version = "\textasciitilde> 3.6"} & Autorise \code{>= 3.6.0} et \code{< 4.0.0}. \\
+\end{ltable}
+
+L'opérateur \code{\textasciitilde>} fige la branche majeure d'un provider : les correctifs \code{4.x} sont
+récupérés automatiquement, mais une version \code{5.0} (susceptible d'introduire des \textit{breaking
+changes}) est exclue.
+
+\subsection{\code{providers.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+provider "azurerm" {
+  features {}
+}
+\end{Verbatim}
+\end{codebox}
+
+Le bloc \code{features \{\}} est obligatoire pour le provider \code{azurerm}, même vide : il active le
+comportement par défaut du provider. L'authentification est héritée de la session Azure CLI (\code{az login})
+déjà active, ce qui évite d'inscrire un identifiant dans le code.
+
+\begin{tipbox}[Authentification azurerm v4.x]
+Le provider \code{azurerm} v4.x requiert un \code{subscription\_id} lors des opérations \code{plan} et
+\code{apply} (pas pour \code{init} ni \code{validate}). Il sera fourni via la variable d'environnement
+\code{ARM\_SUBSCRIPTION\_ID} à l'Atelier 4, pour conserver \code{providers.tf} minimal et sans identifiant en
+dur.
+\end{tipbox}
+
+\subsection{Initialisation — \code{terraform init}}
+\begin{codebox}{console}
+\begin{Verbatim}
+Initializing provider plugins found in the configuration...
+- Finding hashicorp/random versions matching "~> 3.6"...
+- Finding hashicorp/azurerm versions matching "~> 4.0"...
+- Installing hashicorp/random v3.9.0...
+- Installed hashicorp/random v3.9.0 (signed by HashiCorp)
+- Installing hashicorp/azurerm v4.78.0...
+- Installed hashicorp/azurerm v4.78.0 (signed by HashiCorp)
+
+Terraform has created a lock file .terraform.lock.hcl to record the provider
+selections it made above.
+
+Terraform has been successfully initialized!
+\end{Verbatim}
+\end{codebox}
+\code{terraform init} a résolu et téléchargé les providers (vérifiés par signature HashiCorp) :
+\code{azurerm v4.78.0} et \code{random v3.9.0}. La commande a créé le dossier de travail \code{.terraform/}
+et le fichier \code{.terraform.lock.hcl} qui fige les versions exactes retenues.
+
+\subsection{Formatage — \code{terraform fmt}}
+La commande ne renvoie aucune sortie : tous les fichiers \code{.tf} sont déjà conformes au style canonique
+HCL. \code{terraform fmt} n'affiche que les fichiers qu'il modifie ; une sortie vide est le résultat attendu.
+
+\subsection{Validation — \code{terraform validate}}
+\begin{codebox}{console}
+\begin{Verbatim}
+Success! The configuration is valid.
+\end{Verbatim}
+\end{codebox}
+La configuration est syntaxiquement et structurellement valide. \code{terraform validate} travaille en local :
+il vérifie la cohérence du code sans contacter Azure ni l'existence réelle des ressources.
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{versions.tf} : Terraform \code{>= 1.6.0}, providers \textbf{azurerm \code{\textasciitilde> 4.0}} et \textbf{random \code{\textasciitilde> 3.6}}.
+  \item \code{providers.tf} : provider \code{azurerm} configuré (\code{features \{\}}), authentification héritée d'\code{az login}.
+  \item \code{terraform init} réussi : \code{azurerm v4.78.0} et \code{random v3.9.0} installés, lock file créé ; \code{validate} : \textbf{Success}.
+  \item \textbf{Prêt pour l'Atelier 3 — paramétrage du projet.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 3
+% #####################################################################
+\section{Atelier 3 — Paramétrage du projet}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — rendre le projet réutilisable en externalisant les valeurs configurables et en centralisant le nommage et les tags.
+
+\textbf{\ePackage~Livrable attendu} — \code{variables.tf}, \code{terraform.tfvars} et \code{locals.tf} (variables, valeurs d'environnement, locals et tags).
+\end{fiche}
+
+\subsection{Variables d'entrée — \code{variables.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+variable "project" {
+  description = "Nom court du projet"
+  type        = string
+  default     = "shopeasy"
+}
+
+variable "environment" {
+  description = "Nom de l'environnement"
+  type        = string
+  default     = "dev"
+}
+
+variable "location" {
+  description = "Region Azure cible"
+  type        = string
+  default     = "francecentral"
+}
+
+variable "admin_username" {
+  description = "Utilisateur administrateur Linux"
+  type        = string
+  default     = "azureuser"
+}
+
+variable "ssh_public_key_path" {
+  description = "Chemin local vers la cle publique SSH"
+  type        = string
+}
+
+variable "allowed_ssh_cidr" {
+  description = "CIDR autorise pour l'acces SSH"
+  type        = string
+}
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{Q[l,0.55] Q[c,0.35] Q[l,0.45] X[l,1]}
+Variable & Type & Défaut & Rôle \\
+\code{project} & string & \code{shopeasy} & Nom court du projet ; alimente le préfixe et les tags. \\
+\code{environment} & string & \code{dev} & Environnement ; alimente le préfixe et les tags. \\
+\code{location} & string & \code{francecentral} & Région Azure cible (surchargée par \code{terraform.tfvars}, §2). \\
+\code{admin\_username} & string & \code{azureuser} & Compte administrateur Linux des VM. \\
+\code{ssh\_public\_key\_path} & string & \textit{(requis)} & Chemin de la clé publique SSH injectée dans les VM. \\
+\code{allowed\_ssh\_cidr} & string & \textit{(requis)} & Plage CIDR autorisée en SSH (IP admin en \code{/32}). \\
+\end{ltable}
+
+Les variables \code{ssh\_public\_key\_path} et \code{allowed\_ssh\_cidr} sont \textbf{sans valeur par défaut} :
+elles sont propres à l'environnement et doivent être fournies via \code{terraform.tfvars}. Externaliser ces
+paramètres évite tout codage en dur et permet de réutiliser le même code pour d'autres environnements.
+
+\subsection{Valeurs de l'environnement — \code{terraform.tfvars}}
+
+\begin{notebox}[Adaptation de la région (Azure for Students)]
+Le TP fixe \code{location = "francecentral"}. Cette région est \textbf{bloquée} par la policy \textit{Allowed
+resource deployment regions} de l'abonnement \textit{Azure for Students} (contrainte déjà rencontrée au TP1).
+La région déployable retenue est \textbf{\code{swedencentral}}. La valeur est définie dans
+\code{terraform.tfvars} — chargé automatiquement par Terraform — sans modifier le défaut de \code{variables.tf}.
+\end{notebox}
+
+Valeurs retenues (modèle anonymisé \code{terraform.tfvars.example}) :
+\begin{codebox}{hcl}
+\begin{Verbatim}
+project             = "shopeasy"
+environment         = "dev"
+location            = "swedencentral"   # francecentral bloquee sur Azure for Students
+admin_username      = "azureuser"
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+allowed_ssh_cidr    = "X.X.X.X/32"      # IP publique de l'administrateur (masquee)
+\end{Verbatim}
+\end{codebox}
+
+Le fichier réel \code{terraform.tfvars} renseigne \code{allowed\_ssh\_cidr} avec l'\textbf{IP publique réelle}
+de l'administrateur, en \code{/32}. Conformément à la règle « aucune valeur sensible dans un fichier
+versionné », \code{terraform.tfvars} est \textbf{exclu du dépôt} ; seul \code{terraform.tfvars.example},
+anonymisé, est versionné.
+
+\subsection{Locals et tags — \code{locals.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+locals {
+  # Prefixe de nommage commun a toutes les ressources : "shopeasy-dev"
+  prefix = "${var.project}-${var.environment}"
+
+  # Tags de gouvernance appliques a chaque ressource
+  common_tags = {
+    project     = var.project
+    environment = var.environment
+    owner       = "formation"
+    managed_by  = "terraform"
+  }
+}
+\end{Verbatim}
+\end{codebox}
+
+\code{prefix} vaut \code{shopeasy-dev} et est réutilisé pour nommer chaque ressource de façon cohérente
+(\code{rg-shopeasy-dev}, \code{vnet-shopeasy-dev}, \code{nsg-shopeasy-dev-web}…). \code{common\_tags} regroupe
+les tags de gouvernance appliqués à toutes les ressources :
+
+\begin{ltable}{Q[l,0.4] Q[l,0.5] X[l,1]}
+Tag & Valeur & Usage \\
+\code{project} & \code{shopeasy} & Rattachement applicatif. \\
+\code{environment} & \code{dev} & Distinction dev / test / prod. \\
+\code{owner} & \code{formation} & Équipe responsable. \\
+\code{managed\_by} & \code{terraform} & Indique que la ressource est gérée en IaC (toute modification manuelle est une dérive). \\
+\end{ltable}
+
+Centraliser le nommage et les tags dans \code{locals.tf} applique le principe \textit{DRY} : une seule source
+de vérité, modifiable en un point, propagée à l'ensemble des ressources.
+
+\subsection{Validation}
+\begin{codebox}{console}
+\begin{Verbatim}
+$ terraform fmt        # aucune sortie : fichiers deja conformes
+$ terraform validate
+Success! The configuration is valid.
+
+# Controle de la protection de l'IP par .gitignore
+terraform.tfvars          -> IGNORE par git (OK, contient l'IP)
+terraform.tfvars.example  -> VERSIONNE (OK, anonymise)
+\end{Verbatim}
+\end{codebox}
+La configuration est valide et le fichier contenant l'IP réelle est bien exclu du dépôt.
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{variables.tf} : 6 variables d'entrée (projet, environnement, région, admin, clé SSH, CIDR SSH).
+  \item \code{terraform.tfvars} : environnement \code{dev}, \textbf{région \code{swedencentral}} (adaptation Azure for Students), IP admin en \code{/32} — fichier \textbf{exclu du dépôt}.
+  \item \code{terraform.tfvars.example} : modèle \textbf{anonymisé} versionné ; \code{locals.tf} : préfixe \code{shopeasy-dev} + 4 tags de gouvernance.
+  \item \textbf{Prêt pour l'Atelier 4 — Resource Group et réseau (premier \code{apply}).}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 4
+% #####################################################################
+\section{Atelier 4 — Groupe de ressources et réseau}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — créer le groupe de ressources et le réseau privé de ShopEasy avec Terraform, et réaliser le premier \code{apply}.
+
+\textbf{\ePackage~Livrable attendu} — \code{network.tf} (RG + VNet + subnet) et la preuve de création (plan, apply, portail).
+
+\textbf{\eGlobe~Région} — \code{swedencentral} \quad\textbullet\quad RG \code{rg-shopeasy-dev}, VNet \code{10.20.0.0/16}.
+\end{fiche}
+
+\subsection{Authentification du provider}
+L'authentification vers Azure est héritée de la session Azure CLI (\code{az login}). Le provider
+\code{azurerm} v4.x exige en plus l'identifiant d'abonnement, fourni par variable d'environnement, \textbf{sans
+l'inscrire dans le code} :
+\begin{codebox}{bash}
+\begin{Verbatim}
+export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Ressources réseau — \code{network.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+resource "azurerm_resource_group" "main" {
+  name     = "rg-${local.prefix}"
+  location = var.location
+  tags     = local.common_tags
+}
+
+resource "azurerm_virtual_network" "main" {
+  name                = "vnet-${local.prefix}"
+  address_space       = ["10.20.0.0/16"]
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  tags                = local.common_tags
+}
+
+resource "azurerm_subnet" "web" {
+  name                 = "snet-web"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.20.1.0/24"]
+}
+\end{Verbatim}
+\end{codebox}
+
+Le VNet et le subnet \textbf{référencent} les attributs du Resource Group : Terraform en déduit le
+\textbf{graphe de dépendances} (RG d'abord, puis VNet, puis subnet). Le nommage s'appuie sur \code{local.prefix}
+et chaque élément porte \code{local.common\_tags}.
+
+\begin{ltable}{Q[l,0.9] Q[l,0.7] X[l,0.9]}
+Ressource & Nom & Valeur clé \\
+\code{azurerm\_resource\_group.main} & \code{rg-shopeasy-dev} & région \code{swedencentral} \\
+\code{azurerm\_virtual\_network.main} & \code{vnet-shopeasy-dev} & espace \code{10.20.0.0/16} \\
+\code{azurerm\_subnet.web} & \code{snet-web} & préfixe \code{10.20.1.0/24} \\
+\end{ltable}
+
+\subsection{Prévisualisation — \code{terraform plan}}
+\begin{codebox}{console}
+\begin{Verbatim}
+Terraform will perform the following actions:
+
+  # azurerm_resource_group.main will be created
+  + resource "azurerm_resource_group" "main" {
+      + id       = (known after apply)
+      + location = "swedencentral"
+      + name     = "rg-shopeasy-dev"
+      + tags     = {
+          + "environment" = "dev"
+          + "managed_by"  = "terraform"
+          + "owner"       = "formation"
+          + "project"     = "shopeasy"
+        }
+    }
+
+  # azurerm_subnet.web will be created
+  + resource "azurerm_subnet" "web" {
+      + address_prefixes    = [ "10.20.1.0/24" ]
+      + name                = "snet-web"
+      + resource_group_name = "rg-shopeasy-dev"
+      + virtual_network_name = "vnet-shopeasy-dev"
+    }
+
+  # azurerm_virtual_network.main will be created
+  + resource "azurerm_virtual_network" "main" {
+      + address_space       = [ "10.20.0.0/16" ]
+      + location            = "swedencentral"
+      + name                = "vnet-shopeasy-dev"
+      + resource_group_name = "rg-shopeasy-dev"
+      + tags                = { ... 4 tags ... }
+    }
+
+Plan: 3 to add, 0 to change, 0 to destroy.
+\end{Verbatim}
+\end{codebox}
+Le plan annonce \textbf{3 ressources à créer}, aucune modification ni destruction — résultat attendu pour un
+premier déploiement.
+
+\subsection{Application — \code{terraform apply}}
+\begin{codebox}{console}
+\begin{Verbatim}
+azurerm_resource_group.main: Creating...
+azurerm_resource_group.main: Creation complete after 26s [id=/subscriptions/e67b15f9-.../resourceGroups/rg-shopeasy-dev]
+azurerm_virtual_network.main: Creating...
+azurerm_virtual_network.main: Creation complete after 6s [id=.../virtualNetworks/vnet-shopeasy-dev]
+azurerm_subnet.web: Creating...
+azurerm_subnet.web: Creation complete after 5s [id=.../subnets/snet-web]
+
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+\end{Verbatim}
+\end{codebox}
+{\small L'identifiant d'abonnement est masqué (\code{e67b15f9-...}) dans les ID de ressources.}
+
+\subsection{Vérification (Azure CLI et état Terraform)}
+\begin{codebox}{console}
+\begin{Verbatim}
+$ az group show -n rg-shopeasy-dev --query '{name,location,provisioningState:...,tags}'
+{ "location": "swedencentral", "name": "rg-shopeasy-dev",
+  "provisioningState": "Succeeded",
+  "tags": { "environment":"dev","managed_by":"terraform","owner":"formation","project":"shopeasy" } }
+
+$ az network vnet show -g rg-shopeasy-dev -n vnet-shopeasy-dev --query '{...}'
+{ "addressSpace": [ "10.20.0.0/16" ], "location": "swedencentral",
+  "name": "vnet-shopeasy-dev", "provisioningState": "Succeeded" }
+  -> subnet snet-web : addressPrefix 10.20.1.0/24, state Succeeded
+
+$ terraform state list
+azurerm_resource_group.main
+azurerm_subnet.web
+azurerm_virtual_network.main
+\end{Verbatim}
+\end{codebox}
+Les trois ressources sont en \code{provisioningState: Succeeded}, avec la bonne région, le bon plan
+d'adressage et les quatre tags de gouvernance. L'état Terraform recense exactement les trois ressources gérées.
+
+\subsection{Captures portail}
+\screenshot{tp2-rg-overview.png}{Vue d'ensemble du Resource Group \code{rg-shopeasy-dev} (région Sweden Central) — \textit{subscription ID flouté}.}
+\screenshot{tp2-rg-tags.png}{Les 4 tags de gouvernance appliqués au Resource Group.}
+\screenshot{tp2-vnet-subnets.png}{Le subnet \code{snet-web} (\code{10.20.1.0/24}) dans le VNet \code{vnet-shopeasy-dev}.}
+
+\subsection{Questions}
+\textbf{1. Pourquoi le VNet utilise-t-il une plage privée ?}\\
+La plage \code{10.20.0.0/16} appartient aux \textbf{adresses privées RFC 1918}, non routables sur Internet. Un
+VNet est un \textbf{réseau privé} : une plage privée évite tout conflit avec des adresses publiques, garde les
+communications internes \textbf{isolées}, et permet une \textbf{segmentation maîtrisée} par subnets.
+L'exposition vers l'extérieur se fait \textbf{explicitement} via des IP publiques et un Load Balancer
+(Ateliers 6 et 7), jamais par le VNet lui-même.
+
+\textbf{2. Que faudrait-il ajouter pour isoler une base de données dans un subnet dédié ?}\\
+Un \textbf{second subnet} (ex. \code{snet-data}, \code{10.20.2.0/24}) réservé à la couche données, associé à
+son \textbf{propre NSG} n'autorisant l'accès à la base (port \code{1433}/\code{5432}) \textbf{que depuis le
+subnet web} et refusant le reste. Idéalement, la base est jointe via un \textbf{Private Endpoint} (aucune
+exposition publique). C'est l'application de la \textbf{segmentation réseau} et du \textbf{moindre privilège}.
+
+\textbf{3. Pourquoi séparer les fichiers Terraform au lieu de tout placer dans \code{main.tf} ?}\\
+Terraform charge \textbf{tous} les fichiers \code{.tf} d'un répertoire quel que soit leur nom : le découpage
+est purement \textbf{organisationnel}, sans coût fonctionnel. Regrouper les ressources par \textbf{responsabilité}
+rend le projet \textbf{lisible}, \textbf{navigable} et \textbf{maintenable}, et réduit les conflits de fusion
+en équipe.
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{network.tf} créé ; \code{terraform apply} : \textbf{3 ressources ajoutées} (\code{rg-shopeasy-dev}, \code{vnet-shopeasy-dev}, \code{snet-web}), toutes en \code{Succeeded}.
+  \item Région \code{swedencentral}, plan d'adressage \code{10.20.0.0/16} (subnet web \code{10.20.1.0/24}), 4 tags de gouvernance.
+  \item \textbf{Prêt pour l'Atelier 5 — sécurisation du réseau avec un NSG.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 5
+% #####################################################################
+\section{Atelier 5 — Sécurisation du réseau avec un NSG}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — filtrer les flux réseau du subnet web en n'autorisant que les ouvertures nécessaires.
+
+\textbf{\ePackage~Livrable attendu} — \code{security.tf} (NSG + règles + association) et l'analyse de sécurité des flux.
+\end{fiche}
+
+\subsection{NSG, règles et association — \code{security.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+resource "azurerm_network_security_group" "web" {
+  name                = "nsg-${local.prefix}-web"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  tags                = local.common_tags
+
+  security_rule {
+    name                       = "Allow-HTTP"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "Internet"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Allow-SSH-Admin"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = var.allowed_ssh_cidr
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "web" {
+  subnet_id                 = azurerm_subnet.web.id
+  network_security_group_id = azurerm_network_security_group.web.id
+}
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{Q[l,0.55] Q[c,0.3] Q[c,0.3] Q[c,0.25] Q[c,0.25] Q[l,0.55] X[l,0.9]}
+Règle & Prio & Sens & Accès & Port & Source & Rôle \\
+\code{Allow-HTTP} & 100 & In & Allow & 80 & \code{Internet} & Accès HTTP à l'application web de test \\
+\code{Allow-SSH-Admin} & 110 & In & Allow & 22 & \code{<IP\_ADMIN>/32} & Administration Linux limitée à l'IP admin \\
+\end{ltable}
+
+La source SSH n'est jamais codée en dur : elle provient de la variable \code{allowed\_ssh\_cidr} (définie dans
+\code{terraform.tfvars}, exclu du dépôt). L'association rattache le NSG au subnet \code{snet-web} : toutes les
+VM qui y seront déployées héritent du filtrage.
+
+\subsection{Prévisualisation et application}
+Le plan annonce \textbf{2 ressources à créer} (NSG + association). Extrait (IP admin masquée) :
+\begin{codebox}{console}
+\begin{Verbatim}
+  # azurerm_network_security_group.web will be created
+  + security_rule = [
+      + { name = "Allow-SSH-Admin", priority = 110, direction = "Inbound",
+          access = "Allow", protocol = "Tcp", destination_port_range = "22",
+          source_address_prefix = "<IP_ADMIN>/32" },
+      + { name = "Allow-HTTP", priority = 100, direction = "Inbound",
+          access = "Allow", protocol = "Tcp", destination_port_range = "80",
+          source_address_prefix = "Internet" },
+    ]
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+azurerm_network_security_group.web: Creation complete after 2s [id=.../nsg-shopeasy-dev-web]
+azurerm_subnet_network_security_group_association.web: Creation complete after 6s
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Vérification (Azure CLI)}
+\begin{codebox}{console}
+\begin{Verbatim}
+$ az network nsg rule list -g rg-shopeasy-dev --nsg-name nsg-shopeasy-dev-web ...
+Name             Priority  Direction  Access  Proto  Port  Source
+Allow-HTTP       100       Inbound    Allow   Tcp    80    Internet
+Allow-SSH-Admin  110       Inbound    Allow   Tcp    22    <IP_ADMIN>/32
+
+$ az network vnet subnet show ... -n snet-web --query '{subnet,nsg_associe}'
+{ "nsg_associe": ".../networkSecurityGroups/nsg-shopeasy-dev-web", "subnet": "snet-web" }
+\end{Verbatim}
+\end{codebox}
+Les deux règles sont actives et le subnet \code{snet-web} est associé au NSG \code{nsg-shopeasy-dev-web}. La
+source de la règle SSH est restreinte à l'IP de l'administrateur (masquée).
+
+\subsection{Captures portail}
+\screenshot{tp2-nsg-rules.png}{Règles entrantes du NSG \code{nsg-shopeasy-dev-web} (\code{Allow-HTTP} et \code{Allow-SSH-Admin}) — \textit{source SSH (IP admin) floutée}.}
+\screenshot{tp2-nsg-association.png}{Association du NSG \code{nsg-shopeasy-dev-web} au subnet \code{snet-web}.}
+
+\subsection{Analyse de sécurité des flux}
+\begin{tblr}{
+  width=\linewidth, colspec={Q[l,0.6] Q[c,0.3] X[l,1.1] X[l,1.1]},
+  row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\scriptsize},
+  row{2-Z}={font=\scriptsize}, row{even}={bg=rowalt},
+  hline{1,Z}={1.1pt,azuredark}, hline{2}={0.5pt,azuredark!45},
+  colsep=4pt, rowsep=3.2pt, stretch=1.15,
+}
+Flux & Autorisé ? & Justification & Risque résiduel \\
+\textbf{Internet \arr{} HTTP (80)} & \textbf{Oui} & Règle \code{Allow-HTTP} ; expose l'application web de test. & Trafic \textbf{en clair}. En prod : HTTPS (443) + Application Gateway + WAF. \\
+\textbf{SSH (22) depuis l'IP admin} & \textbf{Oui} & Règle \code{Allow-SSH-Admin} limitée à l'IP admin en \code{/32}. & Dépend d'une IP fixe. En prod : Azure Bastion / VPN, JIT, MFA. \\
+\textbf{SSH (22) depuis tout Internet} & \textbf{Non} & Aucune règle ne l'autorise ; \code{DenyAllInBound} (65500) bloque le reste. & Quasi nul tant que le CIDR admin reste étroit (\code{/32}). \\
+\textbf{Tout trafic sortant} & \textbf{Oui} & Azure autorise l'Outbound par défaut (\code{AllowVnetOutBound}, \code{AllowInternetOutBound}). & Exfiltration possible. En prod : restreindre l'Outbound aux destinations légitimes. \\
+\end{tblr}
+{\small Un NSG applique des règles par défaut invisibles : \code{AllowVnetInBound}, \code{AllowAzureLoadBalancerInBound}, \code{DenyAllInBound} en entrée. Les règles personnalisées (prio < 65000) sont évaluées \textbf{avant} ces défauts.}
+
+\subsection{Question de recul — l'accès SSH en production}
+Exposer le port SSH (22) directement sur Internet, même restreint à une IP, reste à \textbf{éviter en
+production}. Les approches recommandées :
+\begin{itemize}
+  \item \textbf{Azure Bastion} : connexion SSH/RDP via le portail, \textbf{sans IP publique} sur les VM ;
+  \item \textbf{VPN} site-to-site ou point-to-site : administration par le réseau privé ;
+  \item \textbf{Jump server / bastion host} contrôlé et audité ;
+  \item \textbf{Accès just-in-time} (Defender for Cloud) : ouverture à la demande, pour une durée et une IP limitées.
+\end{itemize}
+L'objectif commun est de \textbf{supprimer l'exposition permanente} du SSH au profit d'un accès privé,
+temporaire et tracé.
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{security.tf} créé : NSG \code{nsg-shopeasy-dev-web} (2 règles entrantes) + association au subnet \code{snet-web} ; \code{apply} : \textbf{2 ressources ajoutées}.
+  \item HTTP (80) ouvert depuis Internet ; SSH (22) \textbf{restreint à l'IP admin} ; reste de l'entrant bloqué par défaut.
+  \item \textbf{Prêt pour l'Atelier 6 — déploiement des deux machines virtuelles Linux.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 6
+% #####################################################################
+\section{Atelier 6 — Déploiement des deux machines virtuelles Linux}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — déployer deux serveurs web Linux identiques, provisionnés automatiquement par cloud-init.
+
+\textbf{\ePackage~Livrable attendu} — \code{templates/cloud-init.yml}, \code{compute.tf} (IP publiques, interfaces réseau, VM) et la preuve d'accès web.
+\end{fiche}
+
+\begin{notebox}[Adaptation imposée par Azure for Students (taille de VM)]
+Le TP fixe \code{size = "Standard\_B1s"}, \textbf{indisponible} sur l'abonnement \textit{Azure for Students}
+(contrainte déjà résolue au TP1). La taille retenue est \textbf{\code{Standard\_B2ats\_v2}} (2 vCPU, série
+burstable \code{Basv2}), \textbf{officiellement recommandée par Microsoft} comme alternative à \code{B1s}. Le
+quota \code{Basv2} (10 vCPU) couvre les 2 × 2 = 4 vCPU nécessaires.
+\end{notebox}
+
+\subsection{Script cloud-init — \code{templates/cloud-init.yml}}
+\begin{codebox}{yaml}
+\begin{Verbatim}
+#cloud-config
+package_update: true
+packages:
+  - nginx
+write_files:
+  - path: /var/www/html/index.html
+    content: |
+      <html>
+        <body>
+          <h1>ShopEasy - serveur web ${server_index}</h1>
+          <p>Deploiement realise avec Terraform sur Azure.</p>
+        </body>
+      </html>
+runcmd:
+  - systemctl enable nginx
+  - systemctl restart nginx
+\end{Verbatim}
+\end{codebox}
+Ce script est exécuté \textbf{au premier démarrage} de chaque VM : il installe \textbf{Nginx}, écrit une page
+\code{index.html} puis active et démarre le service. Le marqueur \code{\$\{server\_index\}} est injecté par
+Terraform (§2) pour \textbf{personnaliser la page par serveur}.
+
+\subsection{IP publiques, interfaces et VM — \code{compute.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+resource "azurerm_public_ip" "web" {
+  count               = 2
+  name                = "pip-${local.prefix}-web-${count.index + 1}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  tags                = local.common_tags
+}
+
+resource "azurerm_network_interface" "web" {
+  count               = 2
+  name                = "nic-${local.prefix}-web-${count.index + 1}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  tags                = local.common_tags
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.web.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.web[count.index].id
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "web" {
+  count               = 2
+  name                = "vm-${local.prefix}-web-${count.index + 1}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  size                = "Standard_B2ats_v2"   # B1s indisponible (Azure for Students)
+  admin_username      = var.admin_username
+  network_interface_ids = [ azurerm_network_interface.web[count.index].id ]
+
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = file(pathexpand(var.ssh_public_key_path))
+  }
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+
+  custom_data = base64encode(templatefile("${path.module}/templates/cloud-init.yml", {
+    server_index = count.index + 1
+  }))
+
+  tags = local.common_tags
+}
+\end{Verbatim}
+\end{codebox}
+
+\begin{itemize}
+  \item \textbf{\code{count = 2}} déploie deux exemplaires de chaque ressource, indexés par \code{count.index} (0 et 1). Chaque VM est reliée à \textbf{sa} NIC et \textbf{son} IP via \code{[count.index]}.
+  \item \textbf{\code{templatefile(...)}} lit le \code{cloud-init.yml} et y injecte \code{server\_index = count.index + 1}, puis \code{base64encode} encode le résultat pour \code{custom\_data}.
+  \item \textbf{\code{pathexpand(...)}} : la fonction \code{file()} ne développe pas \code{\textasciitilde} ; \code{pathexpand} convertit \code{\textasciitilde/.ssh/id\_rsa.pub} en chemin absolu.
+\end{itemize}
+
+\subsection{Plan et application}
+\begin{codebox}{console}
+\begin{Verbatim}
+Plan: 6 to add, 0 to change, 0 to destroy.   (2 IP publiques, 2 NIC, 2 VM)
+
+azurerm_public_ip.web[0..1]: Creation complete after ~3s
+azurerm_network_interface.web[0..1]: Creation complete after ~5s
+azurerm_linux_virtual_machine.web[1]: Creation complete after 49s [id=.../vm-shopeasy-dev-web-2]
+azurerm_linux_virtual_machine.web[0]: Creation complete after 50s [id=.../vm-shopeasy-dev-web-1]
+
+Apply complete! Resources: 6 added, 0 changed, 0 destroyed.
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Vérification (Azure CLI et accès web)}
+\begin{ltable}{Q[l,0.9] Q[l,0.8] Q[l,0.6] Q[l,0.5] Q[c,0.5]}
+Nom & Taille & IP publique & IP privée & État \\
+\code{vm-shopeasy-dev-web-1} & \code{Standard\_B2ats\_v2} & \code{135.225.73.252} & \code{10.20.1.5} & VM running \\
+\code{vm-shopeasy-dev-web-2} & \code{Standard\_B2ats\_v2} & \code{135.225.74.4} & \code{10.20.1.4} & VM running \\
+\end{ltable}
+
+Test HTTP de chaque page (depuis le poste admin) :
+\begin{codebox}{console}
+\begin{Verbatim}
+$ curl http://135.225.73.252
+<html><body><h1>ShopEasy - serveur web 1</h1>
+<p>Deploiement realise avec Terraform sur Azure.</p></body></html>
+
+$ curl http://135.225.74.4
+<html><body><h1>ShopEasy - serveur web 2</h1>
+<p>Deploiement realise avec Terraform sur Azure.</p></body></html>
+\end{Verbatim}
+\end{codebox}
+Les deux VM sont \code{VM running}, en \code{Standard\_B2ats\_v2}, et chaque page identifie son serveur (1 et
+2) — ce qui permettra de vérifier la répartition de charge à l'Atelier 7. L'état Terraform recense les
+\textbf{11 ressources} gérées.
+
+\subsection{Captures portail et navigateur}
+\screenshot{tp2-vms-in-rg.png}{Les deux VM \code{vm-shopeasy-dev-web-1/2} (\code{VM running}, \code{Standard\_B2ats\_v2}).}
+\screenshot{tp2-web-vm1.png}{Page web servie par \code{vm-web-1} (\code{http://135.225.73.252}) : « serveur web 1 ».}
+\screenshot{tp2-web-vm2.png}{Page web servie par \code{vm-web-2} (\code{http://135.225.74.4}) : « serveur web 2 ».}
+
+\subsection{Questions}
+\textbf{1. À quoi sert \code{count} dans cette configuration ?}\\
+\code{count = 2} crée \textbf{deux exemplaires} de la ressource, indexés par \code{count.index} (0 et 1). Cela
+permet de déployer plusieurs serveurs \textbf{sans dupliquer le code} (DRY). L'index sert à \textbf{nommer}
+les ressources (\code{web-1}, \code{web-2}) et à \textbf{relier} chaque VM à la bonne interface et à la bonne IP.
+
+\textbf{2. Quel est le rôle de \code{custom\_data} ?}\\
+\code{custom\_data} transmet à la VM un script \textbf{cloud-init} (encodé en base64) exécuté \textbf{au premier
+démarrage}. Ici, il installe Nginx et publie la page de test, sans aucune intervention manuelle ni connexion
+SSH. Couplé à \code{templatefile}, il \textbf{personnalise} la page de chaque serveur.
+
+\textbf{3. Pourquoi une VM \code{Standard\_B2ats\_v2} (à défaut de \code{B1s}) est-elle acceptable en
+formation ?}\\
+Une VM \textbf{burstable de petite taille} (série B) suffit à un environnement de \textbf{test/formation} :
+charge faible, pas de SLA de production, \textbf{coût minimal} ($\approx$ 0,01 \$/h). Sur \textit{Azure for
+Students}, \code{B1s} est indisponible : \code{B2ats\_v2} est la taille \textbf{recommandée par Microsoft} en
+remplacement.
+
+\textbf{4. Pourquoi ne pas conserver des IP publiques directes sur les VM en production ?}\\
+Une IP publique par VM \textbf{expose chaque machine à Internet} (surface d'attaque, scans, brute-force),
+\textbf{coûte en continu} et complique la gouvernance. En production, les VM restent en \textbf{IP privée} :
+l'entrée se fait par un \textbf{Load Balancer / Application Gateway} et l'administration par \textbf{Azure
+Bastion}. Ici, les IP publiques sont conservées pour \textbf{tester chaque VM individuellement}.
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{templates/cloud-init.yml} + \code{compute.tf} créés : \textbf{2 IP publiques}, \textbf{2 interfaces réseau}, \textbf{2 VM Linux} \code{Standard\_B2ats\_v2} ; \code{apply} : \textbf{6 ressources ajoutées}.
+  \item Nginx installé automatiquement par cloud-init ; pages distinctes (« serveur web 1 » / « serveur web 2 ») accessibles en HTTP.
+  \item État Terraform synchronisé (\textbf{11 ressources} gérées).
+  \item \textbf{Prêt pour l'Atelier 7 — mise en place du Load Balancer.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 7
+% #####################################################################
+\section{Atelier 7 — Mise en place du Load Balancer}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — répartir le trafic web entrant sur les deux VM via un Load Balancer public.
+
+\textbf{\ePackage~Livrable attendu} — \code{loadbalancer.tf} et la preuve de répartition (alternance des réponses entre les 2 serveurs).
+
+\textbf{\eGlobe~Région} — \code{swedencentral} \quad\textbullet\quad Load Balancer \code{lb-shopeasy-dev-web} (SKU Standard, public).
+\end{fiche}
+
+\subsection{IP publique, LB, pool, sonde et règle — \code{loadbalancer.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+resource "azurerm_public_ip" "lb" {
+  name                = "pip-${local.prefix}-lb"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  tags                = local.common_tags
+}
+
+resource "azurerm_lb" "web" {
+  name                = "lb-${local.prefix}-web"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                 = "Standard"
+  tags                = local.common_tags
+  frontend_ip_configuration {
+    name                 = "public-frontend"
+    public_ip_address_id = azurerm_public_ip.lb.id
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "web" {
+  name            = "backend-web"
+  loadbalancer_id = azurerm_lb.web.id
+}
+
+resource "azurerm_network_interface_backend_address_pool_association" "web" {
+  count                   = 2
+  network_interface_id    = azurerm_network_interface.web[count.index].id
+  ip_configuration_name   = "internal"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.web.id
+}
+
+resource "azurerm_lb_probe" "http" {
+  name            = "http-probe"
+  loadbalancer_id = azurerm_lb.web.id
+  protocol        = "Http"
+  request_path    = "/"
+  port            = 80
+}
+
+resource "azurerm_lb_rule" "http" {
+  name                           = "http-rule"
+  loadbalancer_id                = azurerm_lb.web.id
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = "public-frontend"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.web.id]
+  probe_id                       = azurerm_lb_probe.http.id
+}
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{X[l,0.9] X[l,1.1]}
+Ressource & Rôle \\
+\code{azurerm\_public\_ip.lb} & IP publique statique du frontend du LB. \\
+\code{azurerm\_lb.web} & Load Balancer \textbf{Standard} (L4), frontend \code{public-frontend}. \\
+\code{azurerm\_lb\_backend\_address\_pool.web} & Pool des VM cibles (\code{backend-web}). \\
+\code{azurerm\_network\_interface\_}\allowbreak\code{backend\_address\_pool\_association.web} (×2) & Rattache chaque NIC (\code{web-1}, \code{web-2}) au pool. \\
+\code{azurerm\_lb\_probe.http} & Sonde HTTP sur \code{/} port 80 (santé des VM). \\
+\code{azurerm\_lb\_rule.http} & Règle 80 \arr{} 80 (Tcp) liant frontend + pool + sonde. \\
+\end{ltable}
+
+\subsection{Plan et application}
+\begin{codebox}{console}
+\begin{Verbatim}
+Plan: 7 to add, 0 to change, 0 to destroy.
+(LB + frontend, backend pool, 2 associations NIC, sonde, regle, IP publique)
+
+azurerm_public_ip.lb: Creation complete after 2s [id=.../pip-shopeasy-dev-lb]
+azurerm_lb.web: Creation complete after 11s [id=.../lb-shopeasy-dev-web]
+azurerm_lb_probe.http: Creation complete after 11s
+azurerm_lb_backend_address_pool.web: Creation complete after 14s
+azurerm_network_interface_backend_address_pool_association.web[0..1]: complete after 2s
+azurerm_lb_rule.http: Creation complete after 9s
+
+Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Vérification et test de répartition}
+IP publique du Load Balancer : \texttt{9.223.33.133} (SKU Standard, frontend \code{public-frontend}).
+
+\smallskip
+\noindent\begin{minipage}[t]{0.48\linewidth}
+\begin{ltable}{Q[l] Q[c] Q[c] Q[c]}
+Règle & Proto & Front & Back \\
+\code{http-rule} & Tcp & 80 & 80 \\
+\end{ltable}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{ltable}{Q[l] Q[c] Q[c] Q[c]}
+Sonde & Proto & Port & Chemin \\
+\code{http-probe} & Http & 80 & / \\
+\end{ltable}
+\end{minipage}
+
+\smallskip
+Les deux interfaces \code{nic-shopeasy-dev-web-1/2} sont membres du pool \code{backend-web}. Test de
+répartition — \textbf{12 requêtes} sur l'IP du Load Balancer :
+\begin{codebox}{console}
+\begin{Verbatim}
+$ for i in $(seq 1 12); do curl -s http://9.223.33.133 | grep -o "serveur web [12]"; done
+req 1->web 2  req 2->web 1  req 3->web 1  req 4->web 1  req 5->web 2  req 6->web 1
+req 7->web 2  req 8->web 2  req 9->web 2  req 10->web 1 req 11->web 1 req 12->web 2
+=> 6 reponses "serveur web 1" / 6 reponses "serveur web 2"
+\end{Verbatim}
+\end{codebox}
+\begin{tipbox}[Répartition de charge effective]
+Sur 12 requêtes via le LB, \textbf{6 sur web-1 et 6 sur web-2} : le Load Balancer répartit bien le trafic
+entre les deux VM, et la sonde HTTP confirme leur état de santé. C'est la suppression du point de défaillance
+unique applicatif via un \textbf{point d'entrée unique}.
+\end{tipbox}
+
+\subsection{Captures}
+\screenshot{tp2-lb-overview.png}{Vue d'ensemble du Load Balancer \code{lb-shopeasy-dev-web} (frontend, backend pool, règle) — \textit{subscription ID flouté}.}
+\screenshot{tp2-web-lb.png}{Page web servie via le Load Balancer (\code{http://9.223.33.133}) ; en rafraîchissant, la réponse alterne entre « serveur web 1 » et « serveur web 2 ».}
+
+\subsection{Analyse}
+\textbf{1. Quel problème résout le Load Balancer ?}\\
+Il \textbf{répartit le trafic entrant} sur plusieurs VM derrière un \textbf{point d'entrée public unique},
+évitant la surcharge d'un seul serveur, améliorant la \textbf{disponibilité} et permettant de \textbf{monter en
+charge}. Il découple l'adresse publique des serveurs individuels.
+
+\textbf{2. Que se passe-t-il si une VM devient indisponible ?}\\
+La \textbf{sonde de santé} (\code{http-probe} sur \code{/}) cesse de recevoir une réponse \code{200} et
+\textbf{retire la VM de la rotation}. Le trafic est routé \textbf{uniquement vers la (les) VM saine(s)} : le
+service reste disponible. Dès que la VM repasse la sonde, elle est \textbf{réintégrée automatiquement}.
+
+\textbf{3. Quelle différence avec Azure Application Gateway ?}\\
+\textbf{Azure Load Balancer} opère en \textbf{couche 4} (TCP/UDP) : répartition par hash, sans comprendre le
+contenu HTTP. \textbf{Application Gateway} opère en \textbf{couche 7} (HTTP/HTTPS) : routage par chemin/hôte,
+\textbf{terminaison TLS}, affinité de session et surtout \textbf{WAF}. On choisit le LB pour une répartition L4
+générique, et l'Application Gateway pour les fonctions L7 (cf. analyse de sécurité).
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{loadbalancer.tf} créé : IP publique + Load Balancer Standard + backend pool (2 VM) + sonde HTTP + règle 80 ; \code{apply} : \textbf{7 ressources ajoutées}.
+  \item Test validé : \textbf{alternance 6/6} des réponses entre « serveur web 1 » et « serveur web 2 » via l'IP du LB.
+  \item État Terraform : \textbf{18 ressources} gérées.
+  \item \textbf{Prêt pour l'Atelier 8 — ajout d'un Storage Account.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 8
+% #####################################################################
+\section{Atelier 8 — Ajout d'un Storage Account}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — ajouter un stockage documentaire privé et versionné, avec un nom globalement unique.
+
+\textbf{\ePackage~Livrable attendu} — \code{storage.tf} (suffixe aléatoire + Storage Account + container) et vérifications (privé, versioning, tags).
+\end{fiche}
+
+\subsection{Suffixe aléatoire, Storage Account et container — \code{storage.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+resource "random_string" "suffix" {
+  length  = 6
+  upper   = false
+  special = false
+}
+
+resource "azurerm_storage_account" "docs" {
+  name                     = "${replace(local.prefix, "-", "")}docs${random_string.suffix.result}"
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = azurerm_resource_group.main.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2"
+  tags                     = local.common_tags
+  blob_properties {
+    versioning_enabled = true
+  }
+}
+
+resource "azurerm_storage_container" "documents" {
+  name                  = "documents"
+  storage_account_id    = azurerm_storage_account.docs.id
+  container_access_type = "private"
+}
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{Q[l,0.5] X[l,1]}
+Élément / choix & Raison \\
+\code{random\_string.suffix} (6 car.) & Le nom d'un Storage Account doit être \textbf{globalement unique} (3-24 car., minuscules/chiffres). \\
+\code{replace(local.prefix,"-","")} & Un Storage Account \textbf{n'accepte ni tiret ni majuscule} \arr{} \code{shopeasydevdocs1ac6q9}. \\
+\code{account\_replication\_type = "LRS"} & Redondance locale, suffisante en dev (pas de GRS facturée inutilement). \\
+\code{min\_tls\_version = "TLS1\_2"} & Refuse les protocoles obsolètes (sécurité en transit). \\
+\code{versioning\_enabled = true} & Conserve l'historique des objets (récupération après écrasement/suppression). \\
+\code{container\_access\_type = "private"} & Aucun accès anonyme : seuls les appels authentifiés accèdent aux documents. \\
+\end{ltable}
+Le provider \code{random} génère le suffixe \textbf{au moment de l'\code{apply}} : sa valeur est « known after
+apply » dans le plan.
+
+\subsection{Plan, application et vérification}
+\begin{codebox}{console}
+\begin{Verbatim}
+Plan: 3 to add, 0 to change, 0 to destroy.   (random_string + Storage Account + container)
+random_string.suffix: Creation complete [id=1ac6q9]
+azurerm_storage_account.docs: Creation complete after 1m6s [id=.../shopeasydevdocs1ac6q9]
+azurerm_storage_container.documents: Creation complete after 11s [id=.../containers/documents]
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+
+# Verifications Azure CLI
+storage account : Standard_LRS, StorageV2, TLS1_2, httpsOnly=true
+versioning      : isVersioningEnabled = true
+container        : "documents" -> publicAccess = null  (= PRIVE)
+\end{Verbatim}
+\end{codebox}
+Le suffixe généré est \code{1ac6q9} \arr{} Storage Account \textbf{\code{shopeasydevdocs1ac6q9}}. Bilan :
+\code{StorageV2} / \code{Standard\_LRS}, \textbf{TLS 1.2}, HTTPS-only, \textbf{versioning activé}, et container
+\code{documents} \textbf{privé}.
+
+\subsection{Captures portail}
+\screenshot{tp2-storage-overview.png}{Storage Account \code{shopeasydevdocs1ac6q9} (\code{Standard\_LRS}, \code{StorageV2}, tags) — \textit{subscription ID flouté}.}
+\screenshot{tp2-storage-container.png}{Container \code{documents} avec un niveau d'accès \textit{Private}.}
+\screenshot{tp2-storage-versioning.png}{Versioning Blob activé (Data protection).}
+
+\subsection{Questions FinOps et sécurité}
+\textbf{1. Pourquoi le container doit-il être privé ?}\\
+Le container héberge des \textbf{documents métier sensibles} (factures, pièces clients). En accès \textbf{privé},
+seuls les appels \textbf{authentifiés et autorisés} (clé de compte, jeton SAS, ou identité Azure AD via RBAC)
+peuvent lire les blobs. Un container \textbf{public} exposerait tous les objets à quiconque connaît l'URL \arr{}
+\textbf{fuite de données} et non-conformité (RGPD).
+
+\textbf{2. Pourquoi le versioning peut-il augmenter les coûts ?}\\
+À chaque modification ou suppression, le versioning \textbf{conserve une copie} de la version précédente. Ces
+versions \textbf{s'accumulent} et sont \textbf{facturées comme du stockage}. Sans gestion du cycle de vie, les
+anciennes versions ne sont \textbf{jamais nettoyées}.
+
+\textbf{3. Quelle règle de cycle de vie proposer pour limiter les coûts ?}\\
+Une \textbf{lifecycle management policy} : transférer les versions anciennes vers un niveau \textbf{Cool} puis
+\textbf{Archive} après \textit{N} jours, et \textbf{supprimer} les versions de plus de \textit{X} jours. Cela
+\textbf{plafonne} l'accumulation des versions et le coût associé.
+
+\subsection{Note de sécurité — accès public au niveau du compte}
+La vérification montre \code{allowBlobPublicAccess = true} \textbf{au niveau du compte} : le container est bien
+privé, mais le compte \textbf{autoriserait} qu'un container soit passé en public. Pour la \textbf{défense en
+profondeur}, on recommande de désactiver explicitement cette possibilité :
+\begin{codebox}{hcl}
+\begin{Verbatim}
+# dans azurerm_storage_account.docs
+allow_nested_items_to_be_public = false
+\end{Verbatim}
+\end{codebox}
+Ainsi, aucun blob ne peut être rendu public, même par erreur — mesure cohérente avec le moindre privilège
+(reprise dans l'analyse de sécurité de l'Atelier 13).
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{storage.tf} créé : \code{random\_string} + Storage Account \code{shopeasydevdocs1ac6q9} (\code{Standard\_LRS}, \code{StorageV2}, TLS 1.2) + container \code{documents} \textbf{privé} \textbf{versionné} ; \code{apply} : \textbf{3 ressources ajoutées}.
+  \item Risque résiduel identifié : \code{allowBlobPublicAccess = true} au niveau du compte (mesure corrective proposée).
+  \item État Terraform : \textbf{21 ressources} gérées.
+  \item \textbf{Prêt pour l'Atelier 9 — outputs et validation finale.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 9
+% #####################################################################
+\section{Atelier 9 — Outputs et validation}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — exposer les informations utiles après déploiement et valider l'ensemble de l'infrastructure.
+
+\textbf{\ePackage~Livrable attendu} — \code{outputs.tf}, les sorties \code{terraform output}, la checklist technique et la page web via le Load Balancer.
+\end{fiche}
+
+\subsection{Sorties exposées — \code{outputs.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+output "resource_group_name" {
+  description = "Nom du Resource Group cree"
+  value       = azurerm_resource_group.main.name
+}
+output "load_balancer_public_ip" {
+  description = "IP publique du Load Balancer (point d'entree de l'application)"
+  value       = azurerm_public_ip.lb.ip_address
+}
+output "web_vm_public_ips" {
+  description = "IP publiques des deux VM web"
+  value       = azurerm_public_ip.web[*].ip_address
+}
+output "storage_account_name" {
+  description = "Nom du Storage Account documentaire"
+  value       = azurerm_storage_account.docs.name
+}
+\end{Verbatim}
+\end{codebox}
+Les outputs exposent les informations dont un développeur ou un script a besoin \textbf{après} le déploiement,
+sans fouiller le portail. L'expression \code{azurerm\_public\_ip.web[*].ip\_address} utilise le \textit{splat}
+\code{[*]} pour renvoyer la \textbf{liste} des IP des deux VM.
+
+\subsection{Application et lecture des sorties}
+Ajouter des outputs \textbf{ne modifie aucune ressource} : Terraform met seulement à jour les sorties du state.
+\begin{codebox}{console}
+\begin{Verbatim}
+Changes to Outputs:
+  + load_balancer_public_ip = "9.223.33.133"
+  + resource_group_name     = "rg-shopeasy-dev"
+  + storage_account_name    = "shopeasydevdocs1ac6q9"
+  + web_vm_public_ips        = [ "135.225.73.252", "135.225.74.4" ]
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+$ terraform output
+load_balancer_public_ip = "9.223.33.133"
+resource_group_name     = "rg-shopeasy-dev"
+storage_account_name    = "shopeasydevdocs1ac6q9"
+web_vm_public_ips       = [ "135.225.73.252", "135.225.74.4" ]
+\end{Verbatim}
+\end{codebox}
+{\small \code{terraform show} a également été exécuté : il restitue l'intégralité du state lisible (les 21 ressources gérées et leurs attributs). Sortie volumineuse, non reproduite ici.}
+
+\subsection{Checklist technique}
+\begin{ltable}{X[l,1.1] Q[c,0.2] X[l,1.3]}
+Contrôle & État & Preuve \\
+Le projet Terraform s'initialise sans erreur & \eCheck & Atelier 2 — \code{terraform init} : providers installés. \\
+\code{terraform validate} réussit & \eCheck & \textit{Success! The configuration is valid.} (chaque atelier). \\
+Le Resource Group est créé & \eCheck & Atelier 4 — \code{rg-shopeasy-dev}, \code{Succeeded}. \\
+Le VNet et le subnet existent & \eCheck & Atelier 4 — \code{vnet-shopeasy-dev} + \code{snet-web}. \\
+Le NSG limite SSH à l'IP admin & \eCheck & Atelier 5 — \code{Allow-SSH-Admin} 22 depuis \code{<IP\_ADMIN>/32}. \\
+Deux VM Linux sont créées & \eCheck & Atelier 6 — \code{vm-...-web-1/2}, \code{VM running}. \\
+Nginx répond sur les VM & \eCheck & Atelier 6 — \code{curl} \arr{} « serveur web 1 » / « 2 ». \\
+Le Load Balancer répond en HTTP & \eCheck & Atelier 7 — alternance \textbf{6/6} sur \code{http://9.223.33.133}. \\
+Le Storage Account est privé & \eCheck & Atelier 8 — container \code{documents} \code{publicAccess: null}. \\
+Le versioning Blob est activé & \eCheck & Atelier 8 — \code{isVersioningEnabled: true}. \\
+Les ressources sont taguées & \eCheck & \code{local.common\_tags} (4 tags) sur RG, VNet, NSG, IP, NIC, VM, LB, Storage. \\
+\end{ltable}
+Tous les contrôles sont \textbf{au vert} (11/11).
+
+\subsection{Page web via le Load Balancer}
+\screenshot{tp2-web-lb.png}{Page web accessible via le Load Balancer (\code{http://9.223.33.133}) : en rafraîchissant, la réponse alterne entre les deux serveurs (répartition de charge).}
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{outputs.tf} créé : \textbf{4 sorties} (nom du RG, IP du LB, IP des VM, nom du Storage).
+  \item \code{terraform apply} : \textbf{0 ressource modifiée}, sorties ajoutées au state ; checklist technique \textbf{11/11 OK}.
+  \item Infrastructure complète : \textbf{21 ressources} gérées, déployées et validées.
+  \item \textbf{Prêt pour l'Atelier 10 — modification de l'infrastructure.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 10
+% #####################################################################
+\section{Atelier 10 — Modification de l'infrastructure}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — modifier l'infrastructure existante (ajout d'un tag) et lire le plan pour comprendre comment Terraform applique un changement.
+
+\textbf{\ePackage~Livrable attendu} — modification de \code{locals.tf} et analyse du plan (mise à jour vs recréation).
+\end{fiche}
+
+\subsection{Ajout du tag \code{cost\_center} dans \code{locals.tf}}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+common_tags = {
+  project     = var.project
+  environment = var.environment
+  owner       = "formation"
+  managed_by  = "terraform"
+  cost_center = "cloud-training"   # <- tag ajoute
+}
+\end{Verbatim}
+\end{codebox}
+Comme ce \textit{local} alimente l'attribut \code{tags} de toutes les ressources concernées, \textbf{une seule
+modification} se propage à l'ensemble du projet (principe DRY).
+
+\subsection{Prévisualisation — \code{terraform plan}}
+\begin{codebox}{console}
+\begin{Verbatim}
+  # azurerm_resource_group.main will be updated in-place
+  ~ resource "azurerm_resource_group" "main" {
+        name = "rg-shopeasy-dev"
+      ~ tags = {
+          + "cost_center" = "cloud-training"
+            "environment" = "dev"
+            "managed_by"  = "terraform"
+            "owner"       = "formation"
+            "project"     = "shopeasy"
+        }
+    }
+  # ... (11 autres ressources taguees : VNet, NSG, IP, NIC, VM, LB, Storage)
+
+Plan: 0 to add, 12 to change, 0 to destroy.
+\end{Verbatim}
+\end{codebox}
+Le \code{\textasciitilde} indique une \textbf{mise à jour en place} et le \code{+} l'\textbf{ajout} d'une seule
+clé de tag ; les autres tags restent inchangés. Aucune ligne \code{-} (destruction) ni \code{-/+}
+(remplacement) n'apparaît.
+
+\subsection{Application et idempotence}
+\begin{codebox}{console}
+\begin{Verbatim}
+azurerm_resource_group.main: Modifications complete after 1s
+...
+Apply complete! Resources: 0 added, 12 changed, 0 destroyed.
+
+# Nouveau plan (idempotence)
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+# Tag propage (verification)
+VNet : cloud-training   VM-1 : cloud-training   LB : cloud-training   Store : cloud-training
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Analyse du plan}
+\textbf{1. Terraform prévoit-il de recréer toutes les ressources ?}\\
+\textbf{Non.} Le plan annonce \code{0 to add, 12 to change, 0 to destroy} et chaque ressource est marquée
+\textbf{\code{update in-place}} (\code{\textasciitilde}). Un tag est un attribut \textbf{modifiable à chaud} :
+Terraform l'ajoute directement, \textbf{sans interruption de service}.
+
+\textbf{2. Quelles ressources sont simplement mises à jour ?}\\
+Les \textbf{12 ressources qui portent l'attribut \code{tags}} (= \code{local.common\_tags}) : RG, VNet, NSG,
+les 2 IP web + l'IP du LB, les 2 NIC, les 2 VM, le LB et le Storage. Les ressources \textbf{sans tags} (subnet,
+associations, backend pool, sonde, règle, container, \code{random\_string}) ne sont \textbf{pas concernées}.
+
+\textbf{3. Pourquoi le plan est-il indispensable avant application ?}\\
+Le plan montre \textbf{exactement} ce qui va changer \textbf{avant} d'agir : ici, des tags ajoutés en place
+(\code{\textasciitilde}), sans destruction (\code{-}) ni remplacement (\code{-/+}). Lire le plan permet de
+\textbf{détecter une action dangereuse} (destruction imprévue, remplacement de VM effaçant des données) avant
+qu'elle ne se produise. C'est le garde-fou du caractère \textbf{déclaratif} de Terraform.
+
+\begin{etatbox}
+\begin{itemize}
+  \item \code{locals.tf} modifié : ajout du tag \code{cost\_center = "cloud-training"} ; \code{apply} : \textbf{12 ressources mises à jour en place}, 0 création, 0 destruction.
+  \item Idempotence vérifiée (\code{plan} suivant : \textit{no changes}), tag propagé à toutes les ressources taguées.
+  \item Démonstration de la différence \textbf{mise à jour (\code{\textasciitilde}) vs recréation (\code{-/+})}.
+  \item \textbf{Prêt pour l'Atelier 11 — observation d'une dérive (drift).}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 11
+% #####################################################################
+\section{Atelier 11 — Observation d'une dérive Terraform}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — provoquer une modification manuelle hors Terraform et observer comment l'outil détecte l'écart (\textit{drift}).
+
+\textbf{\ePackage~Livrable attendu} — mise en évidence de la dérive via \code{terraform plan} et analyse.
+\end{fiche}
+
+\subsection{Création d'une dérive volontaire}
+Une modification est faite \textbf{manuellement dans le portail Azure}, hors Terraform : ajout du tag
+\code{manual\_change = true} sur le Resource Group \code{rg-shopeasy-dev}. Le RG porte alors \textbf{6 tags}
+(les 5 déclarés + le tag manuel). Cette modification \textbf{n'existe pas dans le code} : c'est précisément ce
+qui constitue une dérive.
+
+\subsection{Détection — \code{terraform plan}}
+\begin{codebox}{console}
+\begin{Verbatim}
+  # azurerm_resource_group.main will be updated in-place
+  ~ resource "azurerm_resource_group" "main" {
+        name = "rg-shopeasy-dev"
+      ~ tags = {
+            "cost_center"   = "cloud-training"
+            "environment"   = "dev"
+            "managed_by"    = "terraform"
+          - "manual_change" = "true" -> null
+            "owner"         = "formation"
+            "project"       = "shopeasy"
+        }
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+\end{Verbatim}
+\end{codebox}
+Terraform \textbf{compare l'état réel au code} (sa source de vérité) et détecte le tag \code{manual\_change}
+ajouté hors processus. Il propose de le \textbf{supprimer} (\code{- "manual\_change" = "true" -> null}) pour
+\textbf{réaligner la réalité sur l'état déclaré}.
+
+\subsection{Réconciliation — \code{terraform apply}}
+\begin{codebox}{console}
+\begin{Verbatim}
+azurerm_resource_group.main: Modifications complete after 1s
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+# Tags apres reconciliation : retour aux 5 tags declares (manual_change supprime)
+# Plan de controle
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+\end{Verbatim}
+\end{codebox}
+La dérive est résorbée : l'infrastructure correspond de nouveau exactement au code.
+
+\subsection{Capture portail}
+\screenshot{tp2-drift-manual.png}{Tag \code{manual\_change = true} ajouté manuellement sur le Resource Group (dérive volontaire, hors Terraform).}
+
+\subsection{Analyse}
+\textbf{1. Terraform détecte-t-il une différence ?}\\
+\textbf{Oui.} Lors du \code{plan}, Terraform rafraîchit l'état réel, le compare au code et \textbf{signale
+l'écart} : le tag \code{manual\_change} présent dans Azure n'existe pas dans la configuration.
+
+\textbf{2. Quelle action propose-t-il ?}\\
+Une \textbf{mise à jour en place} (\code{\textasciitilde}) du Resource Group pour \textbf{supprimer} le tag
+\code{manual\_change}, afin de revenir à l'état déclaré (\code{0 to add, 1 to change, 0 to destroy}).
+
+\textbf{3. Pourquoi les modifications manuelles sont-elles dangereuses dans une organisation ?}\\
+Elles créent une \textbf{dérive} entre le code (source de vérité) et l'infrastructure réelle : environnement
+\textbf{imprévisible}, \textbf{sécurité affaiblie} (une règle ouverte à la main échappe à la revue),
+\textbf{confiance dans le code} perdue, et un \code{apply} ultérieur peut \textbf{annuler silencieusement} un
+changement manuel — ou l'inverse. L'environnement devient difficile à auditer et reproduire.
+
+\textbf{4. Quelle règle d'équipe proposer pour limiter ce risque ?}\\
+Tout changement doit \textbf{passer par le code} : modification du \code{.tf} \arr{} \textbf{pull request} \arr{}
+revue \arr{} \code{plan} \arr{} \code{apply} contrôlé. On complète par : \code{plan} régulier en CI (détection
+des dérives), \textbf{droits portail restreints} (lecture seule en prod), \textbf{Azure Policy}, et formation
+des équipes. Le portail sert alors à \textbf{observer et diagnostiquer}, pas à modifier.
+
+\begin{etatbox}
+\begin{itemize}
+  \item Dérive volontaire créée (tag \code{manual\_change} ajouté manuellement) puis \textbf{détectée} par \code{terraform plan} (\code{0 add, 1 change, 0 destroy}).
+  \item \textbf{Réconciliation} appliquée : retour aux 5 tags déclarés, \code{plan} de contrôle \textit{no changes}.
+  \item Démonstration du rôle du code comme \textbf{source de vérité} et de l'intérêt du \code{plan}.
+  \item \textbf{Prêt pour l'Atelier 12 — préparation d'un state distant.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 12
+% #####################################################################
+\section{Atelier 12 — Préparation d'un state distant}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — comprendre pourquoi et comment externaliser le state Terraform dans un backend distant sécurisé.
+
+\textbf{\ePackage~Livrable attendu} — structure cible du backend Azure et analyse (atelier de \textbf{préparation conceptuelle}, sans migration du state).
+\end{fiche}
+
+\subsection{Le state local et ses limites}
+Le projet utilise un \textbf{state local} : un fichier \code{terraform.tfstate} sur le poste. Ce state
+\textbf{contient des données sensibles en clair} — une recherche des \textbf{noms} d'attributs sensibles (sans
+afficher aucune valeur) le confirme :
+\begin{codebox}{console}
+\begin{Verbatim}
+$ ls -la terraform.tfstate          # 59 639 octets
+$ git check-ignore terraform.tfstate   # -> ignore (non versionne)
+$ terraform state list | wc -l         # 21 ressources suivies
+
+# Recherche de noms d'attributs sensibles dans le state :
+cle presente: "admin_password"
+cle presente: "primary_access_key"     <- cle d'acces du Storage Account
+cle presente: "secret"
+\end{Verbatim}
+\end{codebox}
+Le state local est acceptable en découverte individuelle, mais \textbf{insuffisant en équipe} :
+\begin{itemize}
+  \item \textbf{perte} possible du fichier ; \textbf{conflits} entre plusieurs administrateurs ;
+  \item \textbf{pas de verrouillage} \arr{} corruption en cas d'\code{apply} simultané ;
+  \item \textbf{présence de secrets} \arr{} un commit accidentel exposerait clés et mots de passe ;
+  \item \textbf{difficile à intégrer} dans une chaîne CI/CD.
+\end{itemize}
+
+\subsection{Structure cible — backend Azure Storage}
+\begin{codebox}{hcl}
+\begin{Verbatim}
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-terraform-state"
+    storage_account_name = "stterraformstatexxx"
+    container_name       = "tfstate"
+    key                  = "shopeasy/dev/terraform.tfstate"
+  }
+}
+\end{Verbatim}
+\end{codebox}
+\begin{ltable}{Q[l,0.6] X[l,1]}
+Champ & Rôle \\
+\code{resource\_group\_name} & RG dédié au state (séparé des ressources applicatives). \\
+\code{storage\_account\_name} & Storage Account hébergeant le state (nom globalement unique). \\
+\code{container\_name} & Container Blob \code{tfstate}. \\
+\code{key} & Chemin/nom du blob de state — \textbf{inclut l'environnement} (\code{shopeasy/dev/...}) pour isoler dev/recette/prod. \\
+\end{ltable}
+Le backend \code{azurerm} fournit nativement le \textbf{verrouillage} (via un \textit{lease} sur le blob) : deux
+\code{apply} simultanés ne peuvent pas corrompre le state.
+
+\begin{notebox}[Bootstrap — ne pas ajouter le bloc à la légère]
+Le bloc \code{backend} ne doit \textbf{pas} être ajouté sans avoir créé \textbf{au préalable} le Resource
+Group, le Storage Account et le container de state. Dans un vrai projet, cette initialisation est réalisée par
+une \textbf{équipe plateforme} ou un \textbf{bootstrap dédié}, puis sécurisée (RBAC, chiffrement, réseau). La
+bascule se ferait ensuite avec \code{terraform init -migrate-state}. \textbf{Cette migration n'est pas
+effectuée ici} : l'atelier reste conceptuel, et le state du TP demeure local (puis supprimé à l'Atelier 14).
+\end{notebox}
+
+\subsection{Questions}
+\textbf{1. Pourquoi le state distant facilite-t-il le travail en équipe ?}\\
+Il fournit un \textbf{emplacement central et partagé} : tous les membres et la \textbf{CI/CD} lisent et écrivent
+le \textbf{même} state, sans copies divergentes. Il apporte le \textbf{verrouillage} (un seul \code{apply} à la
+fois), supprime le state des postes (\textbf{pas de perte ni de commit accidentel}) et s'intègre dans un
+\textbf{pipeline}.
+
+\textbf{2. Pourquoi faut-il protéger l'accès au Storage Account du state ?}\\
+Parce que le state \textbf{contient des secrets en clair} (\code{admin\_password}, \code{primary\_access\_key},
+\code{secret}) \textbf{et} l'inventaire complet de l'infrastructure. Il faut : \textbf{RBAC restreint},
+\textbf{chiffrement au repos}, \textbf{restrictions réseau} (private endpoint / pare-feu), désactivation de
+l'accès public, rotation des clés et journalisation.
+
+\textbf{3. Pourquoi faut-il séparer le state de développement, recette et production ?}\\
+Pour \textbf{isoler les environnements} : une erreur sur le state \textbf{dev} ne doit jamais impacter la
+\textbf{prod}. La séparation (clé/container distincts, ex. \code{shopeasy/prod/terraform.tfstate}) permet des
+\textbf{droits différenciés}, évite d'\textbf{appliquer par erreur} un changement dev sur la prod, et donne à
+chaque environnement un \textbf{cycle de vie indépendant}.
+
+\begin{etatbox}
+\begin{itemize}
+  \item Limites du state local démontrées : fichier local de 21 ressources \textbf{contenant des secrets en clair}.
+  \item Structure cible documentée : backend \code{azurerm} (Storage Account + container \code{tfstate}, clé par environnement, verrouillage natif) ; bootstrap et migration expliqués (\textbf{non appliqués}).
+  \item \textbf{Prêt pour l'Atelier 13 — analyses coût, sécurité et maintenabilité.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 13
+% #####################################################################
+\section{Atelier 13 — Analyse coût, sécurité et maintenabilité}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — analyser l'infrastructure déployée sous trois angles : coûts (FinOps), sécurité et maintenabilité.
+
+\textbf{\ePackage~Livrable attendu} — tableau FinOps, tableau d'analyse de sécurité et réponses sur la maintenabilité.
+\end{fiche}
+
+\subsection{Analyse FinOps}
+Prix unitaires \textbf{réels} (Azure Retail Prices API, région \code{swedencentral}, pay-as-you-go USD,
+hypothèse 24/7 = 730 h/mois) :
+\begin{ltable}{X[l,1.2] Q[l,0.7]}
+Poste & Prix unitaire officiel \\
+VM \code{Standard\_B2ats\_v2} (Linux) & \textbf{0,00972 \$/h} \\
+IP publique Standard (static) & \textbf{0,005 \$/h} \\
+Disque OS Standard HDD S4 (32 Go) LRS & \textbf{1,536 \$/mois} \\
+Load Balancer Standard & \textbf{$\approx$ 0,025 \$/h} (règles incluses) \\
+Blob Storage (faible volume) & négligeable \\
+\end{ltable}
+
+\begin{tblr}{
+  width=\linewidth, colspec={Q[l,0.7] Q[l,0.6] X[l,1.1] X[l,1.3]},
+  row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\scriptsize},
+  row{2-Z}={font=\scriptsize}, row{even}={bg=rowalt},
+  hline{1,Z}={1.1pt,azuredark}, hline{2}={0.5pt,azuredark!45},
+  colsep=4pt, rowsep=3.2pt, stretch=1.15,
+}
+Ressource & Coût relatif & Risque de surcoût & Optimisation proposée \\
+\textbf{VM Linux} (2 × \code{B2ats\_v2}) & Moyen-élevé ($\approx$ 14,2 \$) & VM allumées 24/7 sans usage réel & Désallouer hors période ; autoscale en prod ; taille adaptée \\
+\textbf{IP publiques} (3) & Moyen ($\approx$ 10,9 \$) & Facturées même à trafic nul & Réduire à 1 (celle du LB) ; VM sans IP publique + Bastion \\
+\textbf{Load Balancer} (Standard) & Élevé ($\approx$ 18,2 \$) & Facturé en continu, même sans trafic & Garder pour la prod ; App Gateway si L7/WAF requis \\
+\textbf{Storage Account} (LRS) & Faible (< 0,1 \$) & Réplication géo (GRS) inutile en dev & LRS (pas GRS) ; suppression au nettoyage \\
+\textbf{Versioning Blob} & Faible \arr{} croissant & Accumulation illimitée d'anciennes versions & Lifecycle : transition Cool/Archive + purge des versions \\
+\textbf{Disques managés} (2 × OS, S4) & Faible ($\approx$ 3,1 \$) & Disques orphelins après suppression VM & Taille adaptée ; suppression au nettoyage \\
+\end{tblr}
+
+\begin{notebox}[Total et postes principaux]
+\textbf{Total indicatif $\approx$ 46,5 \$/mois en 24/7.} Les 3 postes principaux sont le \textbf{Load Balancer
+(18,2 \$)}, le \textbf{compute des 2 VM (14,2 \$)} et les \textbf{IP publiques (10,9 \$)} — le LB et les IP
+facturent même à trafic nul. Désallouer les VM annule leur coût compute, et la \textbf{suppression du Resource
+Group} (Atelier 14) ramène le coût à $\approx$ 0.
+\end{notebox}
+
+\subsection{Analyse de sécurité}
+\begin{tblr}{
+  width=\linewidth, colspec={Q[l,0.6] X[l,0.9] X[l,0.9] X[l,1.1]},
+  row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\scriptsize},
+  row{2-Z}={font=\scriptsize}, row{even}={bg=rowalt},
+  hline{1,Z}={1.1pt,azuredark}, hline{2}={0.5pt,azuredark!45},
+  colsep=4pt, rowsep=3.2pt, stretch=1.15,
+}
+Risque & Cause possible & Impact & Correction \\
+\textbf{SSH trop ouvert} & Source \code{0.0.0.0/0} au lieu de l'IP admin & Scans, brute-force, compromission & Restreindre à l'IP \code{/32} \textit{(appliqué)} ; Bastion / JIT en prod \\
+\textbf{State exposé} & \code{tfstate} commité ou Storage de state non protégé & Fuite de secrets + inventaire du SI & \code{.gitignore} \textit{(appliqué)} ; backend distant chiffré + RBAC \\
+\textbf{Storage public} & Container public ou \code{allowBlobPublicAccess=true} & Fuite de documents métier (RGPD) & Container privé \textit{(appliqué)} ; \code{allow\_nested\_items\_to\_be\_public=false} \\
+\textbf{Tags absents} & Oubli de tags sur des ressources & Coûts non imputables, gouvernance impossible & \code{common\_tags} systématiques \textit{(appliqué)} ; Azure Policy \\
+\textbf{Secrets dans Git} & Mot de passe/clé en dur dans \code{.tf} ou \code{tfvars} versionné & Compromission d'identifiants & Aucun secret en dur ; \code{tfvars} ignoré \textit{(appliqué)} ; Key Vault \\
+\textbf{Modification manuelle} & Changement portail hors Terraform & Dérive, imprévisibilité, sécurité affaiblie & Tout par le code (PR + plan + apply) ; \code{plan} régulier en CI \\
+\end{tblr}
+{\small Les corrections \textit{(appliqué)} sont déjà en place (Ateliers 1, 5, 8, 11). Les autres sont les évolutions recommandées pour la production.}
+
+\subsection{Maintenabilité}
+\textbf{1. Comment rendre ce projet réutilisable pour un environnement de recette ?}\\
+Le code est déjà \textbf{paramétré par variables} : il suffit de fournir un \textbf{\code{terraform.tfvars} par
+environnement} (ex. \code{environment = "recette"}, sa région, sa taille de VM) et un \textbf{state séparé}
+(clé/backend distincts). Le \textbf{code reste unique} ; seules les \textbf{valeurs} changent. On peut aussi
+utiliser des \textbf{workspaces}.
+
+\textbf{2. Quelles variables faudrait-il ajouter ?}\\
+\code{vm\_size}, \code{vm\_count} (nombre d'instances), \code{address\_space} / \code{web\_subnet\_prefix},
+\code{storage\_replication\_type}, \code{enable\_public\_ip} (booléen pour supprimer les IP publiques en prod),
+et un bloc de \textbf{tags additionnels}.
+
+\textbf{3. Quels fichiers pourraient devenir des modules Terraform ?}\\
+\code{network.tf} + \code{security.tf} \arr{} \textbf{module \code{network}} ; \code{compute.tf} \arr{}
+\textbf{module \code{compute}} ; \code{loadbalancer.tf} \arr{} \textbf{module \code{loadbalancer}} ;
+\code{storage.tf} \arr{} \textbf{module \code{storage}}. Appelés depuis un \code{main.tf} avec des variables,
+ils deviennent \textbf{réutilisables} pour dev / recette / prod.
+
+\textbf{4. Quelles validations automatiques pourrait-on ajouter dans une pipeline CI/CD ?}\\
+\code{terraform fmt -check} et \code{validate} ; \textbf{\code{tflint}} ; \textbf{\code{tfsec} / \code{checkov}}
+(sécurité statique) ; \textbf{\code{gitleaks}} (secrets) ; \code{terraform plan} automatique sur chaque
+\textbf{pull request} + revue et approbation avant \code{apply} ; exécution régulière de \code{plan} pour
+détecter les dérives.
+
+\begin{etatbox}
+\begin{itemize}
+  \item \textbf{FinOps} : coût $\approx$ \textbf{46,5 \$/mois} (24/7, prix réels), 3 postes principaux (LB, compute, IP), optimisations par ressource.
+  \item \textbf{Sécurité} : 6 risques analysés (cause / impact / correction), dont 4 déjà corrigés dans le projet.
+  \item \textbf{Maintenabilité} : réutilisation par environnement, variables à ajouter, modularisation, validations CI/CD.
+  \item \textbf{Prêt pour l'Atelier 14 — nettoyage de l'environnement.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 14
+% #####################################################################
+\section{Atelier 14 — Nettoyage de l'environnement}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — supprimer proprement toutes les ressources créées pour arrêter la facturation.
+
+\textbf{\ePackage~Livrable attendu} — prévisualisation de la destruction et commande \code{terraform destroy}.
+\end{fiche}
+
+\begin{notebox}[Destruction documentée — exécutée en toute fin]
+L'environnement est \textbf{conservé} le temps de valider l'ensemble des livrables et des captures. Seule la
+\textbf{prévisualisation} (\code{terraform plan -destroy}, qui ne supprime rien) a été exécutée à ce stade. La
+destruction effective (\code{terraform destroy}) est la \textbf{dernière action} du projet.
+\end{notebox}
+
+\subsection{Pourquoi détruire l'environnement ?}
+L'infrastructure de test coûte $\approx$ \textbf{46,5 \$/mois en 24/7} (cf. Atelier 13), facturée \textbf{même
+à trafic nul} pour le Load Balancer et les IP publiques. Comme tout est décrit en \textbf{Infrastructure as
+Code}, l'environnement est \textbf{reproductible à l'identique} par \code{terraform apply} : il n'y a aucune
+raison de le laisser tourner entre deux séances. La destruction ramène le coût à $\approx$ 0.
+
+\subsection{Prévisualisation — \code{terraform plan -destroy}}
+\begin{codebox}{console}
+\begin{Verbatim}
+$ terraform plan -destroy        # ne supprime rien : liste ce qui SERAIT detruit
+azurerm_lb.web, azurerm_lb_backend_address_pool.web, azurerm_lb_probe.http,
+azurerm_lb_rule.http, azurerm_linux_virtual_machine.web[0..1],
+azurerm_network_interface.web[0..1],
+azurerm_network_interface_backend_address_pool_association.web[0..1],
+azurerm_network_security_group.web, azurerm_public_ip.lb,
+azurerm_public_ip.web[0..1], azurerm_resource_group.main,
+azurerm_storage_account.docs, azurerm_storage_container.documents,
+azurerm_subnet.web, azurerm_subnet_network_security_group_association.web,
+azurerm_virtual_network.main, random_string.suffix          ... will be destroyed
+
+Plan: 0 to add, 0 to change, 21 to destroy.
+\end{Verbatim}
+\end{codebox}
+Les \textbf{21 ressources} gérées par Terraform sont prévues pour suppression.
+
+\subsection{Commande de destruction et vérification}
+\begin{codebox}{bash}
+\begin{Verbatim}
+terraform destroy        # confirmation interactive : yes
+# Resultat attendu : Destroy complete! Resources: 21 destroyed
+
+# Verifications apres destruction :
+terraform state list                 # (vide)
+az group show -n rg-shopeasy-dev      # ResourceGroupNotFound
+\end{Verbatim}
+\end{codebox}
+\code{terraform destroy} supprime toutes les ressources gérées par le state, dans l'ordre inverse des
+dépendances. La suppression du \textbf{Resource Group} entraîne celle de toutes les ressources qu'il contient
+(y compris les disques managés). Les captures ayant déjà été récupérées, aucune perte n'en résulte pour le
+rendu.
+
+\begin{notebox}[Point obligatoire du TP]
+Ne jamais terminer une séance sans avoir supprimé les ressources de formation. Cette étape est exécutée juste
+avant la clôture du projet.
+\end{notebox}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Prévisualisation \code{terraform plan -destroy} : \textbf{21 ressources} prêtes à être détruites (\code{0 add, 0 change}).
+  \item Procédure de destruction documentée (\code{terraform destroy} + vérifications).
+  \item Environnement volontairement conservé pour validation finale ; destruction = dernière action du projet.
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  NOTE TECHNIQUE
+% #####################################################################
+\section{Note technique — synthèse des choix}
+
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=4pt, colback=azurepale, colframe=azuredark,
+   left=4.5mm,right=4.5mm,top=3.6mm,bottom=3.6mm, before skip=10pt, after skip=12pt]
+\textbf{Objet} — industrialisation du déploiement Azure de ShopEasy avec Terraform (Infrastructure as Code)\\[2pt]
+\textbf{Portée} — synthèse des choix techniques, de sécurité, de coût et de gouvernance, et proposition d'évolution\\[2pt]
+\textbf{Auteurs (binôme)} — Louis \textsc{Scarfone} \& Maxence \textsc{Bourragué}
+\end{tcolorbox}
+
+\subsection{Contexte}
+Le TP1 avait conçu et déployé \textbf{manuellement} (Azure CLI) l'architecture cible de ShopEasy. Le TP2
+reprend cette architecture et la décrit en \textbf{Infrastructure as Code} : l'infrastructure devient un
+ensemble de fichiers \code{.tf} \textbf{versionnés, relus, appliqués puis détruits} de manière reproductible.
+Le résultat n'est pas seulement « une infrastructure qui fonctionne », mais une infrastructure \textbf{décrite
+proprement, lisible, versionnable, sécurisée et maîtrisée dans son cycle de vie}.
+
+\subsection{Architecture déployée}
+\begin{ltable}{Q[l,0.5] X[l,1.4]}
+Couche & Ressources \\
+\textbf{Organisation} & Resource Group \code{rg-shopeasy-dev} (\code{swedencentral}), tags de gouvernance. \\
+\textbf{Réseau} & VNet \code{10.20.0.0/16}, subnet \code{snet-web} \code{10.20.1.0/24}, NSG (HTTP ouvert, SSH restreint à l'IP admin). \\
+\textbf{Calcul} & 2 VM Linux \code{Standard\_B2ats\_v2} (Ubuntu 22.04), Nginx installé par cloud-init, déployées via \code{count}. \\
+\textbf{Répartition} & Load Balancer \textbf{Standard} (IP publique, backend pool, sonde HTTP, règle 80). \\
+\textbf{Stockage} & Storage Account \code{StorageV2} \textbf{LRS}, container \textbf{privé}, \textbf{versioning} Blob activé. \\
+\textbf{Exploitation} & Outputs (IP du LB, IP des VM, nom du Storage), state local protégé. \\
+\end{ltable}
+\textbf{21 ressources} Terraform, déployées et validées (checklist technique de l'Atelier 9 : 11/11).
+
+\subsection{Choix techniques}
+\begin{ltable}{Q[l,0.55] Q[l,0.9] X[l,1.2]}
+Choix & Décision & Justification \\
+Outil IaC & \textbf{Terraform} + \code{azurerm \textasciitilde> 4.0} & Déclaratif, multi-cloud, lisible. \\
+Authentification & \code{az login} + \code{ARM\_SUBSCRIPTION\_ID} & Aucun identifiant en dur dans le code. \\
+Région & \textbf{\code{swedencentral}} & \code{francecentral} bloquée (policy Azure for Students). \\
+Taille de VM & \textbf{\code{Standard\_B2ats\_v2}} & \code{B1s} indisponible ; \code{B2ats\_v2} recommandée Microsoft. \\
+Multiplication & \code{count = 2} pour IP/NIC/VM & Deux serveurs identiques sans duplication (DRY). \\
+Provisionnement & cloud-init + \code{templatefile} + \code{custom\_data} & Installation Nginx automatique, page par serveur. \\
+Clé SSH & \code{file(pathexpand(...))} & \code{file()} ne développe pas \code{\textasciitilde}. \\
+Nommage / tags & \code{local.prefix} + \code{local.common\_tags} & Source unique, cohérence et gouvernance. \\
+Lisibilité & Découpage par responsabilité (\code{network}, \code{compute}…) & Projet relisible et maintenable. \\
+\end{ltable}
+
+\subsection{Sécurité}
+SSH \textbf{restreint} à l'IP admin (\code{/32}) ; \textbf{aucun secret dans le code} (\code{terraform.tfvars}
+exclu du dépôt, \code{.example} anonymisé versionné) ; \textbf{state protégé} (\code{gitignore} ; il contient
+\code{admin\_password}, \code{primary\_access\_key}, \code{secret} en clair) ; \textbf{Storage privé}, TLS 1.2,
+HTTPS-only ; captures \textbf{anonymisées} (IP admin et identifiants Azure floutés). \textbf{Recommandations
+production} : Azure Bastion, backend de state distant chiffré + RBAC, \code{allow\_nested\_items\_to\_be\_public
+= false}, Application Gateway + WAF en HTTPS, Azure Policy d'obligation de tags.
+
+\subsection{FinOps}
+Coût $\approx$ \textbf{46,5 \$/mois en 24/7} (prix réels Azure Retail Prices). Postes principaux : \textbf{Load
+Balancer ($\approx$ 18 \$)}, \textbf{compute des 2 VM ($\approx$ 14 \$)}, \textbf{IP publiques ($\approx$
+11 \$)} — le LB et les IP facturent même à trafic nul. Leviers : désallouer les VM hors usage, réduire les IP
+publiques (Bastion), lifecycle policy sur le Blob, et \code{terraform destroy} entre les séances pour ramener
+le coût à $\approx$ 0.
+
+\subsection{Gouvernance et cycle de vie}
+\textbf{Workflow} : \code{init} \arr{} \code{fmt} \arr{} \code{validate} \arr{} \code{plan} \arr{} \code{apply}
+\arr{} \code{destroy}, le \code{plan} étant systématiquement relu. La modification d'un tag se propage en
+\textbf{mise à jour en place} (\code{\textasciitilde}), sans recréation. Une modification manuelle (portail) est
+\textbf{détectée} par \code{terraform plan} et \textbf{réconciliée}, démontrant le rôle du code comme
+\textbf{source de vérité}.
+
+\subsection{Amélioration proposée (mise en autonomie — Option B : Azure Bastion)}
+\textbf{Objectif :} supprimer les IP publiques directes des VM et administrer via \textbf{Azure Bastion}, pour
+réduire la surface d'attaque et le coût des IP.
+\begin{itemize}
+  \item \textbf{Modification :} ajout d'un subnet \code{AzureBastionSubnet} (\code{10.20.255.0/27}) + un \code{azurerm\_bastion\_host} (+ IP publique Standard) ; \textbf{suppression des IP publiques des VM} ; retrait de la règle SSH publique du NSG.
+  \item \textbf{Fichiers impactés :} \code{compute.tf} (NIC sans IP publique), \code{network.tf} (subnet Bastion), \code{security.tf} (retrait \code{Allow-SSH-Admin}), nouveau \code{bastion.tf}, \code{variables.tf} (\code{enable\_public\_ip}).
+  \item \textbf{Risques :} le Bastion a un \textbf{coût horaire} (à arbitrer en dev) ; le test web direct par VM n'est plus possible (uniquement via le LB) ; la bascule nécessite un \code{plan} attentif (mise à jour des NIC, pas recréation des VM).
+\end{itemize}
+
+\subsection*{Conclusion}
+Le TP2 fait passer ShopEasy d'une infrastructure \textbf{créée à la main} à une infrastructure \textbf{décrite
+en code}, reproductible et gouvernable. Les principes clés — \textbf{moindre privilège}, \textbf{pas de secret
+versionné}, \textbf{nommage et tags cohérents}, \textbf{lecture systématique du plan}, \textbf{maîtrise du
+drift et des coûts} — sont appliqués et documentés. Les évolutions proposées (Bastion, state distant,
+modularisation, CI/CD) rapprocheraient l'environnement d'un usage de production.
+
+
+% #####################################################################
+%  QUIZ
+% #####################################################################
+\section{Quiz de validation}
+
+\begin{enumerate}[leftmargin=2.2em]
+\item \textbf{Terraform est-il un outil impératif ou déclaratif ? Justifier.}\\ \textbf{Déclaratif} : on décrit l'état final souhaité, Terraform calcule les actions (créer/modifier/détruire) pour l'atteindre — d'où l'importance du \code{plan}.
+\item \textbf{Quel est le rôle d'un provider Terraform ?}\\ Un plugin qui dialogue avec l'API d'une plateforme et traduit les ressources Terraform en appels concrets (ici \code{azurerm} pour Azure).
+\item \textbf{À quoi sert le fichier \code{terraform.tfstate} ?}\\ C'est le fichier d'état : il fait le lien entre le code et les ressources réelles créées dans Azure.
+\item \textbf{Pourquoi exécuter \code{terraform plan} avant \code{terraform apply} ?}\\ Pour prévisualiser les changements avant d'impacter Azure ; une destruction ou un remplacement imprévu est un signal d'alerte.
+\item \textbf{Quelle commande formate le code Terraform ?}\\ \code{terraform fmt}.
+\item \textbf{Quelle commande vérifie la syntaxe et la cohérence de base ?}\\ \code{terraform validate}.
+\item \textbf{Quel service Azure correspond au réseau privé logique ?}\\ Le Virtual Network (VNet).
+\item \textbf{Quel composant Azure filtre les flux réseau entrants et sortants ?}\\ Le Network Security Group (NSG).
+\item \textbf{Pourquoi restreindre SSH à une seule adresse IP ?}\\ Pour réduire la surface d'attaque (scans et force brute) : seule l'IP admin peut tenter une connexion.
+\item \textbf{Quel est l'intérêt de \code{count} dans le déploiement des VM ?}\\ Déployer plusieurs instances identiques sans dupliquer le code ; \code{count.index} nomme et relie chaque VM à son interface et son IP.
+\item \textbf{Pourquoi utiliser des variables ?}\\ Pour éviter les valeurs codées en dur et rendre le projet paramétrable et réutilisable sur plusieurs environnements.
+\item \textbf{Pourquoi utiliser des outputs ?}\\ Pour exposer les informations utiles après déploiement (IP du LB, IP des VM, nom du Storage) sans fouiller le portail.
+\item \textbf{Pourquoi taguer les ressources ?}\\ Pour la gouvernance et le FinOps : imputer les coûts, filtrer les ressources, identifier le propriétaire et l'environnement.
+\item \textbf{Différence entre un changement Terraform et un changement manuel dans le portail ?}\\ Le changement Terraform est versionné, relu et tracé (\code{plan}/\code{apply}) ; le changement manuel se fait hors code \arr{} dérive non tracée.
+\item \textbf{Quel risque présente un Storage Account public ?}\\ Une fuite de données : les blobs deviennent accessibles à quiconque connaît l'URL (risque RGPD).
+\item \textbf{Pourquoi le versioning Blob peut-il générer des coûts supplémentaires ?}\\ Il conserve une copie de chaque version à chaque modification ; ces versions s'accumulent et sont facturées comme du stockage.
+\item \textbf{À quoi sert un Load Balancer ?}\\ À répartir le trafic entrant sur plusieurs VM derrière un point d'entrée unique, ce qui améliore la disponibilité et permet de monter en charge.
+\item \textbf{Pourquoi un state distant est-il préférable en équipe ?}\\ Emplacement central partagé, verrouillage (pas de corruption), pas de state sur les postes, intégration CI/CD.
+\item \textbf{Citer deux bonnes pratiques de sécurité pour un projet Terraform.}\\ Ne jamais versionner de secret (\code{tfvars}/\code{tfstate} exclus, Key Vault) ; moindre privilège (SSH restreint, NSG, backend de state distant sécurisé).
+\item \textbf{Citer deux améliorations pour rapprocher l'architecture d'un environnement de production.}\\ Supprimer les IP publiques des VM + Azure Bastion et externaliser le state ; Application Gateway + WAF (HTTPS), supervision (Azure Monitor) et pipeline CI/CD.
+\end{enumerate}
+
+\vspace{6pt}
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=4pt, colback=okgreenbg, colframe=okgreen,
+   left=4.5mm,right=4.5mm,top=3.6mm,bottom=3.6mm]
+{\sffamily\bfseries\color{okgreen}\eParty~Fin du dossier} — les 14 ateliers, la note technique et le quiz de
+validation sont complets : projet Terraform initialisé et paramétré, déploiement Azure (réseau, NSG, 2 VM
+cloud-init, Load Balancer, Storage privé versionné), outputs, modification et dérive maîtrisées, state distant,
+analyses coût/sécurité/maintenabilité et nettoyage.
+\end{tcolorbox}
+
+\end{document}
