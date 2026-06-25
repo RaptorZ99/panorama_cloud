@@ -1,0 +1,19 @@
+# ============================================================
+#  terraform.tfvars.example — Modèle de valeurs (anonymisé)
+#  À copier en terraform.tfvars puis renseigner les valeurs réelles.
+#  terraform.tfvars est exclu du dépôt (il contient l'IP publique de l'admin).
+# ============================================================
+
+project             = "shopeasy"
+environment         = "dev"
+
+# Région Azure cible.
+# francecentral (défaut du TP) est bloquée par la policy "Allowed resource
+# deployment regions" d'Azure for Students → région déployable retenue : swedencentral.
+location            = "swedencentral"
+
+admin_username      = "azureuser"
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+
+# IP publique de l'administrateur au format CIDR /32 (accès SSH restreint).
+allowed_ssh_cidr    = "X.X.X.X/32"

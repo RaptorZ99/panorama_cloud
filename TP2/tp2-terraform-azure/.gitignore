@@ -1,0 +1,29 @@
+# ============================================================
+#  .gitignore — projet Terraform ShopEasy (TP2)
+# ============================================================
+
+# --- Répertoire de travail Terraform (providers téléchargés, cache, plugins) ---
+.terraform/
+
+# --- Fichiers de STATE : peuvent contenir des données sensibles en clair ---
+#     (clés d'accès Storage, mots de passe, chaînes de connexion, IDs…)
+#     → ne JAMAIS versionner dans un dépôt non sécurisé.
+*.tfstate
+*.tfstate.*
+
+# --- Variables converties en JSON (peuvent embarquer des valeurs sensibles) ---
+*.tfvars.json
+
+# --- Valeurs concrètes d'environnement ---
+#     terraform.tfvars contient ici le CIDR SSH = IP publique réelle de l'admin.
+#     On ne versionne QUE l'exemple anonymisé : terraform.tfvars.example
+terraform.tfvars
+
+# --- Fichier de verrouillage des providers (choix du TP : non versionné) ---
+#     NB : en projet d'équipe, le committer est souvent recommandé pour figer
+#     les versions de providers (cf. note dans le livrable Atelier 1).
+.terraform.lock.hcl
+
+# --- Logs de crash Terraform ---
+crash.log
+crash.*.log
