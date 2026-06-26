@@ -10,7 +10,7 @@ l'architecture cible de ShopEasy conçue au TP1 : réseau segmenté, deux serveu
 balancer, stockage documentaire privé, le tout nommé, taggé, paramétré et supervisé par le code.
 
 > 📄 **Dossier de rendu à remettre** : [`latex/TP2-ShopEasy-Terraform.pdf`](latex/TP2-ShopEasy-Terraform.pdf)
-> — **54 pages**, auto-contenu (les 14 ateliers, la note technique, le quiz, tout le code Terraform et toutes les captures).
+> — **55 pages**, auto-contenu (les 14 ateliers, la note technique, le quiz, tout le code Terraform et toutes les captures).
 > Source LaTeX : [`latex/TP2-ShopEasy-Terraform.tex`](latex/TP2-ShopEasy-Terraform.tex).
 
 ---
@@ -38,7 +38,7 @@ TP2/
 │   └── assets/                            ← captures d'écran (.png)
 └── latex/
     ├── TP2-ShopEasy-Terraform.tex         ← source LaTeX (dossier complet)
-    └── TP2-ShopEasy-Terraform.pdf         ← rendu PDF final (54 pages)
+    └── TP2-ShopEasy-Terraform.pdf         ← rendu PDF final (55 pages)
 ```
 
 ---

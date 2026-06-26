@@ -3,10 +3,9 @@
 > **Objectif :** supprimer proprement toutes les ressources créées pour arrêter la facturation. \
 > **Livrable attendu :** prévisualisation de la destruction + commande `terraform destroy`.
 
-> ⚠️ **Statut : destruction NON exécutée à ce stade.** Conformément à la consigne, l'environnement est
-> **conservé** le temps de valider l'ensemble des livrables et des captures. Seule la **prévisualisation**
-> (`terraform plan -destroy`, qui ne supprime rien) a été exécutée. La destruction effective est la
-> **dernière action** du projet (cf. §4).
+> ✅ **Statut : destruction exécutée.** Après validation de l'ensemble des livrables et des captures, la
+> destruction effective a été lancée (`terraform destroy`). Les **21 ressources ont été supprimées** et le
+> Resource Group n'existe plus côté Azure — la **facturation est arrêtée** (cf. §4).
 
 ---
 
@@ -76,31 +75,51 @@ ressources qu'il contient, y compris les **disques managés** et le **state des 
 
 ## 4. Exécution finale et vérification
 
-La destruction sera lancée **en toute fin de projet**, une fois tous les livrables et captures validés :
+Après validation de tous les livrables et captures, la destruction a été exécutée :
 
 ```bash
-terraform destroy            # confirmation : yes
+terraform destroy -auto-approve
 ```
 
-Vérifications attendues après destruction :
+Sortie réelle (extrait, identifiant d'abonnement masqué) :
 
-```bash
-terraform state list         # (vide)
-az group show -n rg-shopeasy-dev   # ResourceGroupNotFound
-az group list -o table       # rg-shopeasy-dev absent
+```text
+random_string.suffix: Destruction complete after 0s
+azurerm_lb_rule.http: Destruction complete after 4s
+azurerm_network_security_group.web: Destruction complete after 11s
+azurerm_lb.web: Destruction complete after 10s
+azurerm_linux_virtual_machine.web[0]: Destruction complete after 32s
+azurerm_linux_virtual_machine.web[1]: Destruction complete after 32s
+azurerm_public_ip.lb: Destruction complete after 11s
+azurerm_network_interface.web[0]: Destruction complete after 11s
+azurerm_network_interface.web[1]: Destruction complete after 22s
+azurerm_public_ip.web[0]: Destruction complete after 11s
+azurerm_public_ip.web[1]: Destruction complete after 11s
+azurerm_subnet.web: Destruction complete after 11s
+azurerm_virtual_network.main: Destruction complete after 11s
+azurerm_resource_group.main: Destruction complete after 21s
+
+Destroy complete! Resources: 21 destroyed.
 ```
 
-> **Point obligatoire du TP** : ne jamais terminer sans avoir supprimé les ressources de formation. Cette
-> étape sera donc exécutée juste avant la clôture, et ce livrable mis à jour avec la sortie réelle de
-> `terraform destroy` (*« Destroy complete! Resources: 21 destroyed »*) et la confirmation de disparition du
-> Resource Group.
+Vérifications après destruction :
+
+```text
+$ terraform state list
+(vide — aucune ressource gérée)
+
+$ az group show -n rg-shopeasy-dev
+ERROR: (ResourceGroupNotFound) Resource group 'rg-shopeasy-dev' could not be found.
+```
+
+> **Point obligatoire du TP** : ne jamais terminer sans avoir supprimé les ressources de formation. C'est
+> fait — les **21 ressources sont détruites**, le Resource Group n'existe plus, la **facturation est arrêtée**.
 
 ---
 
-## ✅ État après l'Atelier 14 (préparation)
+## ✅ État après l'Atelier 14
 
-- Prévisualisation `terraform plan -destroy` : **21 ressources** prêtes à être détruites, `0 add, 0 change`.
-- Procédure de destruction documentée (`terraform destroy` + vérifications).
-- **Environnement volontairement conservé** pour validation finale ; destruction = dernière action du projet.
-
-**Reste à produire : la note technique (synthèse des choix) et, optionnellement, le quiz de validation.**
+- `terraform destroy` exécuté : **`Destroy complete! Resources: 21 destroyed`**.
+- État Terraform **vide** ; Resource Group `rg-shopeasy-dev` **absent** de l'abonnement (`ResourceGroupNotFound`).
+- **Facturation arrêtée** (coût ramené à ≈ 0). L'environnement reste **reproductible à l'identique** par `terraform apply`.
+- **Fin du TP2** : projet Terraform complet — déployé, validé, documenté et nettoyé.

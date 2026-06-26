@@ -1935,11 +1935,11 @@ détecter les dérives.
 \textbf{\ePackage~Livrable attendu} — prévisualisation de la destruction et commande \code{terraform destroy}.
 \end{fiche}
 
-\begin{notebox}[Destruction documentée — exécutée en toute fin]
-L'environnement est \textbf{conservé} le temps de valider l'ensemble des livrables et des captures. Seule la
-\textbf{prévisualisation} (\code{terraform plan -destroy}, qui ne supprime rien) a été exécutée à ce stade. La
-destruction effective (\code{terraform destroy}) est la \textbf{dernière action} du projet.
-\end{notebox}
+\begin{etatbox}[Destruction exécutée]
+Après validation de l'ensemble des livrables et des captures, la destruction effective a été lancée
+(\code{terraform destroy}). Les \textbf{21 ressources ont été supprimées} et le Resource Group n'existe plus
+côté Azure — la \textbf{facturation est arrêtée} (détaillée ci-dessous).
+\end{etatbox}
 
 \subsection{Pourquoi détruire l'environnement ?}
 L'infrastructure de test coûte $\approx$ \textbf{46,5 \$/mois en 24/7} (cf. Atelier 13), facturée \textbf{même
@@ -1966,32 +1966,49 @@ Plan: 0 to add, 0 to change, 21 to destroy.
 \end{codebox}
 Les \textbf{21 ressources} gérées par Terraform sont prévues pour suppression.
 
-\subsection{Commande de destruction et vérification}
-\begin{codebox}{bash}
+\subsection{Exécution et vérification}
+Après validation de tous les livrables et captures, la destruction a été exécutée (\code{terraform destroy
+-auto-approve}) : elle supprime toutes les ressources gérées par le state, dans l'ordre inverse des
+dépendances. Sortie réelle (extrait, identifiant d'abonnement masqué) :
+\begin{codebox}{console}
 \begin{Verbatim}
-terraform destroy        # confirmation interactive : yes
-# Resultat attendu : Destroy complete! Resources: 21 destroyed
+random_string.suffix: Destruction complete after 0s
+azurerm_lb_rule.http: Destruction complete after 4s
+azurerm_network_security_group.web: Destruction complete after 11s
+azurerm_lb.web: Destruction complete after 10s
+azurerm_linux_virtual_machine.web[0]: Destruction complete after 32s
+azurerm_linux_virtual_machine.web[1]: Destruction complete after 32s
+azurerm_public_ip.lb / web[0..1]: Destruction complete after ~11s
+azurerm_network_interface.web[0..1]: Destruction complete after ~11-22s
+azurerm_subnet.web: Destruction complete after 11s
+azurerm_virtual_network.main: Destruction complete after 11s
+azurerm_resource_group.main: Destruction complete after 21s
 
-# Verifications apres destruction :
-terraform state list                 # (vide)
-az group show -n rg-shopeasy-dev      # ResourceGroupNotFound
+Destroy complete! Resources: 21 destroyed.
 \end{Verbatim}
 \end{codebox}
-\code{terraform destroy} supprime toutes les ressources gérées par le state, dans l'ordre inverse des
-dépendances. La suppression du \textbf{Resource Group} entraîne celle de toutes les ressources qu'il contient
-(y compris les disques managés). Les captures ayant déjà été récupérées, aucune perte n'en résulte pour le
-rendu.
+Vérifications après destruction :
+\begin{codebox}{console}
+\begin{Verbatim}
+$ terraform state list
+(vide -- aucune ressource geree)
+
+$ az group show -n rg-shopeasy-dev
+ERROR: (ResourceGroupNotFound) Resource group 'rg-shopeasy-dev' could not be found.
+\end{Verbatim}
+\end{codebox}
 
 \begin{notebox}[Point obligatoire du TP]
-Ne jamais terminer une séance sans avoir supprimé les ressources de formation. Cette étape est exécutée juste
-avant la clôture du projet.
+Ne jamais terminer une séance sans avoir supprimé les ressources de formation. C'est fait : les \textbf{21
+ressources sont détruites}, le Resource Group n'existe plus, la \textbf{facturation est arrêtée}.
 \end{notebox}
 
 \begin{etatbox}
 \begin{itemize}
-  \item Prévisualisation \code{terraform plan -destroy} : \textbf{21 ressources} prêtes à être détruites (\code{0 add, 0 change}).
-  \item Procédure de destruction documentée (\code{terraform destroy} + vérifications).
-  \item Environnement volontairement conservé pour validation finale ; destruction = dernière action du projet.
+  \item \code{terraform destroy} exécuté : \textbf{Destroy complete! Resources: 21 destroyed}.
+  \item État Terraform \textbf{vide} ; Resource Group \code{rg-shopeasy-dev} \textbf{absent} de l'abonnement (\code{ResourceGroupNotFound}).
+  \item \textbf{Facturation arrêtée} ($\approx$ 0) ; l'environnement reste \textbf{reproductible à l'identique} par \code{terraform apply}.
+  \item \textbf{Fin du TP2} : projet Terraform complet — déployé, validé, documenté et nettoyé.
 \end{itemize}
 \end{etatbox}
 
