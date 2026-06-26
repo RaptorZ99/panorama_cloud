@@ -7,7 +7,9 @@
 
 Ce dépôt contient les livrables du TP3 : l'**exploitation** de l'architecture ShopEasy (conçue au TP1, industrialisée en Terraform au TP2). On passe du *déploiement* à l'*administration* : inventorier, taguer, administrer les VM, scripter (Bash + Python), superviser (Azure Monitor), sécuriser et optimiser les coûts (FinOps), puis produire un **rapport d'exploitation**.
 
-> 📄 **Dossier de rendu PDF** : `latex/TP3-ShopEasy-Administration.pdf` *(généré via LaTeX — voir le dossier `latex/`)*.
+> 📄 **Dossier de rendu à remettre** : [`latex/TP3-ShopEasy-Administration.pdf`](latex/TP3-ShopEasy-Administration.pdf)
+> — **40 pages**, auto-contenu (les 12 ateliers, le rapport d'exploitation, le quiz, tout le code des scripts et toutes les captures).
+> Source LaTeX : [`latex/TP3-ShopEasy-Administration.tex`](latex/TP3-ShopEasy-Administration.tex).
 
 ---
 

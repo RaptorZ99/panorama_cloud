@@ -1,0 +1,1507 @@
+% =====================================================================
+%  TP3 — Administration & Automatisation Azure (ShopEasy)
+%  Binôme : Louis SCARFONE & Maxence BOURRAGUE — Bloc 4 (Cloud Computing)
+%  Moteur : LuaLaTeX (LuaHBTeX)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Langue & fontes ----------
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{french}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}[Scale=0.80]
+\usepackage{microtype}
+\emergencystretch=3em  % absorbe les débordements de texte (code inline en fin de ligne)
+
+% ---------- Respiration (look épuré) ----------
+\usepackage{setspace}
+\setstretch{1.08}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em plus 0.12em minus 0.05em}
+
+% ---------- Géométrie ----------
+\usepackage[a4paper,margin=2.2cm,headheight=16pt,headsep=14pt,footskip=20pt]{geometry}
+
+% ---------- Couleurs (palette Azure) ----------
+\usepackage{xcolor}
+\definecolor{azure}{HTML}{0078D4}
+\definecolor{azuredark}{HTML}{14375E}
+\definecolor{azuremid}{HTML}{2E75B6}
+\definecolor{azurelight}{HTML}{E8F1FB}
+\definecolor{azurepale}{HTML}{F3F8FD}
+\definecolor{okgreen}{HTML}{107C10}
+\definecolor{okgreenbg}{HTML}{E8F5E9}
+\definecolor{warnorange}{HTML}{B5520A}
+\definecolor{warnbg}{HTML}{FBEEDF}
+\definecolor{dangerred}{HTML}{A4262C}
+\definecolor{codebg}{HTML}{F6F8FA}
+\definecolor{codeframe}{HTML}{D8E1EC}
+\definecolor{ink}{HTML}{1B2733}
+\definecolor{rowalt}{HTML}{EBF3FC}
+\color{ink}
+
+% ---------- Divers ----------
+\usepackage{graphicx}
+\graphicspath{{../livrables/assets/}}
+\usepackage{fontawesome5}
+\usepackage{enumitem}
+\setlist{leftmargin=1.4em,topsep=2pt,itemsep=2pt,parsep=0pt}
+\usepackage{needspace}
+\usepackage{fvextra}
+
+% ---------- Emojis (Twemoji couleur) ----------
+\usepackage{twemojis}
+\newcommand{\emo}[1]{\raisebox{-0.14em}{\twemoji{#1}}}
+\newcommand{\eTarget}{\emo{1f3af}}
+\newcommand{\ePackage}{\emo{1f4e6}}
+\newcommand{\eCheck}{\emo{2705}}
+\newcommand{\eWarn}{\emo{26a0}}
+\newcommand{\eBulb}{\emo{1f4a1}}
+\newcommand{\eLock}{\emo{1f512}}
+\newcommand{\eKey}{\emo{1f510}}
+\newcommand{\eRocket}{\emo{1f680}}
+\newcommand{\eChart}{\emo{1f4ca}}
+\newcommand{\eMoney}{\emo{1f4b0}}
+\newcommand{\eGear}{\emo{2699}}
+\newcommand{\eGlobe}{\emo{1f310}}
+\newcommand{\eCamera}{\emo{1f4f8}}
+\newcommand{\ePin}{\emo{1f4cc}}
+\newcommand{\eMag}{\emo{1f50d}}
+\newcommand{\eFlag}{\emo{1f3c1}}
+\newcommand{\eParty}{\emo{1f389}}
+\newcommand{\eShield}{\emo{1f6e1}}
+\newcommand{\eBroom}{\emo{1f9f9}}
+\newcommand{\eFolder}{\emo{1f4c2}}
+\newcommand{\eServer}{\emo{1f5a5}}
+\newcommand{\eDB}{\emo{1f5c4}}
+\newcommand{\eScale}{\emo{2696}}
+\newcommand{\eRed}{\emo{1f534}}
+\newcommand{\eOrange}{\emo{1f7e0}}
+\newcommand{\eYellow}{\emo{1f7e1}}
+\newcommand{\eGreen}{\emo{1f7e2}}
+\newcommand{\eWorld}{\emo{1f30d}}
+\newcommand{\eTerminal}{\emo{1f4bb}}
+\newcommand{\eSnake}{\emo{1f40d}}
+\newcommand{\arr}{\ensuremath{\rightarrow}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% ---------- Tableaux (tabularray) ----------
+\usepackage{tabularray}
+\UseTblrLibrary{booktabs}
+\NewDocumentEnvironment{ltable}{m}{%
+  \par\addvspace{4pt}\begin{tblr}{
+    width=\linewidth,
+    colspec={#1},
+    row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\small},
+    row{2-Z}={font=\small},
+    row{even}={bg=rowalt},
+    hline{1,Z}={1.1pt,solid,azuredark},
+    hline{2}={0.5pt,solid,azuredark!45},
+    colsep=7pt, rowsep=4pt,
+    stretch=1.18,
+  }%
+}{%
+  \end{tblr}\par\addvspace{4pt}%
+}
+
+% ---------- Boîtes (tcolorbox) ----------
+\usepackage[most]{tcolorbox}
+\tcbset{
+  boxbase/.style={
+    enhanced, breakable, sharp corners, boxrule=0pt, leftrule=4pt,
+    left=4.5mm, right=4.5mm, top=3.6mm, bottom=3.6mm,
+    before skip=12pt, after skip=12pt,
+    fonttitle=\sffamily\bfseries, coltitle=white,
+    attach boxed title to top left={xshift=0mm,yshift=-2.6mm},
+    boxed title style={sharp corners, boxrule=0pt, left=2.5mm,right=2.5mm,top=0.9mm,bottom=0.9mm},
+  },
+}
+\newtcolorbox{fiche}{boxbase, colback=azurelight, colframe=azure}
+\newtcolorbox{notebox}[1][Point de vigilance]{boxbase, colback=warnbg, colframe=warnorange,
+  colbacktitle=warnorange, title={\eWarn~#1}}
+\newtcolorbox{tipbox}[1][Astuce]{boxbase, colback=azurepale, colframe=azuremid,
+  colbacktitle=azuremid, title={\eBulb~#1}}
+\newtcolorbox{etatbox}[1][État après l'atelier]{boxbase, colback=okgreenbg, colframe=okgreen,
+  colbacktitle=okgreen, title={\eCheck~#1}}
+
+% Bloc code / terminal
+\fvset{breaklines=true, breakanywhere=true, fontsize=\footnotesize,
+  breaksymbolleft=\raisebox{0.1ex}{\scriptsize\textcolor{azure}{$\hookrightarrow$}}}
+\newtcolorbox{codebox}[1]{
+  enhanced, breakable, sharp corners, boxrule=0.7pt,
+  colback=codebg, colframe=codeframe,
+  coltitle=azuredark, colbacktitle=codeframe, fonttitle=\ttfamily\bfseries\scriptsize,
+  title={\faTerminal~~#1}, left=3mm, right=3mm, top=2.6mm, bottom=2.6mm,
+  before skip=12pt, after skip=14pt,
+}
+
+% Capture d'écran encadrée + légende
+\newcommand{\screenshot}[2]{%
+  \par\addvspace{10pt}
+  \begin{center}
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0.7pt, colframe=codeframe, colback=white,
+      left=0.8mm, right=0.8mm, top=0.8mm, bottom=0.8mm, drop fuzzy shadow=black!18]
+    \includegraphics[width=\linewidth]{#1}
+  \end{tcolorbox}\par\vspace{4pt}
+  {\small\itshape\color{black!58}#2}
+  \end{center}\par\addvspace{12pt}
+}
+
+% Carte « chiffre-clé » pour la page de garde
+\newcommand{\statcard}[2]{%
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=3pt, colframe=azure,
+     colback=azurepale, width=0.305\linewidth, halign=center, valign=center, height=2.3cm,
+     left=1mm, right=1mm, top=1mm, bottom=1mm, nobeforeafter]
+     {\sffamily\bfseries\fontsize{22}{24}\selectfont\color{azuredark}#1}\\[1.5mm]
+     {\sffamily\small\color{black!58}#2}
+  \end{tcolorbox}%
+}
+
+% ---------- Sections (titlesec) ----------
+\usepackage{titlesec}
+\titleformat{\section}
+  {\sffamily\LARGE\bfseries\color{azuredark}}
+  {\tcbox[on line, sharp corners, boxrule=0pt, colback=azure, colupper=white,
+     left=2.2mm,right=2.2mm,top=0.6mm,bottom=0.6mm]{\thesection}}
+  {0.7em}{}[\vspace{1mm}{\color{azure}\titlerule[1.6pt]}]
+\titlespacing*{\section}{0pt}{3.6ex plus 0.8ex}{2.0ex}
+\titleformat{\subsection}
+  {\sffamily\large\bfseries\color{azuremid}}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{2.8ex plus 0.5ex}{1.1ex}
+\titleformat{\subsubsection}
+  {\sffamily\bfseries\color{azuredark}}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{1.9ex plus 0.3ex}{0.5ex}
+
+% ---------- En-têtes / pieds (fancyhdr) ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\small\color{azuredark}\textbf{TP3 Administration}~\textcolor{azure}{\textbullet}~ShopEasy}
+\fancyhead[R]{\sffamily\small\color{black!55}\nouppercase{\leftmark}}
+\fancyfoot[C]{\sffamily\small\color{black!55}\thepage}
+\fancyfoot[R]{\sffamily\scriptsize\color{black!42}Bloc 4 · Cloud Computing}
+\fancyfoot[L]{\sffamily\scriptsize\color{black!42}SCARFONE · BOURRAGUE}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrule}{\vspace{-2pt}{\color{azure!70}\rule{\headwidth}{1.1pt}}}
+
+% ---------- Liens ----------
+\usepackage[hidelinks]{hyperref}
+\hypersetup{colorlinks=true, linkcolor=azuredark, urlcolor=azuremid,
+  pdftitle={TP3 Administration - ShopEasy}, pdfauthor={Louis SCARFONE, Maxence BOURRAGUE}}
+
+% Filet décoratif
+\newcommand{\thinrule}{\par\vspace{1mm}{\color{azure!30}\hrule height 0.5pt}\vspace{1mm}}
+
+\begin{document}
+
+% =====================================================================
+%  PAGE DE GARDE
+% =====================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\setlength{\parskip}{0pt}
+\raggedright
+
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, colback=azuredark,
+   width=\linewidth, left=13mm, right=13mm, top=14mm, bottom=14mm,
+   borderline north={5pt}{0pt}{azure}, borderline south={2pt}{0pt}{azure}]
+  \raggedright
+  {\sffamily\bfseries\large\color{azure!75}\faMicrosoft~~MICROSOFT AZURE \quad\textbullet\quad BLOC 4 — CLOUD COMPUTING}
+
+  \vspace{9mm}
+  {\sffamily\bfseries\color{white}\fontsize{36}{42}\selectfont TP3 — Administration \& Automatisation}
+
+  \vspace{4mm}
+  {\sffamily\color{azurelight}\LARGE exploiter l'environnement Azure de \textbf{ShopEasy}}
+
+  \vspace{8mm}
+  {\color{azure}\rule{5.2cm}{2.5pt}}
+
+  \vspace{5mm}
+  {\sffamily\color{white}\large Inventorier, administrer, superviser et optimiser une infrastructure Azure avec \textbf{Azure CLI}, \textbf{Bash}, \textbf{Python} et \textbf{Azure Monitor}.}
+\end{tcolorbox}
+
+\vspace{1.8cm}
+
+\begin{minipage}[t]{0.5\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Binôme}\\[3.5mm]
+  {\large Louis \textsc{Scarfone}}\\[2mm]
+  {\large Maxence \textsc{Bourragué}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Cadre}\\[3.5mm]
+  Mastère Dev Manager Full Stack — RNCP niveau 7\\[2mm]
+  Cas fil rouge : \textbf{ShopEasy}\\[2mm]
+  Azure for Students — région \texttt{swedencentral}
+\end{minipage}
+
+\vspace{1.9cm}
+
+\noindent
+\statcard{12}{ateliers + quiz}\hfill
+\statcard{4}{scripts CLI/Bash/Python}\hfill
+\statcard{$\approx$\,47\,\$}{coût mensuel estimé}
+
+\vfill
+{\sffamily\large\bfseries\color{azuredark}Juin 2026}\hfill
+{\sffamily\color{black!45}Mastère Dev Manager Full Stack}
+\end{titlepage}
+
+% =====================================================================
+%  TABLE DES MATIÈRES
+% =====================================================================
+\thispagestyle{fancy}
+{\sffamily\Huge\bfseries\color{azuredark}Sommaire}
+\vspace{2mm}{\color{azure}\titlerule[1.6pt]}\vspace{4mm}
+\hypersetup{linkcolor=azuredark}
+{\setlength{\parskip}{1pt}\tableofcontents}
+\newpage
+
+
+% #####################################################################
+%  ATELIER 1
+% #####################################################################
+\section{Atelier 1 — Prise en main d'Azure CLI}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — vérifier l'accès à l'environnement Azure, identifier la subscription active et se positionner sur le bon groupe de ressources.
+
+\textbf{\ePackage~Livrable attendu} — extrait de terminal montrant la subscription active, le groupe de ressources cible et les valeurs par défaut configurées.
+\end{fiche}
+
+\subsection{Contexte — du déploiement à l'exploitation}
+Le TP1 a \textbf{conçu et déployé manuellement} l'architecture ShopEasy ; le TP2 l'a \textbf{décrite en Terraform}. Le TP3 ouvre la phase d'\textbf{exploitation} : administrer, inventorier, surveiller, automatiser et documenter cet environnement avec \textbf{Azure CLI, Bash et Python}. L'environnement de travail est celui du TP2, \textbf{redéployé à l'identique} via \code{terraform apply} (21 ressources) : un groupe de ressources \code{rg-shopeasy-dev} contenant un réseau segmenté, deux VM Linux derrière un Load Balancer et un compte de stockage privé.
+
+\begin{ltable}{Q[l,0.5] X[l,1]}
+Périmètre & Valeur \\
+Abonnement & Azure for Students \\
+Région & \code{swedencentral} (Stockholm) \\
+Groupe de ressources & \code{rg-shopeasy-dev} \\
+VM web & \code{vm-shopeasy-dev-web-1}, \code{vm-shopeasy-dev-web-2} (\code{Standard\_B2ats\_v2}) \\
+Storage Account & \code{shopeasydevdocs350wnq} \\
+\end{ltable}
+
+\begin{tipbox}[Contraintes Azure for Students]
+La région \code{swedencentral} et la taille \code{Standard\_B2ats\_v2} sont conservées du TP1/TP2 : \code{francecentral} est bloquée par la policy \textit{Allowed regions}, et \code{Standard\_B1s} est indisponible sur l'abonnement étudiant.
+\end{tipbox}
+
+\subsection{Centralisation des variables — \code{variables.sh}}
+Toutes les commandes et scripts s'appuient sur un jeu de variables centralisé dans \code{variables.sh}, à sourcer avant chaque session. Cette factorisation évite de répéter les noms de ressources et permet de rejouer les commandes sur un autre environnement.
+
+\begin{codebox}{variables.sh}
+\begin{Verbatim}
+#!/usr/bin/env bash
+# variables.sh - Variables d'exploitation de l'environnement ShopEasy (TP3)
+
+export RG="rg-shopeasy-dev"              # Groupe de ressources dedie au projet
+export LOCATION="swedencentral"          # Region de deploiement
+export VM1="vm-shopeasy-dev-web-1"       # Premiere VM web
+export VM2="vm-shopeasy-dev-web-2"       # Seconde VM web
+export STORAGE="shopeasydevdocs350wnq"   # Storage Account (suffixe aleatoire Terraform)
+export CONTAINER="operations"            # Conteneur des rapports d'exploitation
+
+export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
+export AZURE_SUBSCRIPTION_ID="$ARM_SUBSCRIPTION_ID"   # Utilisee par le SDK Python
+export AZURE_RESOURCE_GROUP="$RG"
+\end{Verbatim}
+\end{codebox}
+
+Aucun identifiant n'est codé en dur : la subscription est résolue dynamiquement par \code{az account show}.
+
+\subsection{Version d'Azure CLI \& subscription active}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az version
+az account show --output table
+az account list --output table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+azure-cli : 2.87.0
+
+EnvironmentName  IsDefault  Name                State    TenantDefaultDomain  TenantId
+---------------  ---------  ------------------  -------  -------------------  --------
+AzureCloud       True       Azure for Students  Enabled  efrei.net            <masque>
+\end{Verbatim}
+\end{codebox}
+La subscription \textbf{Azure for Students} est active (\code{State = Enabled}) et définie par défaut (\code{IsDefault = True}). Les identifiants (subscription ID, tenant ID) sont \textbf{masqués} dans les livrables ; ils ne sont jamais écrits en clair dans un fichier versionné.
+
+\subsection{Groupe de ressources cible}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az group show --name "$RG" \
+  --query "{Nom:name, Region:location, Etat:properties.provisioningState}" -o table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom              Region         Etat
+---------------  -------------  ---------
+rg-shopeasy-dev  swedencentral  Succeeded
+\end{Verbatim}
+\end{codebox}
+Le groupe \code{rg-shopeasy-dev} existe, en région \code{swedencentral}, à l'état \code{Succeeded} : l'environnement à exploiter est bien en place.
+
+\subsection{Configuration des valeurs par défaut}
+Pour éviter de répéter \code{--resource-group} et \code{--location} sur chaque commande, on configure des valeurs par défaut au niveau de la CLI.
+\begin{codebox}{bash}
+\begin{Verbatim}
+az configure --defaults group="$RG" location="$LOCATION"
+az configure --list-defaults --output table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Name      Source            Value
+--------  ----------------  ---------------
+group     ~/.azure/config   rg-shopeasy-dev
+location  ~/.azure/config   swedencentral
+\end{Verbatim}
+\end{codebox}
+Effet immédiat : les commandes suivantes ciblent le bon groupe \textbf{sans \code{-g}} ; \code{az resource list} renvoie alors directement les \textbf{13 ressources} de premier niveau.
+
+\subsection{Travail demandé}
+\begin{enumerate}
+  \item \textbf{Vérifier la subscription active.} \code{az account show} \arr{} \textbf{Azure for Students}, \textit{Enabled}, par défaut.
+  \item \textbf{Vérifier que le groupe de ressources existe.} \code{az group show} \arr{} \code{rg-shopeasy-dev}, \code{swedencentral}, \code{Succeeded}.
+  \item \textbf{Configurer les valeurs par défaut.} \code{az configure --defaults} \arr{} groupe et région enregistrés dans \code{\textasciitilde/.azure/config}, commandes ultérieures raccourcies.
+\end{enumerate}
+
+\subsection{Capture}
+\screenshot{atelier01-resource-group.png}{Groupe de ressources \code{rg-shopeasy-dev} en région \textit{Sweden Central} avec ses ressources (Portal \arr{} Resource groups \arr{} rg-shopeasy-dev).}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Accès Azure validé : subscription \textbf{Azure for Students} active (\textit{Enabled}, par défaut).
+  \item Groupe \code{rg-shopeasy-dev} présent en \code{swedencentral} (\code{Succeeded}), contenant les 13 ressources de l'architecture.
+  \item Valeurs par défaut configurées (\code{group}, \code{location}) : commandes plus courtes et reproductibles.
+  \item Variables d'exploitation centralisées dans \code{variables.sh} (aucun secret en dur).
+  \item \textbf{Prêt pour l'Atelier 2 — Inventorier les ressources Azure.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 2
+% #####################################################################
+\section{Atelier 2 — Inventorier les ressources Azure}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — produire un inventaire lisible des ressources ShopEasy, rejouable sans passer par le portail.
+
+\textbf{\ePackage~Livrable attendu} — fichiers \code{resources.json}, \code{resources.tsv} et tableau d'inventaire complété.
+\end{fiche}
+
+\subsection{Lister les ressources}
+L'inventaire est la base de l'exploitation : avant de surveiller, sécuriser ou optimiser, il faut savoir ce qui existe. Azure CLI liste les ressources et choisit le format de sortie selon l'usage.
+\begin{codebox}{bash}
+\begin{Verbatim}
+az resource list --resource-group "$RG" \
+  --query "[].{Nom:name,Type:type,Region:location}" --output table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom                     Type                                     Region
+----------------------  ---------------------------------------  -------------
+vnet-shopeasy-dev       Microsoft.Network/virtualNetworks        swedencentral
+shopeasydevdocs350wnq   Microsoft.Storage/storageAccounts        swedencentral
+pip-shopeasy-dev-web-1  Microsoft.Network/publicIPAddresses      swedencentral
+pip-shopeasy-dev-lb     Microsoft.Network/publicIPAddresses      swedencentral
+nsg-shopeasy-dev-web    Microsoft.Network/networkSecurityGroups  swedencentral
+pip-shopeasy-dev-web-2  Microsoft.Network/publicIPAddresses      swedencentral
+lb-shopeasy-dev-web     Microsoft.Network/loadBalancers          swedencentral
+nic-shopeasy-dev-web-2  Microsoft.Network/networkInterfaces      swedencentral
+nic-shopeasy-dev-web-1  Microsoft.Network/networkInterfaces      swedencentral
+vm-shopeasy-dev-web-2   Microsoft.Compute/virtualMachines        swedencentral
+vm-shopeasy-dev-web-1   Microsoft.Compute/virtualMachines        swedencentral
+..._OsDisk_... (x2)     Microsoft.Compute/disks                  swedencentral
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Exporter l'inventaire (JSON + TSV)}
+Un inventaire d'exploitation doit être \textbf{conservé et rejouable}. On exporte le \textbf{JSON} complet (archivage, traitement) et le \textbf{TSV} (réutilisation tableur/script).
+\begin{codebox}{bash}
+\begin{Verbatim}
+az resource list --resource-group "$RG" --output json > exports/resources.json
+az resource list --resource-group "$RG" \
+  --query "[].{Nom:name,Type:type,Region:location}" --output tsv > exports/resources.tsv
+\end{Verbatim}
+\end{codebox}
+Les ressources portent déjà des \textbf{tags hérités du TP2} (appliqués par Terraform, en \code{snake\_case}). L'Atelier 3 normalisera une stratégie de tags d'exploitation.
+
+\subsection{Identifier les types}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az resource list --resource-group "$RG" --query "[].type" -o tsv | sort | uniq -c | sort -rn
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+   3 Microsoft.Network/publicIPAddresses
+   2 Microsoft.Network/networkInterfaces
+   2 Microsoft.Compute/virtualMachines
+   2 Microsoft.Compute/disks
+   1 Microsoft.Storage/storageAccounts
+   1 Microsoft.Network/virtualNetworks
+   1 Microsoft.Network/networkSecurityGroups
+   1 Microsoft.Network/loadBalancers
+\end{Verbatim}
+\end{codebox}
+\textbf{8 types} pour \textbf{13 ressources} de premier niveau.
+
+\begin{notebox}[Ressources de premier niveau seulement]
+\code{az resource list} ne renvoie que les ressources de premier niveau. Les sous-ressources (subnet, règles NSG, règle/sonde/backend pool du Load Balancer) sont imbriquées dans leur parent. Côté Terraform, l'état gère \textbf{21 objets}.
+\end{notebox}
+
+\subsection{Tableau d'inventaire}
+\begin{ltable}{Q[l,0.62] Q[l,0.5] X[l,1]}
+Ressource & Type & Rôle dans l'architecture \\
+\code{vnet-shopeasy-dev} & VNet & Réseau privé \code{10.20.0.0/16}, segmentation (subnet \code{snet-web}). \\
+\code{nsg-shopeasy-dev-web} & NSG & Pare-feu du subnet : HTTP (80) ouvert, SSH (22) restreint à l'IP admin. \\
+\code{lb-shopeasy-dev-web} & Load Balancer & LB \textbf{Standard} L4 : répartit le trafic HTTP sur les 2 VM. \\
+\code{pip-shopeasy-dev-lb} & Public IP & IP publique du LB = point d'entrée HTTP unique. \\
+\code{pip-...-web-1/2} & Public IP & IP publiques d'administration des 2 VM. \\
+\code{nic-...-web-1/2} & NIC & Cartes réseau des 2 VM (subnet + backend pool). \\
+\code{vm-...-web-1/2} & VM & Serveurs web : Ubuntu 22.04 + Nginx (\code{Standard\_B2ats\_v2}). \\
+\code{...\_OsDisk\_...} ($\times$2) & Disk & Disques OS managés des 2 VM. \\
+\code{shopeasydevdocs350wnq} & Storage & Stockage documentaire privé (\code{StorageV2}, LRS, versioning). \\
+\end{ltable}
+
+\subsection{Travail demandé}
+\begin{enumerate}
+  \item \textbf{Tableau d'inventaire (nom, type, région, rôle).} Réalisé : 13 ressources, toutes en \code{swedencentral}, reliées à leur rôle.
+  \item \textbf{Inventaire rejouable sans le portail.} Produit en CLI, exporté en \code{resources.json} et \code{resources.tsv}, industrialisé ensuite dans \code{inventory.sh} (Atelier 5).
+\end{enumerate}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Inventaire CLI complet : \textbf{13 ressources}, \textbf{8 types}, région unique \code{swedencentral}.
+  \item Exports générés : \code{resources.json} (368 lignes) et \code{resources.tsv} (13 lignes).
+  \item Tableau d'inventaire rôle par rôle établi (base du rapport d'exploitation).
+  \item Constat : ressources déjà taguées (TP2), à normaliser à l'Atelier 3.
+  \item \textbf{Prêt pour l'Atelier 3 — Normaliser les tags d'exploitation.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 3
+% #####################################################################
+\section{Atelier 3 — Normaliser les tags d'exploitation}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — appliquer une stratégie de tags minimale pour faciliter l'exploitation, le suivi des coûts et l'identification des responsabilités.
+
+\textbf{\ePackage~Livrable attendu} — export JSON (et capture) montrant les tags du groupe de ressources et d'au moins une VM.
+\end{fiche}
+
+\subsection{Stratégie de tags d'exploitation}
+Les ressources avaient déjà des \textbf{tags techniques hérités du TP2} (posés par Terraform, en \code{snake\_case}). On les \textbf{normalise} en une convention d'exploitation homogène (\code{PascalCase}).
+\begin{ltable}{Q[l,0.4] Q[l,0.6] X[l,1]}
+Tag & Valeur & Rôle \\
+\code{Application} & \code{shopeasy} & Relier la ressource à l'application métier. \\
+\code{Environment} & \code{dev} & Distinguer dev / test / prod. \\
+\code{Owner} & \code{cloudops-shopeasy} & Identifier l'équipe responsable. \\
+\code{CostCenter} & \code{cloud-training} & Imputer les coûts (FinOps). \\
+\code{ManagedBy} & \code{mixed} & Provisionné par Terraform, exploité par CLI. \\
+\code{Role} (VM) & \code{web} & Rôle technique de la VM. \\
+\end{ltable}
+
+\begin{tipbox}[Choix ManagedBy = mixed]
+L'infrastructure a été créée en IaC (Terraform, TP2) mais est administrée en CLI au TP3. La valeur \code{mixed} décrit honnêtement ce cycle de vie hybride, plutôt que \code{cli} (qui masquerait l'origine IaC) ou \code{terraform} (qui ignorerait l'exploitation CLI).
+\end{tipbox}
+
+\subsection{État avant normalisation}
+Le RG et les VM portaient les 5 tags Terraform en \code{snake\_case} :
+\begin{codebox}{console}
+\begin{Verbatim}
+{
+  "cost_center": "cloud-training",
+  "environment": "dev",
+  "managed_by": "terraform",
+  "owner": "formation",
+  "project": "shopeasy"
+}
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Appliquer les tags (RG puis VM)}
+\code{az group update --tags} \textbf{remplace} l'intégralité du jeu de tags du RG. Pour les VM, \code{az resource tag --ids} remplace proprement et ajoute \code{Role=web}.
+\begin{codebox}{bash}
+\begin{Verbatim}
+az group update --name "$RG" \
+  --tags Application=shopeasy Environment=dev Owner=cloudops-shopeasy \
+         CostCenter=cloud-training ManagedBy=mixed
+
+for VM in "$VM1" "$VM2"; do
+  VM_ID=$(az vm show -g "$RG" -n "$VM" --query id -o tsv)
+  az resource tag --ids "$VM_ID" \
+    --tags Application=shopeasy Environment=dev Owner=cloudops-shopeasy \
+           CostCenter=cloud-training ManagedBy=mixed Role=web
+done
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Application    Environment    Owner              CostCenter      ManagedBy
+-------------  -------------  -----------------  --------------  -----------
+shopeasy       dev            cloudops-shopeasy  cloud-training  mixed
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Vérification et couverture}
+Le travail demandé porte sur le RG et les VM. Les autres ressources conservent les tags techniques Terraform :
+\begin{codebox}{bash}
+\begin{Verbatim}
+az resource list -g "$RG" --query "[?tags.Application==null].name" -o tsv
+\end{Verbatim}
+\end{codebox}
+\textbf{11 ressources} ne portent pas encore le tag \code{Application} normalisé. Ce manque est \textbf{volontairement laissé visible} : il est \textbf{détecté automatiquement} par \code{inventory.sh} (Atelier 5) et \code{healthcheck.sh} (Atelier 9), et son extension figure dans les recommandations FinOps (Atelier 11).
+
+\begin{notebox}[Drift Terraform]
+Modifier les tags via CLI sur des ressources gérées par Terraform crée une \textbf{dérive (drift)} : au prochain \code{terraform plan}, Terraform proposerait de restaurer ses tags \code{snake\_case} (phénomène étudié au TP2, Atelier 11). Réconciliation : reporter la convention dans le code (\code{locals.common\_tags}) ou exclure les tags (\code{lifecycle ignore\_changes}). Pour le TP3, aucun \code{apply} n'est rejoué d'ici la destruction finale.
+\end{notebox}
+
+\subsection{Pourquoi les tags sont utiles (FinOps \& gouvernance)}
+\textbf{FinOps} — les tags \code{CostCenter}, \code{Application} et \code{Environment} permettent de \textbf{ventiler la facture} Azure (Cost Management) par centre de coût, application et environnement. Sans eux, impossible de répondre à « combien coûte ShopEasy en dev ? ». \textbf{Gouvernance} — \code{Owner} identifie le responsable (incident, autorisation d'arrêt), \code{ManagedBy} documente le mode de gestion ; les tags servent de base à des \textbf{Azure Policy} et au filtrage des inventaires.
+
+\subsection{Captures}
+\screenshot{atelier03-tags-rg.png}{Tags normalisés du groupe \code{rg-shopeasy-dev} (Portal \arr{} Resource groups \arr{} rg-shopeasy-dev \arr{} Tags) : les 5 tags d'exploitation.}
+\screenshot{atelier03-tags-vm.png}{Tags normalisés de la VM \code{vm-shopeasy-dev-web-1} (Portal \arr{} Virtual machines \arr{} \dots{} \arr{} Tags) : les 6 tags dont \code{Role=web}.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Convention normalisée (\code{Application}, \code{Environment}, \code{Owner}, \code{CostCenter}, \code{ManagedBy}) appliquée au \textbf{RG} et aux \textbf{2 VM} (+ \code{Role=web}).
+  \item Anciennes clés \code{snake\_case} remplacées proprement ; preuve exportée (\code{tags-rg.json}, \code{tags-vm.json}).
+  \item \textbf{11 ressources} encore en \code{snake\_case} : manque tracé, à corriger via inventaire automatisé.
+  \item Drift Terraform identifié et documenté (réconciliation par le code ou \code{ignore\_changes}).
+  \item \textbf{Prêt pour l'Atelier 4 — Administrer les machines virtuelles.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 4
+% #####################################################################
+\section{Atelier 4 — Administrer les machines virtuelles}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — réaliser les opérations courantes sur les VM : lister, vérifier l'état, démarrer, arrêter, désallouer, redémarrer et exécuter une commande distante.
+
+\textbf{\ePackage~Livrable attendu} — tableau des VM (état, IP, taille, action), avec la commande utilisée et le résultat observé.
+\end{fiche}
+
+\subsection{Lister les VM et leur état}
+\code{--show-details} ajoute l'état d'alimentation et l'IP publique.
+\begin{codebox}{bash}
+\begin{Verbatim}
+az vm list -g "$RG" --show-details \
+  --query "[].{Nom:name,Etat:powerState,IP:publicIps,Taille:hardwareProfile.vmSize}" -o table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom                    Etat        IP              Taille
+---------------------  ----------  --------------  -----------------
+vm-shopeasy-dev-web-1  VM running  20.240.233.166  Standard_B2ats_v2
+vm-shopeasy-dev-web-2  VM running  20.91.246.70    Standard_B2ats_v2
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Exécuter une commande distante (vérifier le serveur web)}
+\code{az vm run-command invoke} exécute un script dans la VM via l'agent Azure, \textbf{sans connexion SSH} (utile quand le port 22 est restreint à l'IP admin).
+\begin{codebox}{bash}
+\begin{Verbatim}
+az vm run-command invoke -g "$RG" -n "$VM1" --command-id RunShellScript \
+  --scripts "hostname && uptime && systemctl is-active nginx && \
+             curl -s -o /dev/null -w 'HTTP local: %{http_code}\n' http://localhost" \
+  --query "value[0].message" -o tsv
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+[stdout]
+vm-shopeasy-dev-web-1
+ 08:15:51 up 21 min,  0 users,  load average: 0.00, 0.00, 0.00
+active
+nginx.service - active (running) since Fri 2026-06-26 07:55:02 UTC
+HTTP local: 200
+\end{Verbatim}
+\end{codebox}
+\textbf{Lecture} : le serveur répond, \code{nginx} est \code{active (running)} et la requête HTTP locale renvoie \textbf{200}. Le service web est opérationnel.
+
+\subsection{Redémarrer et désallouer}
+Deux actions d'exploitation sur deux VM distinctes : \textbf{redémarrer} la VM 1 (reste allouée) et \textbf{désallouer} la VM 2 non utilisée (geste FinOps : libère le calcul).
+\begin{codebox}{bash}
+\begin{Verbatim}
+az vm restart    -g "$RG" -n "$VM1"   # redemarrage, VM toujours allouee
+az vm deallocate -g "$RG" -n "$VM2"   # arret + liberation du compute
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom                    Etat            IP              Taille
+---------------------  --------------  --------------  -----------------
+vm-shopeasy-dev-web-1  VM running      20.240.233.166  Standard_B2ats_v2
+vm-shopeasy-dev-web-2  VM deallocated  20.91.246.70    Standard_B2ats_v2
+\end{Verbatim}
+\end{codebox}
+
+\subsection{\code{stop} $\neq$ \code{deallocate} (point FinOps essentiel)}
+\begin{ltable}{Q[l,0.5] X[l,1] Q[c,0.5]}
+Commande & Effet & Compute facturé \\
+\code{az vm stop} & Arrête l'OS, mais la VM \textbf{reste allouée} & \textbf{Continue} \\
+\code{az vm deallocate} & Arrête \textbf{et libère} le calcul (\textit{Stopped (deallocated)}) & \textbf{Stoppé} \\
+\end{ltable}
+\begin{notebox}[Ce qui reste facturé même désallouée]
+Le \textbf{disque OS} et l'\textbf{IP publique Standard statique} (réservée) restent facturés : \code{vm-shopeasy-dev-web-2} affiche encore son IP bien qu'éteinte. La suppression des IP publiques (Bastion) est un levier FinOps de l'Atelier 11.
+\end{notebox}
+
+\subsection{Tableau récapitulatif des VM}
+\begin{ltable}{Q[l,0.62] Q[l,0.45] Q[l,0.5] X[l,0.9]}
+VM & Taille & État final & Action \& résultat \\
+\code{vm-...-web-1} & \code{B2ats\_v2} & \textbf{running} & \code{run-command} (Nginx \code{active}, HTTP 200) + \code{restart} \\
+\code{vm-...-web-2} & \code{B2ats\_v2} & \textbf{deallocated} & \code{deallocate} (compute libéré, FinOps) \\
+\end{ltable}
+
+\subsection{Travail demandé}
+\begin{enumerate}
+  \item \textbf{Lister toutes les VM.} \code{az vm list} \arr{} 2 VM.
+  \item \textbf{Identifier taille, IP, état.} \code{--show-details} \arr{} \code{B2ats\_v2}, IP publiques, \code{VM running}.
+  \item \textbf{Redémarrer une VM.} \code{az vm restart} \arr{} reste \code{running}.
+  \item \textbf{Désallouer une VM non utilisée.} \code{az vm deallocate} \arr{} \code{VM deallocated}.
+  \item \textbf{Commande distante.} \code{az vm run-command invoke} \arr{} Nginx \code{active}, HTTP 200.
+\end{enumerate}
+
+\subsection{Capture}
+\screenshot{atelier04-vms-states.png}{Liste des VM (Portal \arr{} Virtual machines) : \code{web-1} \textit{Running} et \code{web-2} \textit{Stopped (deallocated)} après les actions.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item 2 VM \code{Standard\_B2ats\_v2} inventoriées (état, IP, taille).
+  \item Commande distante validée (sans SSH) : \code{web-1} sert Nginx, HTTP 200.
+  \item \code{restart} sur la VM 1 (\code{running}), \code{deallocate} sur la VM 2 (\code{deallocated}, compute libéré).
+  \item Distinction \code{stop} / \code{deallocate} documentée (impact FinOps).
+  \item \textbf{Prêt pour l'Atelier 5 — Construire un script Bash d'inventaire.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 5
+% #####################################################################
+\section{Atelier 5 — Construire un script Bash d'inventaire}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — transformer les commandes manuelles d'inventaire en script réutilisable.
+
+\textbf{\ePackage~Livrable attendu} — script \code{inventory.sh} fonctionnel, captures d'exécution et fichiers générés dans \code{exports/}.
+\end{fiche}
+
+\subsection{Le script \code{scripts/inventory.sh}}
+Le script reprend les commandes des Ateliers 2 à 4 et y ajoute une \textbf{synthèse chiffrée} et des \textbf{contrôles d'exploitation}. Paramétrable, robuste (\code{set -euo pipefail}), exports \textbf{horodatés}.
+\begin{codebox}{scripts/inventory.sh}
+\begin{Verbatim}
+#!/usr/bin/env bash
+set -euo pipefail
+
+RG="${1:-rg-shopeasy-dev}"          # groupe de ressources (argument ou defaut)
+DATE="$(date +%Y%m%d-%H%M%S)"       # horodatage des fichiers d'export
+OUT_DIR="exports"; mkdir -p "$OUT_DIR"
+
+# 1. Verification de l'existence du groupe de ressources
+if ! az group show --name "$RG" >/dev/null 2>&1; then
+  echo "ERREUR : le groupe de ressources '$RG' est introuvable." >&2; exit 1
+fi
+
+# 2. Export JSON des ressources
+az resource list --resource-group "$RG" \
+  --query "[].{name:name,type:type,location:location,tags:tags,id:id}" \
+  --output json > "$OUT_DIR/resources-$DATE.json"
+
+# 3. Export TXT de l'etat des VM
+az vm list --resource-group "$RG" --show-details \
+  --query "[].{name:name,powerState:powerState,publicIps:publicIps,vmSize:hardwareProfile.vmSize}" \
+  --output table > "$OUT_DIR/vms-$DATE.txt"
+
+# 4. Synthese chiffree
+TOTAL=$(az resource list -g "$RG" --query "length(@)" -o tsv)
+NB_VM=$(az vm list -g "$RG" --query "length(@)" -o tsv)
+NB_STORAGE=$(az storage account list -g "$RG" --query "length(@)" -o tsv)
+NB_UNTAGGED=$(az resource list -g "$RG" --query "length([?tags.Application==null])" -o tsv)
+printf "  %-34s %s\n" "Ressources (total)"              "$TOTAL"
+printf "  %-34s %s\n" "Machines virtuelles"             "$NB_VM"
+printf "  %-34s %s\n" "Comptes de stockage"             "$NB_STORAGE"
+printf "  %-34s %s\n" "Ressources sans tag Application" "$NB_UNTAGGED"
+
+# 5. Controles : VM en cours d'execution (compute facture)
+RUNNING=$(az vm list -g "$RG" --show-details \
+            --query "[?powerState=='VM running'].name" -o tsv)
+if [[ -n "$RUNNING" ]]; then
+  echo "  [AVERTISSEMENT] VM en cours d'execution (compute facture) :"
+  echo "$RUNNING" | sed 's/^/    - /'
+fi
+if [[ "$NB_UNTAGGED" -gt 0 ]]; then
+  echo "  [INFO] $NB_UNTAGGED ressource(s) sans tag 'Application'"
+fi
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Exécution réelle}
+\begin{codebox}{console}
+\begin{Verbatim}
+[1/4] Export des ressources -> exports/resources-20260626-103147.json
+[2/4] Export de l'etat des VM -> exports/vms-20260626-103147.txt
+[3/4] Calcul de la synthese...
+
+--- Synthese ------------------------------------------------
+  Ressources (total)                 13
+  Machines virtuelles                2
+  Comptes de stockage                1
+  Ressources sans tag Application    11
+-------------------------------------------------------------
+[4/4] Controles d'exploitation...
+
+  [AVERTISSEMENT] VM en cours d'execution (compute facture) :
+    - vm-shopeasy-dev-web-1
+  [INFO] 11 ressource(s) sans tag 'Application'
+\end{Verbatim}
+\end{codebox}
+
+\begin{tipbox}[Validation croisée]
+L'avertissement ne liste \textbf{que} \code{vm-shopeasy-dev-web-1} (en \code{VM running}), et \textbf{pas} \code{vm-shopeasy-dev-web-2} (désallouée à l'Atelier 4). Le filtre \code{powerState=='VM running'} fonctionne donc correctement.
+\end{tipbox}
+
+\subsection{Améliorations apportées (travail demandé)}
+\begin{ltable}{Q[l,1] Q[l,1] Q[c,0.35]}
+Amélioration demandée & Implémentation (JMESPath) & Résultat \\
+Nombre total de ressources & \code{length(@)} & \textbf{13} \\
+Nombre de VM & \code{az vm list ... length(@)} & \textbf{2} \\
+Nombre de comptes de stockage & \code{az storage account list ... length(@)} & \textbf{1} \\
+Ressources sans tag \code{Application} & \code{length([?tags.Application==null])} & \textbf{11} \\
+Avertissement si VM \code{running} & \code{[?powerState=='VM running']} & web-1 signalée \\
+\end{ltable}
+
+\subsection{Bonnes pratiques Bash}
+\begin{ltable}{Q[l,0.5] X[l,1]}
+Bonne pratique & Mise en œuvre \\
+Arrêt sur erreur & \code{set -euo pipefail} (erreur, variable non définie, échec dans un pipe). \\
+Paramétrage & \code{RG="\$\{1:-rg-shopeasy-dev\}"} : groupe en argument, valeur par défaut. \\
+Vérification préalable & \code{az group show ... || exit 1} : sortie propre si le RG n'existe pas. \\
+Traçabilité & Exports \textbf{horodatés} (\code{-\$DATE}) : pas d'écrasement, historique conservé. \\
+Idempotence & \code{mkdir -p}, relances sans effet de bord. \\
+\end{ltable}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Script \code{scripts/inventory.sh} fonctionnel, commenté, robuste et paramétrable.
+  \item Synthèse automatisée : \textbf{13 ressources, 2 VM, 1 compte de stockage, 11 sans tag \code{Application}}.
+  \item Avertissement FinOps opérationnel (VM \code{running} détectée), filtrage d'état validé.
+  \item Exports horodatés générés dans \code{exports/} (JSON ressources + TXT VM).
+  \item \textbf{Prêt pour l'Atelier 6 — Automatiser l'arrêt et le démarrage des VM.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 6
+% #####################################################################
+\section{Atelier 6 — Automatiser l'arrêt et le démarrage des VM}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — construire un script pilotant l'état des VM (start / stop / deallocate / status) de manière sûre.
+
+\textbf{\ePackage~Livrable attendu} — script \code{vm-power.sh}, journal d'exécution et explication des mesures de sécurité ajoutées.
+\end{fiche}
+
+\subsection{Le script \code{scripts/vm-power.sh}}
+\begin{codebox}{scripts/vm-power.sh}
+\begin{Verbatim}
+#!/usr/bin/env bash
+set -euo pipefail
+RG="${1:-}"; ACTION="${2:-}"; ASSUME_YES="${3:-}"   # -y saute la confirmation
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_FILE="$(dirname "$SCRIPT_DIR")/logs/vm-power.log"; mkdir -p "$(dirname "$LOG_FILE")"
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') | $1" | tee -a "$LOG_FILE"; }
+
+[[ -z "$RG" || -z "$ACTION" ]] && { echo "Usage: $0 <rg> <start|stop|deallocate|status> [-y]"; exit 1; }
+
+# Garde-fou 1 : interdiction d'agir sur un RG de production
+if [[ "$RG" == *prod* ]]; then
+  log "REFUS : action '$ACTION' interdite sur un RG de production ('$RG')."; exit 1
+fi
+az group show --name "$RG" >/dev/null 2>&1 || { log "ERREUR : RG introuvable."; exit 1; }
+
+# Garde-fou 2 : confirmation avant action destructive
+confirm() {
+  [[ "$ASSUME_YES" == "-y" ]] && return 0
+  read -r -p "Confirmer '$ACTION' sur TOUTES les VM de '$RG' ? (oui/non) " ANS || true
+  [[ "$ANS" == "oui" ]]
+}
+VMS=$(az vm list -g "$RG" --query "[].name" -o tsv)
+case "$ACTION" in stop|deallocate)
+  confirm || { log "Action '$ACTION' ANNULEE par l'utilisateur."; exit 0; } ;;
+esac
+
+log "=== Action '$ACTION' sur RG '$RG' ==="
+for VM in $VMS; do
+  case "$ACTION" in
+    start)      az vm start      -g "$RG" -n "$VM" -o none; log "  start      -> $VM : OK" ;;
+    stop)       az vm stop       -g "$RG" -n "$VM" -o none; log "  stop       -> $VM : OK" ;;
+    deallocate) az vm deallocate -g "$RG" -n "$VM" -o none; log "  deallocate -> $VM : OK" ;;
+    status)     STATE=$(az vm get-instance-view -g "$RG" -n "$VM" \
+                  --query "instanceView.statuses[?starts_with(code,'PowerState/')].displayStatus" -o tsv)
+                log "  status     -> $VM : $STATE" ;;
+  esac
+done
+log "=== Termine ==="
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Mesures de sécurité ajoutées}
+\begin{ltable}{Q[l,0.55] Q[l,1] X[l,1]}
+Mesure & Mise en œuvre & Pourquoi \\
+Garde-fou production & \code{if [[ "\$RG" == *prod* ]]} & Empêche tout arrêt accidentel d'un environnement de production. \\
+Confirmation destructive & fonction \code{confirm()} sur \code{stop}/\code{deallocate} & Évite une coupure de service par erreur de frappe. \\
+Bypass contrôlé & option \code{-y} & Permet l'automatisation (cron, CI) en connaissance de cause. \\
+Journalisation & \code{log()} \arr{} \code{logs/vm-power.log} & Traçabilité : qui a fait quoi, quand. \\
+Robustesse & \code{set -euo pipefail}, vérif du RG & Arrêt propre en cas d'erreur. \\
+\end{ltable}
+
+\subsection{Test de chaque action}
+\begin{codebox}{console}
+\begin{Verbatim}
+$ ./vm-power.sh rg-shopeasy-prod deallocate
+... | REFUS : action 'deallocate' interdite sur un RG de production. (code 1)
+
+$ echo "non" | ./vm-power.sh rg-shopeasy-dev deallocate
+... | Action 'deallocate' ANNULEE par l'utilisateur.
+
+$ echo "oui" | ./vm-power.sh rg-shopeasy-dev stop
+WARNING: About to power off the specified VM...
+It will continue to be billed. To deallocate a VM, run: az vm deallocate.
+... | stop       -> vm-shopeasy-dev-web-1 : OK
+\end{Verbatim}
+\end{codebox}
+\begin{tipbox}[Confirmation FinOps par Azure lui-même]
+Sur \code{stop}, Azure CLI affiche \textit{« It will continue to be billed. To deallocate a VM, run: az vm deallocate. »} — confirmant la distinction \code{stop} (facturé) / \code{deallocate} (compute libéré).
+\end{tipbox}
+
+\subsection{Journal d'exécution (\code{logs/vm-power.log})}
+\begin{codebox}{logs/vm-power.log}
+\begin{Verbatim}
+2026-06-26 10:37:00 | status     -> vm-shopeasy-dev-web-1 : VM running
+2026-06-26 10:37:03 | REFUS : action 'deallocate' interdite sur un RG de production.
+2026-06-26 10:37:05 | Action 'deallocate' ANNULEE par l'utilisateur.
+2026-06-26 10:38:23 | stop       -> vm-shopeasy-dev-web-1 : OK (VM arretee, toujours allouee)
+2026-06-26 10:39:46 | deallocate -> vm-shopeasy-dev-web-1 : OK (compute libere)
+2026-06-26 10:41:18 | status     -> vm-shopeasy-dev-web-1 : VM running
+\end{Verbatim}
+\end{codebox}
+À l'issue des tests, l'environnement est remis à l'état nominal (les \textbf{2 VM \code{running}}).
+
+\begin{etatbox}
+\begin{itemize}
+  \item Script \code{scripts/vm-power.sh} : 4 actions (\code{start}/\code{stop}/\code{deallocate}/\code{status}), toutes testées.
+  \item 3 mesures de sécurité : garde-fou \code{prod}, confirmation destructive (+ bypass \code{-y}), journalisation horodatée.
+  \item Distinction \code{stop} / \code{deallocate} confirmée par l'avertissement natif d'Azure CLI.
+  \item Journal \code{logs/vm-power.log} produit (26 lignes) ; environnement remis à l'état nominal.
+  \item \textbf{Prêt pour l'Atelier 7 — Exploiter un Storage Account.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 7
+% #####################################################################
+\section{Atelier 7 — Exploiter un Storage Account}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — disposer d'un espace de stockage opérationnel et sécurisé pour déposer les rapports et exports d'exploitation.
+
+\textbf{\ePackage~Livrable attendu} — sortie CLI (et capture) montrant le conteneur, les fichiers déposés et l'accès public désactivé.
+\end{fiche}
+
+\subsection{Réutiliser et inspecter le Storage Account}
+Le compte \code{shopeasydevdocs350wnq} (créé au TP2) est \textbf{réutilisé}. Inspection initiale :
+\begin{codebox}{console}
+\begin{Verbatim}
+Name                   Sku           AllowBlobPublicAccess  MinimumTlsVersion  HttpsOnly
+---------------------  ------------  ---------------------  -----------------  ---------
+shopeasydevdocs350wnq  Standard_LRS  True                   TLS1_2             True
+\end{Verbatim}
+\end{codebox}
+\textbf{Constat} : TLS 1.2 et HTTPS-only sont corrects, mais \textbf{\code{AllowBlobPublicAccess=True}} : le provider Terraform laisse ce paramètre activé par défaut — à corriger en exploitation.
+
+\subsection{Sécuriser : désactiver l'accès public}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az storage account update --name "$STORAGE" -g "$RG" --allow-blob-public-access false
+az storage container create --account-name "$STORAGE" --name "$CONTAINER" \
+  --auth-mode login --public-access off
+\end{Verbatim}
+\end{codebox}
+À partir d'ici, \textbf{aucun conteneur ne peut être rendu public}, même par erreur. Le conteneur privé \code{operations} est créé.
+
+\subsection{RBAC : control-plane vs data-plane}
+Le dépôt de blobs avec \code{--auth-mode login} a d'abord été \textbf{refusé} :
+\begin{codebox}{console}
+\begin{Verbatim}
+ERROR: You do not have the required permissions needed to perform this operation.
+    "Storage Blob Data Contributor" ...
+\end{Verbatim}
+\end{codebox}
+Être \textit{Owner} de l'abonnement donne les droits sur le \textbf{control-plane} (créer/configurer via ARM), mais \textbf{pas} sur le \textbf{data-plane} (lire/écrire le contenu des blobs). La bonne pratique — conforme au moindre privilège — est d'\textbf{assigner un rôle RBAC data-plane} précis, au scope du compte (pas de clé partagée) :
+\begin{codebox}{bash}
+\begin{Verbatim}
+az role assignment create --role "Storage Blob Data Contributor" \
+  --assignee-object-id "$USER_OID" --assignee-principal-type User \
+  --scope "$STORAGE_ID"
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Déposer les exports et vérifier la fermeture}
+\begin{codebox}{console}
+\begin{Verbatim}
+$ az storage blob list --account-name "$STORAGE" -c operations --auth-mode login -o table
+Nom                                         TailleOctets
+------------------------------------------  ------------
+inventaires/resources.json                  12014
+inventaires/resources.tsv                   983
+inventaires/vms-20260626-103147.txt         281
+rapports/rapport-exploitation-shopeasy.md   9772
+
+$ curl -s -o /dev/null -w "%{http_code}" \
+    "https://$STORAGE.blob.core.windows.net/operations/inventaires/resources.tsv"
+409   ->   <Code>PublicAccessNotPermitted</Code>
+\end{Verbatim}
+\end{codebox}
+\begin{notebox}[Preuve d'accès fermé]
+Même en connaissant l'\textbf{URL exacte}, un visiteur anonyme reçoit \textbf{409 \code{PublicAccessNotPermitted}} : le stockage est bien fermé. L'accès n'est possible qu'avec une \textbf{identité Azure autorisée} (RBAC).
+\end{notebox}
+
+\subsection{Pourquoi le stockage de rapports ne doit pas être public}
+\begin{itemize}
+  \item \textbf{Cartographie offerte à un attaquant} : un rapport liste noms de ressources, IP, état des VM, règles réseau.
+  \item \textbf{Fuite de données / RGPD} : un blob public est accessible à quiconque connaît l'URL, sans traçabilité.
+  \item \textbf{Moindre privilège} : seuls les exploitants \textbf{authentifiés} (RBAC) doivent lire ces rapports.
+  \item \textbf{Conformité} : « pas de stockage public » est un contrôle standard (CIS Azure).
+\end{itemize}
+
+\subsection{Captures}
+\screenshot{atelier07-storage-public-access.png}{Configuration du compte (Portal \arr{} Storage accounts \arr{} \dots{} \arr{} Configuration) : \textit{Allow blob anonymous access} = \textbf{Disabled}.}
+\screenshot{atelier07-container-operations.png}{Conteneur \code{operations} et le dossier \code{inventaires/} (exports déposés). Le niveau « Private » n'apparaît plus car l'accès anonyme est désactivé au niveau du compte.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Storage Account réutilisé et \textbf{sécurisé} : accès public \textbf{désactivé} (était \code{True}), TLS 1.2, HTTPS-only.
+  \item Conteneur privé \code{operations} créé ; 4 exports déposés sous \code{inventaires/}.
+  \item RBAC data-plane appliqué proprement (\code{Storage Blob Data Contributor}, scope = compte) — pas de clé partagée.
+  \item Accès anonyme \textbf{prouvé refusé} (HTTP 409 \code{PublicAccessNotPermitted}).
+  \item \textbf{Prêt pour l'Atelier 8 — Surveiller les métriques avec Azure Monitor.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 8
+% #####################################################################
+\section{Atelier 8 — Surveiller les métriques avec Azure Monitor}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — interroger les métriques Azure et créer une alerte simple sur une ressource critique.
+
+\textbf{\ePackage~Livrable attendu} — sortie CLI montrant la métrique CPU et la règle d'alerte créée, avec justification du seuil.
+\end{fiche}
+
+\subsection{Identifier la VM et lister les métriques}
+\begin{codebox}{bash}
+\begin{Verbatim}
+VM_ID=$(az vm show -g "$RG" -n "$VM1" --query id -o tsv)
+az monitor metrics list-definitions --resource "$VM_ID" \
+  --query "[].{Metrique:name.value, Unite:unit}" -o table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Metrique                     Unite
+---------------------------  --------------
+Percentage CPU               Percent
+Network In / Network Out     Bytes
+Disk Read Bytes / Write      Bytes
+CPU Credits Remaining        Count
+CPU Credits Consumed         Count
+...                          (~30 metriques au total)
+\end{Verbatim}
+\end{codebox}
+\begin{tipbox}[Spécificité Standard\_B2ats\_v2 (burstable)]
+C'est une VM \textit{burstable} (famille B). Les métriques \code{CPU Credits Remaining} et \code{CPU Credits Consumed} sont propres à cette famille : si le CPU reste élevé, la VM épuise ses crédits et se fait \textbf{brider} (throttling).
+\end{tipbox}
+
+\subsection{Lire la métrique CPU}
+\begin{codebox}{console}
+\begin{Verbatim}
+Heure                 CPU_moyen_pct
+--------------------  ---------------
+2026-06-26T08:42:00Z  0.15
+2026-06-26T08:46:00Z  0.62
+2026-06-26T08:55:00Z  0.12
+2026-06-26T09:00:00Z  0.15
+\end{Verbatim}
+\end{codebox}
+Le CPU moyen oscille entre \textbf{0,12\,\% et 0,62\,\%} : la VM web est \textbf{au repos} (pas de trafic). La métrique fournit une \textbf{base de référence} pour calibrer le seuil d'alerte.
+
+\subsection{Créer une alerte CPU > 80\,\%}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az monitor metrics alert create --name "alert-cpu-high-$VM1" -g "$RG" \
+  --scopes "$VM_ID" --condition "avg Percentage CPU > 80" \
+  --description "Alerte CPU elevee sur VM web ShopEasy" \
+  --evaluation-frequency 1m --window-size 5m --severity 3
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom                                   Active    Severite    Condition
+------------------------------------  --------  ----------  -----------
+alert-cpu-high-vm-shopeasy-dev-web-1  True      3           GreaterThan
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Justification du seuil}
+\begin{ltable}{Q[l,0.4] Q[l,0.5] X[l,1]}
+Paramètre & Valeur & Justification \\
+Seuil & \code{> 80 \%} & Assez haut pour ignorer les pics normaux, assez bas pour détecter une saturation avant dégradation. \\
+Agrégation & \code{Average} & On surveille une charge \textbf{soutenue}, pas un pic instantané. \\
+Fenêtre & \code{5 min} & \textbf{Lisse} les pics transitoires (charge élevée prolongée requise). \\
+Fréquence & \code{1 min} & Réactivité : réévaluation chaque minute. \\
+Sévérité & \code{3} (Low) & CPU élevé = signal d'attention, pas une panne (Sev 0/1 = indispo). \\
+\end{ltable}
+
+\subsection{Deux autres alertes utiles + limites}
+\begin{ltable}{Q[l,0.6] X[l,1] Q[c,0.4]}
+Alerte proposée & Pourquoi & Sévérité \\
+Disponibilité backends (LB \code{Health Probe Status}) & Une VM ne répond plus à la sonde HTTP : indicateur proche de l'expérience client. & 1 \\
+Saturation disque / mémoire (VM) & Disque plein (logs Nginx) ou mémoire saturée bloque le service. & 2 \\
+\end{ltable}
+\begin{notebox}[Limites d'une alerte mal calibrée]
+\textbf{Trop sensible} (seuil bas, fenêtre courte) \arr{} faux positifs, \textit{fatigue d'alerte}, vrais incidents ratés. \textbf{Trop large} (seuil haut, fenêtre longue) \arr{} détection tardive. Une alerte doit être \textbf{actionnable} et associée à une \textbf{procédure} (runbook).
+\end{notebox}
+
+\subsection{Captures}
+\screenshot{atelier08-alerte-cpu.png}{Règle d'alerte (Portal \arr{} Monitor \arr{} Alerts \arr{} Alert rules) : \code{alert-cpu-high-vm-shopeasy-dev-web-1}, \textit{Enabled}, sévérité 3, condition \textit{Percentage CPU > 80}.}
+\screenshot{atelier08-metrique-cpu.png}{Graphe de la métrique \textit{Percentage CPU} (Portal \arr{} Virtual machines \arr{} \dots{} \arr{} Metrics). Le graphe reste très bas (VM au repos).}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Métriques de la VM identifiées (CPU, réseau, disque, crédits CPU burstable) ; CPU lu (baseline 0,12–0,62\,\%).
+  \item Alerte \code{alert-cpu-high-vm-shopeasy-dev-web-1} créée et active : \code{avg Percentage CPU > 80}, fenêtre 5 min, fréquence 1 min, sévérité 3.
+  \item Seuil justifié ; deux alertes complémentaires proposées (disponibilité LB, saturation disque/mémoire).
+  \item Limites des alertes mal calibrées documentées (fatigue d'alerte vs détection tardive).
+  \item \textbf{Prêt pour l'Atelier 9 — Écrire un script de contrôle de santé.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 9
+% #####################################################################
+\section{Atelier 9 — Écrire un script de contrôle de santé}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — créer un script qui vérifie rapidement si l'environnement est dans un état acceptable.
+
+\textbf{\ePackage~Livrable attendu} — script \code{healthcheck.sh} final, preuve d'exécution et commentaires sur les vérifications ajoutées.
+\end{fiche}
+
+\subsection{Le script \code{scripts/healthcheck.sh}}
+Huit contrôles (4 de base + 5 améliorations), code de sortie \code{0} (conforme) ou \code{1} (avertissement).
+\begin{codebox}{scripts/healthcheck.sh}
+\begin{Verbatim}
+#!/usr/bin/env bash
+set -euo pipefail
+RG="${1:-rg-shopeasy-dev}"; CONTAINER="${2:-operations}"; STATUS=0
+ok()   { echo "  [OK]   $1"; }
+warn() { echo "  [WARN] $1"; STATUS=1; }
+ko()   { echo "  [KO]   $1"; STATUS=1; }
+
+# 1. Groupe de ressources (bloquant)
+az group show --name "$RG" >/dev/null 2>&1 && ok "groupe '$RG' present" \
+  || { ko "RG introuvable"; exit 1; }
+# 2. Au moins une VM
+NB_VM=$(az vm list -g "$RG" --query "length(@)" -o tsv)
+[[ "$NB_VM" -ge 1 ]] && ok "$NB_VM VM(s) presente(s)" || warn "aucune VM"
+# 3. Tag Owner sur le groupe
+OWNER=$(az group show --name "$RG" --query "tags.Owner" -o tsv)
+[[ -n "$OWNER" ]] && ok "tag Owner present ($OWNER)" || warn "tag Owner absent"
+# 4. Ressources sans tag Application
+UNTAGGED=$(az resource list -g "$RG" --query "length([?tags.Application==null])" -o tsv)
+[[ "$UNTAGGED" -eq 0 ]] && ok "toutes taguees Application" || warn "$UNTAGGED sans tag Application"
+# 5. Alertes Azure Monitor
+ALERTS=$(az monitor metrics alert list -g "$RG" --query "length(@)" -o tsv)
+[[ "$ALERTS" -ge 1 ]] && ok "$ALERTS alerte(s)" || warn "aucune alerte configuree"
+# 6. Storage Account (recupere dynamiquement)
+STORAGE=$(az storage account list -g "$RG" --query "[0].name" -o tsv 2>/dev/null || true)
+[[ -n "$STORAGE" ]] && ok "Storage present ($STORAGE)" || warn "aucun Storage Account"
+# 7. Conteneur operations
+az storage container show --account-name "$STORAGE" --name "$CONTAINER" \
+  --auth-mode login >/dev/null 2>&1 && ok "conteneur '$CONTAINER' present" \
+  || warn "conteneur '$CONTAINER' absent"
+# 8. Regle NSG HTTP/HTTPS
+NB_HTTP=$(az network nsg list -g "$RG" \
+  --query "length([].securityRules[?direction=='Inbound' && access=='Allow' && \
+           (destinationPortRange=='80' || destinationPortRange=='443')][])" -o tsv)
+[[ "$NB_HTTP" -ge 1 ]] && ok "$NB_HTTP regle(s) NSG HTTP/HTTPS" || warn "aucune regle HTTP/HTTPS"
+
+exit $STATUS
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Preuve d'exécution}
+\begin{codebox}{console}
+\begin{Verbatim}
+1. Groupe de ressources    [OK]   groupe 'rg-shopeasy-dev' present
+2. Machines virtuelles      [OK]   2 VM(s) presente(s)
+3. Gouvernance - Owner      [OK]   tag Owner present (cloudops-shopeasy)
+4. Gouvernance - Application[WARN] 11 ressource(s) sans tag Application
+5. Supervision - alertes    [OK]   1 alerte(s) configuree(s)
+6. Stockage - compte        [OK]   Storage present (shopeasydevdocs350wnq)
+7. Stockage - operations    [OK]   conteneur 'operations' present
+8. Reseau - NSG HTTP/HTTPS  [OK]   1 regle(s) NSG autorisant HTTP/HTTPS
+ RESULTAT : ATTENTION - points a verifier (voir [WARN])     >>> Code de sortie : 1
+\end{Verbatim}
+\end{codebox}
+\textbf{7 contrôles sur 8 au vert.} Le seul avertissement — \textbf{11 ressources sans tag \code{Application}} — est cohérent avec l'Atelier 3. Le code \textbf{1} permet d'intégrer le script en \textbf{CI/cron} (un code $\neq$ 0 déclenche une notification).
+
+\subsection{Vérifications ajoutées}
+\begin{ltable}{Q[l,0.55] X[l,1]}
+Contrôle ajouté & Pourquoi \\
+Au moins une VM & Un groupe sans VM = service web absent. \\
+Tag \code{Owner} & Sans responsable identifié, pas de gouvernance (qui contacter ?). \\
+Storage Account & Sans stockage, impossible d'archiver les rapports. \\
+Conteneur \code{operations} & Valide l'espace de dépôt des rapports. \\
+Règle NSG HTTP/HTTPS & Sans ouverture 80/443, le site est injoignable. \\
+\end{ltable}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Script \code{scripts/healthcheck.sh} final : \textbf{8 contrôles}, code de sortie 0/1.
+  \item Exécution réelle : \textbf{7 OK / 1 WARN} (11 ressources sans tag \code{Application}), code 1 \arr{} intégrable en CI/cron.
+  \item Contrôles de gouvernance, stockage et réseau ajoutés et commentés ; Storage récupéré dynamiquement.
+  \item \textbf{Prêt pour l'Atelier 10 — Automatiser avec Python et Azure SDK.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 10
+% #####################################################################
+\section{Atelier 10 — Automatiser avec Python et Azure SDK}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — découvrir le SDK Azure pour Python afin de produire un inventaire programmable.
+
+\textbf{\ePackage~Livrable attendu} — script \code{inventory.py} et fichier CSV généré, lisible dans Excel ou LibreOffice Calc.
+\end{fiche}
+
+\subsection{Installation des dépendances}
+\begin{codebox}{bash}
+\begin{Verbatim}
+python3 -m venv .venv && source .venv/bin/activate
+pip install azure-identity azure-mgmt-resource azure-mgmt-compute
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+azure-identity 1.25.3 | azure-mgmt-resource 26.0.0 | azure-mgmt-compute 38.1.0
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Le script \code{python/inventory.py}}
+\begin{codebox}{python/inventory.py}
+\begin{Verbatim}
+#!/usr/bin/env python3
+"""inventory.py - Inventaire programmable de ShopEasy via l'Azure SDK -> CSV."""
+import os, csv
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.compute import ComputeManagementClient
+try:
+    from azure.mgmt.resource import ResourceManagementClient            # SDK < 26
+except ImportError:
+    from azure.mgmt.resource.resources import ResourceManagementClient  # SDK >= 26
+
+subscription_id = os.environ.get("AZURE_SUBSCRIPTION_ID")
+resource_group = os.environ.get("AZURE_RESOURCE_GROUP", "rg-shopeasy-dev")
+if not subscription_id:
+    raise SystemExit("Variable AZURE_SUBSCRIPTION_ID manquante")
+
+credential = DefaultAzureCredential()
+resource_client = ResourceManagementClient(credential, subscription_id)
+compute_client = ComputeManagementClient(credential, subscription_id)
+
+def deduce_role(name, res_type):
+    t = res_type.lower(); n = name.lower()
+    if "virtualmachines" in t:   return "Serveur web (Ubuntu + Nginx)"
+    if "loadbalancers" in t:     return "Repartiteur de charge (point d'entree HTTP)"
+    if "publicipaddresses" in t: return "IP publique du LB" if "lb" in n else "IP publique VM"
+    if "storageaccounts" in t:   return "Stockage documentaire prive"
+    if "insights" in t:          return "Alerte de supervision (Azure Monitor)"
+    return "Autre"   # (+ VNet, NSG, NIC, disks)
+
+def fmt_tags(tags):
+    return ";".join(f"{k}={v}" for k, v in sorted(tags.items())) if tags else "(aucun)"
+
+vm_sizes = {vm.name.lower(): vm.hardware_profile.vm_size
+            for vm in compute_client.virtual_machines.list(resource_group)}
+rows = []
+for res in resource_client.resources.list_by_resource_group(resource_group):
+    rows.append({"Nom": res.name, "Type": res.type, "Region": res.location,
+                 "Taille": vm_sizes.get(res.name.lower(), ""),
+                 "Tags": fmt_tags(res.tags), "Role": deduce_role(res.name, res.type)})
+rows.sort(key=lambda r: (r["Type"], r["Nom"]))
+with open("exports/inventory.csv", "w", newline="", encoding="utf-8-sig") as f:
+    w = csv.DictWriter(f, fieldnames=["Nom","Type","Region","Taille","Tags","Role"])
+    w.writeheader(); w.writerows(rows)
+print(f"Ressources inventoriees: {len(rows)} | VM: {len(vm_sizes)} | CSV genere")
+\end{Verbatim}
+\end{codebox}
+
+\begin{notebox}[Adaptation au SDK récent]
+Le code du sujet (\code{from azure.mgmt.resource import ResourceManagementClient}) \textbf{échoue} avec \code{azure-mgmt-resource 26.0.0} : le client a été déplacé dans le sous-module \code{azure.mgmt.resource.resources}. Le script gère les deux cas via un \code{try/except ImportError} (rétrocompatible).
+\end{notebox}
+
+\subsection{Exécution et CSV généré}
+\code{DefaultAzureCredential} réutilise la session \code{az login} (via \code{AzureCliCredential}), sans secret.
+\begin{codebox}{console}
+\begin{Verbatim}
+Inventaire du groupe   : rg-shopeasy-dev
+Ressources inventoriees: 14
+Machines virtuelles    : 2
+CSV genere             : exports/inventory.csv
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{exports/inventory.csv}
+\begin{Verbatim}
+Nom,Type,Region,Taille,Tags,Role
+vm-shopeasy-dev-web-1,Microsoft.Compute/virtualMachines,swedencentral,Standard_B2ats_v2,
+  Application=shopeasy;Environment=dev;Owner=cloudops-shopeasy;Role=web,Serveur web (Ubuntu + Nginx)
+alert-cpu-high-vm-shopeasy-dev-web-1,Microsoft.Insights/metricalerts,global,,(aucun),
+  Alerte de supervision (Azure Monitor)
+lb-shopeasy-dev-web,Microsoft.Network/loadBalancers,swedencentral,,...,Repartiteur de charge
+\end{Verbatim}
+\end{codebox}
+\begin{tipbox}[14 ressources via le SDK, 13 via la CLI]
+Le SDK Python retourne l'\textbf{alerte métrique} \code{Microsoft.Insights/metricAlerts} (créée à l'Atelier 8), que \code{az resource list} \textbf{n'inclut pas} dans son décompte. Ce n'est pas une incohérence mais une \textbf{différence de comportement} documentée entre les deux outils.
+\end{tipbox}
+
+\subsection{Bash ou Python ?}
+\begin{ltable}{Q[l,1] X[l,1]}
+Besoin & Outil adapté \\
+Enchaîner des commandes, contrôles rapides, exports bruts & \textbf{Bash} (\code{inventory.sh}, \code{healthcheck.sh}) \\
+Enrichir / croiser des données, format structuré (CSV), intégrer une API & \textbf{Python + SDK} (\code{inventory.py}) \\
+\end{ltable}
+Ici, le \textbf{croisement} ressources $\leftrightarrow$ tailles de VM et la \textbf{déduction de rôle} illustrent le moment où Python devient préférable : le besoin n'est plus « lister » mais « \textbf{structurer et enrichir} ».
+
+\subsection{Capture}
+\screenshot{atelier10-csv-tableur.png}{Le fichier \code{exports/inventory.csv} ouvert dans un tableur : les colonnes \textit{Nom, Type, Region, Taille, Tags, Role} s'affichent correctement (encodage \code{utf-8-sig}).}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Environnement Python isolé (\code{.venv}) ; SDK Azure installé (identity, mgmt-resource, mgmt-compute).
+  \item Script \code{python/inventory.py} fonctionnel : authentification \code{az login}, \textbf{CSV enrichi} (rôle + taille).
+  \item Adaptation au SDK récent gérée (\code{ResourceManagementClient} déplacé en v26, import rétrocompatible).
+  \item \code{exports/inventory.csv} (14 ressources) lisible dans un tableur ; classe l'alerte de supervision.
+  \item \textbf{Prêt pour l'Atelier 11 — Analyse FinOps d'exploitation.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 11
+% #####################################################################
+\section{Atelier 11 — Analyse FinOps d'exploitation}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — identifier les actions simples permettant de limiter les coûts d'un environnement de développement.
+
+\textbf{\ePackage~Livrable attendu} — tableau FinOps complété et trois recommandations courtes pour la DSI.
+\end{fiche}
+
+\subsection{Ressources les plus coûteuses}
+Coûts calculés à partir des \textbf{prix réels} de l'API Azure Retail Prices (\code{swedencentral}, USD, base 730\,h/mois).
+\begin{ltable}{Q[l,0.7] Q[l,0.7] Q[c,0.45] Q[c,0.35]}
+Poste & Détail & Coût/mois & Part \\
+\textbf{Load Balancer Standard} & forfait règles + data & $\approx$ 18,25 \$ & $\sim$39 \% \\
+\textbf{Compute — 2 VM \code{B2ats\_v2}} & 2 $\times$ 0,00972 \$/h $\times$ 730 & $\approx$ 14,19 \$ & $\sim$30 \% \\
+\textbf{3 IP publiques Standard} & 3 $\times$ 0,005 \$/h $\times$ 730 & $\approx$ 10,95 \$ & $\sim$23 \% \\
+2 disques OS \code{Standard\_LRS} & $\sim$30 Go HDD & $\approx$ 2,60 \$ & $\sim$6 \% \\
+Storage Account LRS & usage faible & $<$ 1 \$ & $\sim$2 \% \\
+\textbf{Total} & & \textbf{$\approx$ 47 \$} & 100 \% \\
+\end{ltable}
+Les trois premiers postes représentent \textbf{$\sim$92 \%} du coût. Le \textbf{Load Balancer} et les \textbf{IP} sont facturés \textbf{24h/24, indépendamment du trafic} ; seul le \textbf{compute} est élastique.
+\begin{tipbox}[Aucune ressource orpheline]
+\code{az disk list --query "[?managedBy==null]"} et \code{az network public-ip list --query "[?ipConfiguration==null]"} \arr{} \textbf{aucun disque orphelin, aucune IP non associée}. L'environnement est propre, sans coût « invisible ».
+\end{tipbox}
+
+\subsection{Tableau FinOps}
+\begin{ltable}{Q[l,0.6] Q[l,0.7] Q[l,0.7] X[l,1]}
+Action & Effet & Risque / limite & Application à ShopEasy \\
+Désallouer les VM hors usage & Réduction du coût compute & Indisponibilité & \code{vm-power.sh} : VM2 désallouée par défaut, VM1 hors heures. \\
+Réduire la taille des VM & Réduction du coût mensuel & Performance plus faible & \code{B2ats\_v2} déjà petite ; surveiller les crédits CPU. \\
+Supprimer les disques inutilisés & Réduction du stockage & Perte de donnée utile & Aucun disque orphelin ; contrôle automatisé. \\
+Standardiser les tags & Meilleure analyse des coûts & Discipline nécessaire & Étendre aux 11 ressources restantes. \\
+Définir un budget & Alerte en cas de dérive & Ne bloque pas la dépense & Budget 50 \$/mois, alertes 80 / 100 \%. \\
+\end{ltable}
+
+\subsection{Stratégie d'arrêt/démarrage \& budget}
+\begin{itemize}
+  \item \textbf{Désallocation hors heures ouvrées} (\code{vm-power.sh deallocate} le soir, \code{start} le matin) : une VM utilisée $\sim$50\,h/semaine économise \textbf{$\sim$70 \%} de son compute.
+  \item \textbf{Automatisation} : Azure Automation runbook, Logic App ou cron ; tag \code{AutoShutdown}.
+  \item \textbf{VM secondaire} \code{web-2} (HA) : \textbf{désallouée par défaut} en dev.
+  \item \textbf{Levier maximal} : \code{terraform destroy} entre les séances \arr{} coût $\approx$ 0, recréable par \code{apply}.
+  \item \textbf{Budget} : 50 \$/mois sur le RG, alertes \textbf{80 \% (40 \$)} et \textbf{100 \% (50 \$)} — un budget alerte mais ne bloque pas.
+\end{itemize}
+
+\subsection{Trois recommandations FinOps pour la DSI}
+\begin{ltable}{Q[c,0.2] X[l,1.3] Q[l,0.7]}
+\# & Recommandation & Gain \\
+1 & \textbf{Désallocation automatisée} des VM dev + destruction entre séances & $-60$ à $-70$ \% compute \\
+2 & \textbf{Supprimer les IP publiques des VM}, administrer via \textbf{Azure Bastion} & $\approx$ 7 \$/mois + sécurité \\
+3 & \textbf{Imposer les tags par Azure Policy} + budget mensuel avec alertes & gouvernance, détection des dérives \\
+\end{ltable}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Coût réel chiffré (prix Azure Retail Prices) : \textbf{$\approx$ 47 \$/mois en 24/7}, dont $\sim$92 \% sur LB + compute + IP.
+  \item Environnement \textbf{propre} : aucun disque orphelin, aucune IP non associée.
+  \item Tableau FinOps complété (5 actions $\times$ effet $\times$ risque $\times$ application ShopEasy).
+  \item Stratégie d'arrêt, politique de tags, budget (50 \$) et \textbf{3 recommandations DSI} prêtes.
+  \item \textbf{Prêt pour l'Atelier 12 — Rapport d'exploitation ShopEasy.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 12 — RAPPORT D'EXPLOITATION
+% #####################################################################
+\section{Atelier 12 — Rapport d'exploitation ShopEasy}
+
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=4pt, colback=azurepale, colframe=azuredark,
+   left=4.5mm,right=4.5mm,top=3.6mm,bottom=3.6mm, before skip=10pt, after skip=12pt]
+\textbf{Objet} — exploitation et automatisation de l'environnement Azure de ShopEasy\\[2pt]
+\textbf{Périmètre} — groupe de ressources \code{rg-shopeasy-dev} (\code{swedencentral}), abonnement Azure for Students\\[2pt]
+\textbf{Auteurs (binôme)} — Louis \textsc{Scarfone} \& Maxence \textsc{Bourragué}\\[2pt]
+\textbf{Double lecture} — l'équipe technique (commandes rejouables) et la DSI (risques, coûts, priorités)
+\end{tcolorbox}
+
+\subsection{Contexte et périmètre}
+ShopEasy a conçu son architecture au TP1 (déploiement manuel) puis l'a industrialisée au TP2 (Terraform). Le TP3 ouvre la phase d'\textbf{exploitation} : administrer, superviser, sécuriser et optimiser avec \textbf{Azure CLI, Bash et Python}. L'environnement a été \textbf{redéployé à l'identique} depuis le code Terraform du TP2 (21 objets), puis exploité sans repasser par le portail.
+
+\subsection{Inventaire des ressources}
+Inventaire produit en CLI, exporté en JSON/TSV, enrichi en CSV par le SDK Python. \textbf{13 ressources d'infrastructure} (décompte \code{az resource list}) + \textbf{1 alerte de supervision} retournée par le SDK, soit \textbf{14 objets ARM} : 2 VM web, 2 disques, 3 IP publiques, 2 NIC, 1 VNet, 1 NSG, 1 Load Balancer, 1 Storage Account, 1 alerte métrique. \textbf{Statut : conforme.}
+
+\subsection{Tags et gouvernance}
+Convention d'exploitation \textbf{normalisée} (\code{Application}, \code{Environment}, \code{Owner}, \code{CostCenter}, \code{ManagedBy}) appliquée au RG et aux 2 VM, en remplacement des tags techniques Terraform. \textbf{11 ressources} conservent encore les tags \code{snake\_case} — écart détecté automatiquement par \code{inventory.sh} et \code{healthcheck.sh}. \textbf{Statut : partiel.}
+
+\subsection{État des VM et actions réalisées}
+Administration complète en CLI, sans portail ni SSH direct : \code{run-command} (Nginx \code{active}, HTTP 200), \code{restart} sur \code{web-1}, \code{deallocate} puis \code{start} sur \code{web-2}. Distinction \code{stop} / \code{deallocate} maîtrisée. \textbf{Statut : conforme.}
+
+\subsection{Stockage opérationnel}
+Storage Account du TP2 \textbf{réutilisé et sécurisé} : accès public \textbf{désactivé} (\code{AllowBlobPublicAccess=False}), TLS 1.2, HTTPS-only ; conteneur \textbf{privé \code{operations}} ; authentification par \textbf{RBAC data-plane} (sans clé partagée) ; accès anonyme \textbf{prouvé refusé} (HTTP 409). \textbf{Statut : conforme.}
+
+\subsection{Monitoring et alertes}
+Métriques identifiées (CPU, réseau, disque, crédits CPU) ; \textbf{alerte active} \code{alert-cpu-high-vm-shopeasy-dev-web-1} (\code{avg Percentage CPU > 80}, fenêtre 5 min, sévérité 3) ; deux alertes complémentaires \textbf{proposées} (disponibilité LB, saturation disque). \textbf{Statut : partiel.}
+
+\subsection{Scripts produits}
+\begin{ltable}{Q[l,0.55] X[l,1]}
+Script & Rôle \\
+\code{inventory.sh} & Inventaire + synthèse (compteurs, ressources sans tag, avertissement VM \code{running}). \\
+\code{vm-power.sh} & Start/stop/deallocate/status, garde-fou \code{prod}, confirmation, journal. \\
+\code{healthcheck.sh} & 8 contrôles de santé, code de sortie 0/1 (CI/cron). \\
+\code{inventory.py} & Inventaire SDK $\rightarrow$ CSV (rôle déduit, taille VM, \code{utf-8-sig}). \\
+\code{variables.sh} & Variables centralisées, aucun secret en dur. \\
+\end{ltable}
+Tous commentés, paramétrables, relançables, sans action destructive non confirmée. \textbf{Statut : conforme.}
+
+\subsection{Analyse sécurité}
+\textbf{Contrôles en place} : SSH restreint à l'IP admin (\code{/32}) ; HTTP limité au port 80 ; stockage privé + RBAC (moindre privilège) ; aucun secret versionné ; administration sans SSH direct (\code{run-command}). \textbf{Risques résiduels} : IP publiques directes sur les VM, absence d'Azure Bastion, journalisation/diagnostic non centralisée. \textbf{Statut : conforme} sur l'essentiel, renforcements identifiés.
+
+\subsection{Analyse FinOps}
+Coût réel \textbf{$\approx$ 47 \$/mois en 24/7} : Load Balancer ($\sim$39 \%), compute ($\sim$30 \%), IP publiques ($\sim$23 \%). Le LB et les IP facturent même à trafic nul ; seul le compute est élastique. Aucune ressource orpheline. \textbf{Statut : partiel} — coût chiffré et leviers identifiés, budget et désallocation auto à appliquer.
+
+\subsection{Recommandations d'amélioration (priorisées)}
+\begin{ltable}{Q[c,0.2] X[l,1.3] Q[l,0.55] Q[c,0.4]}
+\# & Recommandation & Gain & Priorité \\
+1 & Désallocation automatisée + destruction entre séances & $-60$ à $-70$ \% compute & Haute \\
+2 & Supprimer les IP publiques des VM (Azure Bastion) & $\approx$ 7 \$/mois + sécurité & Haute \\
+3 & Généraliser les tags + Azure Policy & gouvernance & Moyenne \\
+4 & Budget (50 \$/mois) avec alertes 80/100 \% & détection des dérives & Moyenne \\
+5 & Compléter les alertes (LB, disque) + action group & détection des pannes & Moyenne \\
+6 & Diagnostic settings / Activity Log centralisés & auditabilité & Basse \\
+\end{ltable}
+
+\subsection*{Tableau de synthèse}
+\begin{ltable}{Q[l,0.5] Q[l,0.5] X[l,1.3]}
+Domaine & Statut & Commentaire \\
+\textbf{Inventaire} & \eGreen~Conforme & Inventaire CLI complet (14 objets), exports JSON/TSV/CSV, rejouable. \\
+\textbf{Tags} & \eYellow~Partiel & RG + 2 VM normalisés ; 11 ressources encore en \code{snake\_case}. \\
+\textbf{VM} & \eGreen~Conforme & États, \code{run-command}, \code{start}/\code{stop}/\code{deallocate} maîtrisés. \\
+\textbf{Stockage} & \eGreen~Conforme & Conteneur privé, accès public désactivé, RBAC, accès anonyme refusé (409). \\
+\textbf{Monitoring} & \eYellow~Partiel & Alerte CPU active ; alertes disponibilité/disque et action group à créer. \\
+\textbf{Sécurité} & \eGreen~Conforme & SSH restreint, stockage privé, RBAC, aucun secret versionné ; Bastion recommandé. \\
+\textbf{FinOps} & \eYellow~Partiel & Coût chiffré ($\sim$47 \$/mois), leviers identifiés ; budget et désallocation à appliquer. \\
+\end{ltable}
+
+\subsection*{Conclusion}
+L'environnement ShopEasy est désormais \textbf{exploité de manière outillée et reproductible} : inventaire automatisé, administration scriptée et sécurisée, stockage verrouillé, supervision initiale et analyse de coûts chiffrée. Les fondamentaux (inventaire, VM, stockage, sécurité) sont \textbf{conformes} ; les axes \textbf{tags}, \textbf{monitoring} et \textbf{FinOps} sont engagés et \textbf{partiellement} appliqués, avec une feuille de route claire. L'ensemble constitue un \textbf{mini-runbook} permettant à une autre personne de reprendre l'administration \textbf{sans dépendre du portail Azure}.
+
+\begin{etatbox}[Fin du TP3]
+\begin{itemize}
+  \item Rapport d'exploitation complet (10 sections + tableau de synthèse), déposé dans le conteneur \code{operations/rapports/}.
+  \item Bilan : \textbf{4 domaines conformes} (inventaire, VM, stockage, sécurité), \textbf{3 partiels} (tags, monitoring, FinOps) avec recommandations.
+  \item Mini-kit d'exploitation livré : \code{variables.sh}, 3 scripts Bash, \code{inventory.py}, exports, logs et rapport.
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  QUIZ
+% #####################################################################
+\section{Quiz de validation}
+
+\begin{enumerate}[leftmargin=2.2em]
+\item \textbf{Différence entre \code{az vm stop} et \code{az vm deallocate} ?}\\ \code{stop} arrête l'OS mais la VM reste \textbf{allouée} (compute facturé) ; \code{deallocate} arrête \textbf{et libère} le calcul (\textit{Stopped (deallocated)}, compute non facturé). En dev, privilégier \code{deallocate}.
+\item \textbf{Pourquoi Azure CLI plutôt que le portail pour une tâche répétitive ?}\\ Une commande est \textbf{rejouable}, documentable, intégrable à un script et exécutable en pipeline. Le portail est manuel, peu reproductible et difficile à tracer.
+\item \textbf{À quoi sert l'option \code{--query} ?}\\ À filtrer et transformer les sorties JSON avec le langage \textbf{JMESPath} (sélectionner des champs, filtrer, renommer des colonnes).
+\item \textbf{Quel format de sortie pour réutiliser un résultat dans un script Bash ?}\\ Le \textbf{TSV} (\code{-o tsv}) : sans guillemets ni en-tête, il s'extrait directement dans une variable Bash.
+\item \textbf{Pourquoi les tags sont-ils importants pour le FinOps ?}\\ Ils permettent de \textbf{ventiler la facture} (application, environnement, \code{CostCenter}), d'identifier le responsable (\code{Owner}) et d'automatiser des politiques (arrêt des \code{dev}).
+\item \textbf{Qu'est-ce qu'un runbook d'exploitation ?}\\ Une \textbf{procédure documentée} décrivant comment réaliser une action de façon fiable (démarrer/arrêter, vérifier la santé, réagir à une alerte). Les scripts du TP3 forment un mini-runbook.
+\item \textbf{Pourquoi éviter d'ouvrir SSH à tout Internet ?}\\ Exposer le port 22 à \code{0.0.0.0/0} l'expose aux \textbf{scans} et attaques par \textbf{force brute}. On restreint à l'IP admin (\code{/32}).
+\item \textbf{Quelle commande liste les ressources d'un groupe ?}\\ \code{az resource list --resource-group <rg>}.
+\item \textbf{Quel service suit les métriques et crée des alertes ?}\\ \textbf{Azure Monitor} (métriques, logs, alertes, action groups).
+\item \textbf{Différence entre métrique et log ?}\\ Une \textbf{métrique} est une valeur \textbf{numérique} dans le temps (CPU \%, débit) ; un \textbf{log} est un \textbf{événement détaillé} (texte structuré). La métrique mesure, le log raconte.
+\item \textbf{Pourquoi versionner les scripts d'exploitation ?}\\ Pour \textbf{tracer} les modifications, revenir en arrière, collaborer (revue de code) et garantir la même version fiable. Un script d'exploitation est du code.
+\item \textbf{Rôle de \code{DefaultAzureCredential} dans un script Python Azure ?}\\ Une \textbf{chaîne d'authentification} qui tente plusieurs sources (env, identité managée, \code{az login}) pour obtenir un token Azure AD \textbf{sans secret en dur}.
+\item \textbf{Pourquoi tester un script sur un environnement non productif ?}\\ Un script peut \textbf{arrêter, modifier ou supprimer} des ressources. Le tester en dev évite d'impacter la production en cas de bug ou de mauvaise variable.
+\item \textbf{Deux risques d'un script d'administration mal sécurisé ?}\\ \textbf{Action destructive sans confirmation} (arrêt/suppression accidentelle) ; \textbf{secrets en clair} dans le code (clé, mot de passe) exposés en cas de fuite.
+\item \textbf{Quelle information doit figurer dans un rapport d'exploitation ?}\\ Inventaire, état des VM/services, contrôle des tags/gouvernance, sécurité, supervision, \textbf{analyse des coûts}, risques et \textbf{recommandations priorisées} — pour l'équipe technique et la DSI.
+\item \textbf{Pourquoi un budget ne remplace-t-il pas une gouvernance des ressources ?}\\ Un budget \textbf{alerte sur un montant} mais ne dit pas quelles ressources, qui en est responsable, ni lesquelles arrêter. Sans tags ni organisation, on voit la dérive sans pouvoir agir ; il ne bloque pas la dépense.
+\item \textbf{Deux actions simples pour réduire les coûts d'un environnement de dev ?}\\ \textbf{Désallouer les VM} hors usage (et détruire l'environnement entre séances) ; \textbf{supprimer les ressources orphelines / IP inutilisées} (ou réduire la taille des VM).
+\item \textbf{Pourquoi journaliser les actions d'un script ?}\\ Pour \textbf{tracer} qui a fait quoi et quand (audit), diagnostiquer en cas d'incident et prouver les contrôles. \code{vm-power.sh} écrit dans \code{logs/vm-power.log}.
+\item \textbf{Différence entre IaC et script d'exploitation ?}\\ L'\textbf{IaC} (Terraform) décrit l'\textbf{état cible} de façon déclarative (construit l'infra). Un \textbf{script d'exploitation} réalise des \textbf{actions ponctuelles} sur l'existant de façon impérative (administre l'infra). L'un construit, l'autre exploite.
+\item \textbf{Citer trois contrôles d'un \code{healthcheck.sh}.}\\ Existence du \textbf{groupe de ressources} (bloquant) ; présence et \textbf{état des VM} ; \textbf{ressources sans tag} obligatoire (\code{Application}/\code{Owner}). \textit{(Également : alerte Azure Monitor, Storage + conteneur \code{operations}, règle NSG HTTP/HTTPS.)}
+\end{enumerate}
+
+\vspace{6mm}
+\begin{center}
+{\sffamily\bfseries\large\color{azuredark}\eParty~~Fin du dossier de rendu — TP3 Administration \& Automatisation Azure}\\[2mm]
+{\color{black!55}ShopEasy — Louis \textsc{Scarfone} \& Maxence \textsc{Bourragué} — Bloc 4 · Cloud Computing}
+\end{center}
+
+\end{document}
