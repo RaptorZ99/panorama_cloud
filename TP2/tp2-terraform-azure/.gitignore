@@ -11,6 +11,13 @@
 *.tfstate
 *.tfstate.*
 
+# --- Fichiers de PLAN (sortie de `terraform plan -out=tfplan`) ---
+#     Un fichier de plan sérialise TOUS les changements prévus, y compris
+#     d'éventuelles valeurs sensibles en clair (variables sensitive, secrets).
+#     C'est un artefact temporaire → ne JAMAIS versionner.
+#     Pattern officiel HashiCorp : *tfplan*
+*tfplan*
+
 # --- Variables converties en JSON (peuvent embarquer des valeurs sensibles) ---
 *.tfvars.json
 
