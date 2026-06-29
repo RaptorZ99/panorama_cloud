@@ -1,0 +1,1211 @@
+% =====================================================================
+%  TP4 — Monitoring, FinOps & Sécurité Azure (ShopEasy)
+%  Binôme : Louis SCARFONE & Maxence BOURRAGUE — Bloc 4 (Cloud Computing)
+%  Moteur : LuaLaTeX (LuaHBTeX)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Langue & fontes ----------
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{french}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}[Scale=0.80]
+\usepackage{microtype}
+\emergencystretch=3em  % absorbe les débordements de texte (code inline en fin de ligne)
+
+% ---------- Respiration (look épuré) ----------
+\usepackage{setspace}
+\setstretch{1.08}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em plus 0.12em minus 0.05em}
+
+% ---------- Géométrie ----------
+\usepackage[a4paper,margin=2.2cm,headheight=16pt,headsep=14pt,footskip=20pt]{geometry}
+
+% ---------- Couleurs (palette Azure) ----------
+\usepackage{xcolor}
+\definecolor{azure}{HTML}{0078D4}
+\definecolor{azuredark}{HTML}{14375E}
+\definecolor{azuremid}{HTML}{2E75B6}
+\definecolor{azurelight}{HTML}{E8F1FB}
+\definecolor{azurepale}{HTML}{F3F8FD}
+\definecolor{okgreen}{HTML}{107C10}
+\definecolor{okgreenbg}{HTML}{E8F5E9}
+\definecolor{warnorange}{HTML}{B5520A}
+\definecolor{warnbg}{HTML}{FBEEDF}
+\definecolor{dangerred}{HTML}{A4262C}
+\definecolor{codebg}{HTML}{F6F8FA}
+\definecolor{codeframe}{HTML}{D8E1EC}
+\definecolor{ink}{HTML}{1B2733}
+\definecolor{rowalt}{HTML}{EBF3FC}
+\color{ink}
+
+% ---------- Divers ----------
+\usepackage{graphicx}
+\graphicspath{{../livrables/assets/}}
+\usepackage{fontawesome5}
+\usepackage{enumitem}
+\setlist{leftmargin=1.4em,topsep=2pt,itemsep=2pt,parsep=0pt}
+\usepackage{needspace}
+\usepackage{fvextra}
+
+% ---------- Emojis (Twemoji couleur) ----------
+\usepackage{twemojis}
+\newcommand{\emo}[1]{\raisebox{-0.14em}{\twemoji{#1}}}
+\newcommand{\eTarget}{\emo{1f3af}}
+\newcommand{\ePackage}{\emo{1f4e6}}
+\newcommand{\eCheck}{\emo{2705}}
+\newcommand{\eWarn}{\emo{26a0}}
+\newcommand{\eBulb}{\emo{1f4a1}}
+\newcommand{\eLock}{\emo{1f512}}
+\newcommand{\eKey}{\emo{1f510}}
+\newcommand{\eRocket}{\emo{1f680}}
+\newcommand{\eChart}{\emo{1f4ca}}
+\newcommand{\eMoney}{\emo{1f4b0}}
+\newcommand{\eGear}{\emo{2699}}
+\newcommand{\eGlobe}{\emo{1f310}}
+\newcommand{\eCamera}{\emo{1f4f8}}
+\newcommand{\ePin}{\emo{1f4cc}}
+\newcommand{\eMag}{\emo{1f50d}}
+\newcommand{\eFlag}{\emo{1f3c1}}
+\newcommand{\eParty}{\emo{1f389}}
+\newcommand{\eShield}{\emo{1f6e1}}
+\newcommand{\eBroom}{\emo{1f9f9}}
+\newcommand{\eFolder}{\emo{1f4c2}}
+\newcommand{\eServer}{\emo{1f5a5}}
+\newcommand{\eDB}{\emo{1f5c4}}
+\newcommand{\eScale}{\emo{2696}}
+\newcommand{\eRed}{\emo{1f534}}
+\newcommand{\eOrange}{\emo{1f7e0}}
+\newcommand{\eYellow}{\emo{1f7e1}}
+\newcommand{\eGreen}{\emo{1f7e2}}
+\newcommand{\eWorld}{\emo{1f30d}}
+\newcommand{\eTerminal}{\emo{1f4bb}}
+\newcommand{\eSnake}{\emo{1f40d}}
+\newcommand{\eBell}{\emo{1f514}}
+\newcommand{\arr}{\ensuremath{\rightarrow}}
+% \code : monospace SECABLE (points de coupure entre caracteres, utilises seulement
+% si necessaire) -> evite les debordements de code en tableau. Preserve les ESPACES.
+\makeatletter
+\def\tp@stop{\tp@stop}
+\newcommand{\code}[1]{\texttt{\tp@loop#1\tp@stop}}
+\def\tp@loop{\futurelet\tp@nxt\tp@step}
+\def\tp@step{%
+  \ifx\tp@nxt\tp@stop \let\tp@do\tp@fin
+  \else\ifx\tp@nxt\@sptoken \let\tp@do\tp@sp
+  \else \let\tp@do\tp@ch \fi\fi \tp@do}
+\def\tp@fin#1{}%
+\def\tp@ch#1{#1\penalty100 \tp@loop}
+\expandafter\def\expandafter\tp@sp\space{\space\penalty100 \tp@loop}
+\makeatother
+
+% ---------- Tableaux (tabularray) ----------
+\usepackage{tabularray}
+\UseTblrLibrary{booktabs}
+\NewDocumentEnvironment{ltable}{m}{%
+  \par\addvspace{4pt}\begin{tblr}{
+    width=\linewidth,
+    colspec={#1},
+    row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\small},
+    row{2-Z}={font=\small},
+    row{even}={bg=rowalt},
+    hline{1,Z}={1.1pt,solid,azuredark},
+    hline{2}={0.5pt,solid,azuredark!45},
+    colsep=7pt, rowsep=4pt,
+    stretch=1.18,
+  }%
+}{%
+  \end{tblr}\par\addvspace{4pt}%
+}
+
+% ---------- Boîtes (tcolorbox) ----------
+\usepackage[most]{tcolorbox}
+\tcbset{
+  boxbase/.style={
+    enhanced, breakable, sharp corners, boxrule=0pt, leftrule=4pt,
+    left=4.5mm, right=4.5mm, top=3.6mm, bottom=3.6mm,
+    before skip=12pt, after skip=12pt,
+    fonttitle=\sffamily\bfseries, coltitle=white,
+    attach boxed title to top left={xshift=0mm,yshift=-2.6mm},
+    boxed title style={sharp corners, boxrule=0pt, left=2.5mm,right=2.5mm,top=0.9mm,bottom=0.9mm},
+  },
+}
+\newtcolorbox{fiche}{boxbase, colback=azurelight, colframe=azure}
+\newtcolorbox{notebox}[1][Point de vigilance]{boxbase, colback=warnbg, colframe=warnorange,
+  colbacktitle=warnorange, title={\eWarn~#1}}
+\newtcolorbox{tipbox}[1][Astuce]{boxbase, colback=azurepale, colframe=azuremid,
+  colbacktitle=azuremid, title={\eBulb~#1}}
+\newtcolorbox{etatbox}[1][État après l'atelier]{boxbase, colback=okgreenbg, colframe=okgreen,
+  colbacktitle=okgreen, title={\eCheck~#1}}
+
+% Bloc code / terminal
+\fvset{breaklines=true, breakanywhere=true, fontsize=\footnotesize,
+  breaksymbolleft=\raisebox{0.1ex}{\scriptsize\textcolor{azure}{$\hookrightarrow$}}}
+\newtcolorbox{codebox}[1]{
+  enhanced, breakable, sharp corners, boxrule=0.7pt,
+  colback=codebg, colframe=codeframe,
+  coltitle=azuredark, colbacktitle=codeframe, fonttitle=\ttfamily\bfseries\scriptsize,
+  title={\faTerminal~~#1}, left=3mm, right=3mm, top=2.6mm, bottom=2.6mm,
+  before skip=12pt, after skip=14pt,
+}
+
+% Capture d'écran encadrée + légende
+\newcommand{\screenshot}[2]{%
+  \par\addvspace{10pt}
+  \begin{center}
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0.7pt, colframe=codeframe, colback=white,
+      left=0.8mm, right=0.8mm, top=0.8mm, bottom=0.8mm, drop fuzzy shadow=black!18]
+    \includegraphics[width=\linewidth]{#1}
+  \end{tcolorbox}\par\vspace{4pt}
+  {\small\itshape\color{black!58}#2}
+  \end{center}\par\addvspace{12pt}
+}
+
+% Carte « chiffre-clé » pour la page de garde
+\newcommand{\statcard}[2]{%
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=3pt, colframe=azure,
+     colback=azurepale, width=0.305\linewidth, halign=center, valign=center, height=2.3cm,
+     left=1mm, right=1mm, top=1mm, bottom=1mm, nobeforeafter]
+     {\sffamily\bfseries\fontsize{22}{24}\selectfont\color{azuredark}#1}\\[1.5mm]
+     {\sffamily\small\color{black!58}#2}
+  \end{tcolorbox}%
+}
+
+% ---------- Sections (titlesec) ----------
+\usepackage{titlesec}
+\titleformat{\section}
+  {\sffamily\LARGE\bfseries\color{azuredark}}
+  {\tcbox[on line, sharp corners, boxrule=0pt, colback=azure, colupper=white,
+     left=2.2mm,right=2.2mm,top=0.6mm,bottom=0.6mm]{\thesection}}
+  {0.7em}{}[\vspace{1mm}{\color{azure}\titlerule[1.6pt]}]
+\titlespacing*{\section}{0pt}{3.6ex plus 0.8ex}{2.0ex}
+\titleformat{\subsection}
+  {\sffamily\large\bfseries\color{azuremid}}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{2.8ex plus 0.5ex}{1.1ex}
+\titleformat{\subsubsection}
+  {\sffamily\bfseries\color{azuredark}}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{1.9ex plus 0.3ex}{0.5ex}
+
+% ---------- En-têtes / pieds (fancyhdr) ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\small\color{azuredark}\textbf{TP4 Monitoring}~\textcolor{azure}{\textbullet}~ShopEasy}
+\fancyhead[R]{\sffamily\small\color{black!55}\nouppercase{\leftmark}}
+\fancyfoot[C]{\sffamily\small\color{black!55}\thepage}
+\fancyfoot[R]{\sffamily\scriptsize\color{black!42}Bloc 4 · Cloud Computing}
+\fancyfoot[L]{\sffamily\scriptsize\color{black!42}SCARFONE · BOURRAGUE}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrule}{\vspace{-2pt}{\color{azure!70}\rule{\headwidth}{1.1pt}}}
+
+% ---------- Liens ----------
+\usepackage[hidelinks]{hyperref}
+\hypersetup{colorlinks=true, linkcolor=azuredark, urlcolor=azuremid,
+  pdftitle={TP4 Monitoring, FinOps et Securite - ShopEasy}, pdfauthor={Louis SCARFONE, Maxence BOURRAGUE}}
+
+% Filet décoratif
+\newcommand{\thinrule}{\par\vspace{1mm}{\color{azure!30}\hrule height 0.5pt}\vspace{1mm}}
+
+\begin{document}
+
+% =====================================================================
+%  PAGE DE GARDE
+% =====================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\setlength{\parskip}{0pt}
+\raggedright
+
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, colback=azuredark,
+   width=\linewidth, left=13mm, right=13mm, top=14mm, bottom=14mm,
+   borderline north={5pt}{0pt}{azure}, borderline south={2pt}{0pt}{azure}]
+  \raggedright
+  {\sffamily\bfseries\large\color{azure!75}\faMicrosoft~~MICROSOFT AZURE \quad\textbullet\quad BLOC 4 — CLOUD COMPUTING}
+
+  \vspace{9mm}
+  {\sffamily\bfseries\color{white}\fontsize{34}{40}\selectfont TP4 — Monitoring, FinOps \& Sécurité}
+
+  \vspace{4mm}
+  {\sffamily\color{azurelight}\LARGE piloter l'exploitation de l'environnement Azure de \textbf{ShopEasy}}
+
+  \vspace{8mm}
+  {\color{azure}\rule{5.2cm}{2.5pt}}
+
+  \vspace{5mm}
+  {\sffamily\color{white}\large Superviser avec \textbf{Azure Monitor} et \textbf{Log Analytics}, créer des \textbf{alertes}, analyser les coûts (\textbf{FinOps}), conduire une \textbf{revue de sécurité}, \textbf{auditer} les changements et produire une \textbf{note de recommandations DSI}.}
+\end{tcolorbox}
+
+\vspace{1.8cm}
+
+\begin{minipage}[t]{0.5\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Binôme}\\[3.5mm]
+  {\large Louis \textsc{Scarfone}}\\[2mm]
+  {\large Maxence \textsc{Bourragué}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Cadre}\\[3.5mm]
+  Mastère Dev Manager Full Stack — RNCP niveau 7\\[2mm]
+  Cas fil rouge : \textbf{ShopEasy}\\[2mm]
+  Azure for Students — région \texttt{swedencentral}
+\end{minipage}
+
+\vspace{1.9cm}
+
+\noindent
+\statcard{9}{ateliers + quiz}\hfill
+\statcard{4}{piliers d'exploitation}\hfill
+\statcard{$\approx$\,47\,\$}{coût mensuel estimé}
+
+\vfill
+{\sffamily\large\bfseries\color{azuredark}Juin 2026}\hfill
+{\sffamily\color{black!45}Mastère Dev Manager Full Stack}
+\end{titlepage}
+
+% =====================================================================
+%  TABLE DES MATIÈRES
+% =====================================================================
+\thispagestyle{fancy}
+{\sffamily\Huge\bfseries\color{azuredark}Sommaire}
+\vspace{2mm}{\color{azure}\titlerule[1.6pt]}\vspace{4mm}
+\hypersetup{linkcolor=azuredark}
+{\setlength{\parskip}{1pt}\tableofcontents}
+\newpage
+
+% #####################################################################
+%  ATELIER 1
+% #####################################################################
+\section{Atelier 1 — Cadrer les indicateurs d'exploitation}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — avant de configurer un outil, définir \textbf{quoi surveiller} pour ShopEasy : couvrir la disponibilité, la performance, les coûts et la sécurité.
+
+\textbf{\ePackage~Livrable attendu} — un tableau d'indicateurs \textbf{priorisés}, avec un seuil proposé et une justification claire pour chaque indicateur retenu.
+\end{fiche}
+
+Le cadrage s'appuie sur l'environnement réel hérité des TP précédents : Load Balancer \code{lb-shopeasy-dev-web}, deux VM \code{Standard\_B2ats\_v2} (burstable, Ubuntu + Nginx), NSG \code{nsg-shopeasy-dev-web}, Storage \code{shopeasydevdocsczvc1s}, le tout en \code{swedencentral} pour $\approx$ 47 \$/mois.
+
+\subsection{Tableau des indicateurs priorisés}
+\begin{ltable}{X[l,0.5] X[l,0.82] X[l,0.66] X[l,0.42] X[l,1.1]}
+Domaine & Indicateur & Seuil proposé & Priorité & Justification \\
+\textbf{Disponibilité} & Disponibilité des backends du Load Balancer (sonde HTTP) & < 100 \% des backends sains sur 5 min & \textbf{Haute} & Indicateur le plus proche du client : si une VM ne répond plus à la sonde, le site se dégrade — à détecter avant l'utilisateur. \\
+\textbf{Disponibilité} & État d'alimentation des VM (\code{PowerState}) & VM \code{stopped}/\code{deallocated} inattendue & Moyenne & Une VM web éteinte hors plan = perte de capacité ou indisponibilité. \\
+\textbf{Performance} & CPU moyen des VM (\code{Percentage CPU}) & > 80 \% en moyenne sur 5 min & \textbf{Haute} & Détecte une saturation calcul soutenue avant dégradation des temps de réponse (seuil bien au-dessus de la baseline au repos). \\
+\textbf{Performance} & Crédits CPU restants (\code{CPU Credits Remaining}) & Tendance vers 0 & Moyenne & Spécifique au burstable \code{B2ats\_v2} : crédits épuisés \arr{} la VM est bridée même sans saturation apparente. \\
+\textbf{Coût} & Coût mensuel cumulé vs budget & > 80 \% puis 100 \% du budget (50 \$) & \textbf{Haute} & Détecte une dérive budgétaire en cours de mois, à temps pour réagir. \\
+\textbf{Coût} & Ressources sans tag / orphelines (disques, IP) & > 0 ressource & Moyenne & Coût non imputable ou facturé à vide (LB + IP facturés même sans trafic). \\
+\textbf{Sécurité} & Ports d'administration exposés à Internet (NSG : 22/3389 depuis \code{0.0.0.0/0}) & Toute règle source Internet sur 22/3389 & \textbf{Haute} & Un port d'administration ouvert = scans et force brute permanents ; vérifie que SSH reste limité à l'IP admin. \\
+\textbf{Sécurité} & Accès public au Storage / droits \code{Owner} excessifs & \code{allowBlobPublicAccess = true} ou trop d'\code{Owner} & Moyenne & Fuite de documents (RGPD) et non-respect du moindre privilège. \\
+\textbf{Exploitation} & Nombre d'alertes critiques actives & > 0 alerte critique & \textbf{Haute} & Vision immédiate de l'état de santé : combien d'incidents en cours ? \\
+\textbf{Exploitation} & Couverture monitoring (ressources critiques avec diagnostics/logs) & < 100 \% des ressources critiques & Moyenne & Une ressource sans logs est un angle mort : rien à analyser après un incident. \\
+\end{ltable}
+
+\subsection{Questions guidées}
+\textbf{1. Pourquoi ne faut-il pas surveiller uniquement le CPU ?}\\
+Le CPU ne couvre qu'un seul axe (la saturation calcul). Un service peut être défaillant avec un \textbf{CPU normal} : VM allumée mais Nginx tombé, Load Balancer mal configuré, disque plein, mémoire saturée, base injoignable, crédits CPU épuisés, coût qui dérive, port exposé. Surveiller uniquement le CPU laisse des angles morts sur la disponibilité, la capacité, le coût et la sécurité. Une VM web au repos affiche d'ailleurs un CPU de l'ordre de \textbf{0,3 \%} (mesuré à l'Atelier 3) — une valeur « saine » qui ne dirait rien d'un site KO ou d'une facture qui grimpe.
+
+\textbf{2. Quels indicateurs permettent de détecter un risque de saturation ?}\\
+Les indicateurs de capacité et de performance : \textbf{CPU moyen} soutenu, \textbf{crédits CPU restants} (déterminant sur le burstable \code{B2ats\_v2}), \textbf{mémoire disponible} basse, \textbf{espace disque utilisé} (> 85 \%, logs Nginx), \textbf{IOPS/débit disque} proche du plafond, et le \textbf{nombre de connexions/requêtes}. On surveille la \textbf{tendance vers la limite}, pas seulement la valeur instantanée.
+
+\textbf{3. Quels indicateurs permettent d'identifier une dérive de coûts ?}\\
+Le \textbf{coût cumulé du mois vs budget} (alerte 80 \%/100 \%), le \textbf{coût prévisionnel (forecast)}, le \textbf{coût par service/par tag}, les \textbf{ressources sans tag} (coût non imputable), les \textbf{ressources orphelines} (disques/IP non attachés) et les \textbf{ressources facturées à vide} (Load Balancer, IP publiques $\approx$ 29 \$/mois). Sans tags ni budget, la hausse se constate trop tard, sur la facture.
+
+\textbf{4. Quels signaux permettent de détecter un problème de sécurité ?}\\
+Les \textbf{règles NSG ouvertes} sur Internet (surtout 22/3389), l'\textbf{accès public au Storage}, les \textbf{attributions de rôle excessives} (\code{Owner}), les \textbf{modifications sensibles dans l'Activity Log} (droits, règles réseau, suppressions), les \textbf{recommandations Defender/Advisor} et le \textbf{Secure Score}, les \textbf{authentifications échouées} (force brute) et l'\textbf{absence de logs} sur une ressource critique.
+
+\textbf{5. Quelle différence entre un incident, une alerte et une recommandation ?}
+\begin{ltable}{Q[l,0.5] Q[l,0.9] X[l,1]}
+Notion & Nature & Exemple ShopEasy \\
+\textbf{Recommandation} & Proposition d'amélioration \textbf{priorisée}, préventive & « Restreindre les ports d'administration », « créer un budget ». \\
+\textbf{Alerte} & Signal \textbf{automatique} déclenché par une condition franchie, \textbf{actionnable} & « CPU > 80 \% depuis 5 min », « VM indisponible ». \\
+\textbf{Incident} & Événement qui \textbf{dégrade ou interrompt} réellement le service & « Le site renvoie des erreurs », « une VM est tombée ». \\
+\end{ltable}
+La recommandation \textbf{réduit la probabilité} d'un incident, l'alerte le \textbf{détecte au plus tôt} (et le transforme en action), l'incident est ce que l'on cherche à éviter. Une alerte qui n'appelle aucune action n'est pas une alerte mais une simple information de tableau de bord.
+
+\begin{etatbox}
+\begin{itemize}
+  \item Tableau d'indicateurs \textbf{priorisés} couvrant les 5 domaines (Disponibilité, Performance, Coût, Sécurité, Exploitation), chacun avec seuil et justification ancrés dans l'environnement réel de ShopEasy.
+  \item Réponses aux 5 questions guidées.
+  \item Atelier \textbf{conceptuel} : le livrable est ce tableau de cadrage. Aucune capture d'écran n'est attendue (aucun outil n'est encore configuré).
+  \item \textbf{Prêt pour l'Atelier 2 — Préparer l'environnement Azure Monitor.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 2
+% #####################################################################
+\section{Atelier 2 — Préparer l'environnement Azure Monitor}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — mettre en place la base de l'observabilité Azure : un espace \textbf{Log Analytics}, des \textbf{diagnostics} et une organisation claire des ressources.
+
+\textbf{\ePackage~Livrable attendu} — description de l'espace Log Analytics, \textbf{liste des ressources connectées ou à connecter}, et justification des choix.
+\end{fiche}
+
+\subsection{Ressources à identifier}
+L'environnement ShopEasy a été redéployé à l'identique depuis le Terraform du TP2 (\code{terraform apply} \arr{} 21 objets). Repérage des ressources :
+\begin{codebox}{bash}
+\begin{Verbatim}
+az account show --query "{name:name, state:state}" -o table
+az resource list --resource-group rg-shopeasy-dev --output table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Name                State
+------------------  -------
+Azure for Students  Enabled
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{Q[l,0.7] Q[l,0.55] X[l,1]}
+Ressource attendue & Présence & Détail \\
+Groupe de ressources & \eCheck{} & \code{rg-shopeasy-dev} (\code{swedencentral}) \\
+Machines virtuelles & \eCheck{} & \code{vm-shopeasy-dev-web-1/2} (\code{Standard\_B2ats\_v2}) \\
+Network Security Groups & \eCheck{} & \code{nsg-shopeasy-dev-web} \\
+Storage Account & \eCheck{} & \code{shopeasydevdocsczvc1s} (privé, versionné) \\
+Réseau virtuel & \eCheck{} & \code{vnet-shopeasy-dev} (\code{10.20.0.0/16}, subnet \code{snet-web}) \\
+Base de données & \eWarn{} & \textbf{Non déployée} : cible TP1, hors périmètre Terraform du TP2. Traitée en proposition (Atelier 5). \\
+Monitoring existant & \eWarn{} & \textbf{Aucun} au départ \arr{} le workspace est créé dans cet atelier. \\
+\end{ltable}
+
+\textbf{13 ressources de premier niveau} ; aucune ressource d'observabilité préexistante, d'où la nécessité de centraliser.
+
+\subsection{Création du Log Analytics Workspace}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az monitor log-analytics workspace create \
+  --resource-group rg-shopeasy-dev \
+  --workspace-name law-shopeasy-dev \
+  --location swedencentral \
+  --tags Application=shopeasy Environment=dev Owner=cloudops-shopeasy \
+        CostCenter=cloud-training ManagedBy=cli
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom               Region         Sku        RetentionJours    Etat
+----------------  -------------  ---------  ----------------  ---------
+law-shopeasy-dev  swedencentral  PerGB2018  30                Succeeded
+\end{Verbatim}
+\end{codebox}
+La région est \textbf{\code{swedencentral}} (et non \code{francecentral} comme dans l'exemple de l'énoncé) : \code{francecentral} est bloquée par la policy \textit{Allowed regions} d'\textit{Azure for Students}. Le workspace \code{law-shopeasy-dev} : SKU \textbf{PerGB2018} (facturation à l'ingestion), rétention \textbf{30 jours}, état \code{Succeeded}.
+
+\subsection{Diagnostic settings — raccordement au workspace}
+Pour chaque ressource critique, vérification de ce qui \textbf{peut} être envoyé vers Log Analytics, puis raccordement de ce qui est réalisable :
+\begin{ltable}{Q[l,0.5] Q[l,0.85] Q[l,0.7] X[l,0.9]}
+Ressource & Diagnostics attendus & Intérêt opérationnel & Statut \\
+\textbf{VM} (web-1, web-2) & Métriques plateforme (CPU, réseau, disque, crédits CPU) ; logs système & Détecter surcharge et indisponibilité & Métriques \textbf{natives} OK ; logs invité \textbf{à connecter} (AMA + DCR) \\
+\textbf{Storage Account} & Transactions (métrique), logs data-plane & Surveiller activité et coûts & \eCheck{} \textbf{Connecté} : \code{diag-storage-to-law} + \code{diag-blob-to-law} \\
+\textbf{Azure SQL} & CPU, DTU/vCore, connexions & Détecter saturation base & \textbf{Non déployé} \arr{} à connecter si la base est provisionnée \\
+\textbf{Activity Log} & Opérations administratives, sécurité & Auditer les changements & \eCheck{} \textbf{Connecté} : \code{activitylog-to-law} \\
+\end{ltable}
+
+\subsubsection{Storage Account \arr{} workspace}
+\begin{codebox}{bash}
+\begin{Verbatim}
+STORAGE_ID=$(az storage account show -g rg-shopeasy-dev -n shopeasydevdocsczvc1s --query id -o tsv)
+LAW_ID=$(az monitor log-analytics workspace show -g rg-shopeasy-dev -n law-shopeasy-dev --query id -o tsv)
+
+# Metrique Transaction (activite et couts) au niveau du compte
+az monitor diagnostic-settings create --name "diag-storage-to-law" \
+  --resource "$STORAGE_ID" --workspace "$LAW_ID" \
+  --metrics '[{"category":"Transaction","enabled":true}]'
+
+# Logs data-plane (acces read/write/delete) au niveau du Blob service
+az monitor diagnostic-settings create --name "diag-blob-to-law" \
+  --resource "$STORAGE_ID/blobServices/default" --workspace "$LAW_ID" \
+  --logs '[{"category":"StorageRead","enabled":true},
+           {"category":"StorageWrite","enabled":true},
+           {"category":"StorageDelete","enabled":true}]'
+\end{Verbatim}
+\end{codebox}
+
+\subsubsection{Activity Log (abonnement) \arr{} workspace}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az monitor diagnostic-settings subscription create --name "activitylog-to-law" \
+  --location swedencentral --workspace "$LAW_ID" \
+  --logs '[{"category":"Administrative","enabled":true},
+           {"category":"Security","enabled":true},
+           {"category":"Policy","enabled":true},
+           {"category":"Alert","enabled":true},
+           {"category":"ResourceHealth","enabled":true}]'
+\end{Verbatim}
+\end{codebox}
+
+\subsubsection{VM — métriques disponibles sans agent}
+Les \textbf{métriques de plateforme} des VM remontent nativement dans Azure Monitor (sans agent ni workspace) : \code{Percentage CPU}, \code{CPU Credits Remaining}, \code{Network In Total}\dots{} Les \textbf{logs invité} (syslog) et compteurs mémoire/disque nécessitent l'\textbf{Azure Monitor Agent} + une \textbf{Data Collection Rule} (DCR) vers \code{law-shopeasy-dev} — raccordement documenté comme « à connecter ».
+
+\subsection{Justification des choix}
+\begin{itemize}
+  \item \textbf{Un workspace centralisé} (\code{law-shopeasy-dev}) : corréler logs et métriques de plusieurs ressources et interroger en \textbf{KQL} depuis un point unique.
+  \item \textbf{Activity Log raccordé en priorité} : source d'\textbf{audit} (qui a fait quoi, quand) exploitée à l'Atelier 8 ; \code{Administrative} et \code{Security} couvrent les changements de configuration et de droits.
+  \item \textbf{Storage raccordé} (métrique + logs data-plane) : surveille l'activité (transactions) et les accès aux documents, utile aux coûts et à la sécurité.
+  \item \textbf{SKU PerGB2018 / rétention 30 j} : facturation à l'ingestion et rétention courte, adaptées à un environnement de dev.
+  \item \textbf{Base SQL et logs invité VM laissés « à connecter »} : honnêteté du périmètre — documentés avec la méthode exacte plutôt que simulés.
+\end{itemize}
+
+\subsection{Capture}
+\screenshot{atelier02-log-analytics-workspace.png}{Espace Log Analytics \code{law-shopeasy-dev} (région \textit{Sweden Central}, SKU PerGB2018, rétention 30 jours). Portal \arr{} Log Analytics workspaces \arr{} law-shopeasy-dev \arr{} Overview.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Ressources \textbf{identifiées} (13 ressources ; aucune ressource de monitoring préexistante).
+  \item \textbf{Log Analytics Workspace \code{law-shopeasy-dev}} créé (\code{swedencentral}, PerGB2018, 30 j, \code{Succeeded}).
+  \item \textbf{3 diagnostic settings} opérationnels : Storage (métrique Transaction + logs blob) et Activity Log (Administrative/Security/Policy/Alert/ResourceHealth).
+  \item Métriques VM disponibles nativement ; logs invité VM et base SQL documentés « à connecter ».
+  \item \textbf{Prêt pour l'Atelier 3 — Superviser les machines virtuelles.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 3
+% #####################################################################
+\section{Atelier 3 — Superviser les machines virtuelles}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — analyser l'état des machines virtuelles et construire une première vision de supervision.
+
+\textbf{\ePackage~Livrable attendu} — un tableau d'analyse des VM avec \textbf{au moins deux recommandations} d'exploitation.
+\end{fiche}
+
+\subsection{État des VM (inventaire)}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az vm list -g rg-shopeasy-dev --show-details \
+  --query "[].{Nom:name,Etat:powerState,IP_publique:publicIps,IP_privee:privateIps,Taille:hardwareProfile.vmSize}" -o table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom                    Etat        IP_publique    IP_privee    Taille
+---------------------  ----------  -------------  -----------  -----------------
+vm-shopeasy-dev-web-1  VM running  20.240.255.96  10.20.1.4    Standard_B2ats_v2
+vm-shopeasy-dev-web-2  VM running  20.240.47.225  10.20.1.5    Standard_B2ats_v2
+\end{Verbatim}
+\end{codebox}
+
+Statut de démarrage et provisionnement (\code{az vm get-instance-view}) :
+\begin{codebox}{bash}
+\begin{Verbatim}
+az vm get-instance-view -g rg-shopeasy-dev -n vm-shopeasy-dev-web-1 \
+  --query "instanceView.statuses[?starts_with(code,'PowerState/') || starts_with(code,'ProvisioningState/')].{Code:code, Etat:displayStatus}" -o table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Code                         Etat
+---------------------------  ----------------------
+ProvisioningState/succeeded  Provisioning succeeded
+PowerState/running           VM running
+\end{Verbatim}
+\end{codebox}
+Les deux VM sont \textbf{\code{running}}, provisionnées avec succès, en \code{Standard\_B2ats\_v2} (Ubuntu + Nginx). Aucune erreur dans l'\textit{instance view}.
+
+\subsection{Métriques observées (Azure Monitor)}
+Lecture des métriques demandées via \code{az monitor metrics list} (fenêtre des 30--60 dernières min) :
+\begin{codebox}{bash}
+\begin{Verbatim}
+VM1_ID=$(az vm show -g rg-shopeasy-dev -n vm-shopeasy-dev-web-1 --query id -o tsv)
+az monitor metrics list --resource "$VM1_ID" --metric "Percentage CPU" \
+  --interval PT5M --aggregation Average Maximum -o table
+\end{Verbatim}
+\end{codebox}
+
+\begin{ltable}{X[l,0.62] X[l,0.52] X[l,0.85] X[l,0.55] X[l,0.92]}
+Métrique demandée & Métrique Azure & VM web-1 & VM web-2 & Lecture \\
+\textbf{Pourcentage CPU} & \code{Percentage CPU} & pic \textbf{19 \%} au boot \arr{} \textbf{$\approx$0,3 \%} moy. (1,1 \% max) au repos & idem & VM au repos (page statique, pas de trafic réel). \\
+\textbf{Réseau entr./sort.} & \code{Network In/Out Total} & \textbf{242 Ko} / \textbf{404 Ko} & 229 Ko / 327 Ko & Trafic faible (sondes + administration). \\
+\textbf{Disque lu/écrit} & \code{Disk Read/Write Bytes} & \textbf{2,40 Mo} / \textbf{2,16 Mo} & 2,55 Mo / 2,78 Mo & Activité de boot (cloud-init), puis quasi nulle. \\
+\textbf{Disponibilité VM} & \code{VmAvailabilityMetric} & \textbf{1.0} (saine) & \textbf{1.0} (saine) & La VM est disponible \textbf{au niveau plateforme}. \\
+\textbf{Erreurs éventuelles} & \textit{instance view} & aucune (\code{succeeded}) & aucune & Pas d'erreur d'infra ; erreurs \textbf{applicatives} non visibles ici. \\
+\textbf{Statut de démarrage} & \code{Power}/\code{ProvisioningState} & \code{running} / \code{succeeded} & \code{running} / \code{succeeded} & Démarrage nominal. \\
+\end{ltable}
+
+Métriques complémentaires utiles, propres au contexte :
+\begin{codebox}{console}
+\begin{Verbatim}
+CPU Credits Remaining   : 63,14        (burstable B2ats_v2 : reserve de credits saine)
+Available Memory Bytes  : ~528 Mo      (sur 1 Gio : ~la moitie libre au repos)
+\end{Verbatim}
+\end{codebox}
+
+\begin{notebox}[VM burstable B2ats\_v2]
+La VM \code{Standard\_B2ats\_v2} est \textbf{burstable} (1 Gio de RAM, 2 vCPU) : les \textbf{crédits CPU} et la \textbf{mémoire disponible} sont des indicateurs déterminants (un CPU élevé prolongé épuise les crédits \arr{} bridage ; 1 Gio de RAM est la ressource la plus contrainte).
+\end{notebox}
+
+\subsection{Questions d'analyse}
+\textbf{1. La VM est-elle correctement dimensionnée ?}\\
+Pour l'usage actuel (page Nginx statique, sans trafic réel), elle est \textbf{largement dimensionnée côté CPU} ($\approx$0,3 \% au repos, 63 crédits en réserve) — une taille burstable de série B est adaptée à un environnement de dev. Le point de vigilance est la \textbf{mémoire} : \code{B2ats\_v2} n'offre que \textbf{1 Gio}, dont $\approx$ la moitié est déjà consommée au repos. Sous charge réelle, la \textbf{RAM serait le facteur limitant} avant le CPU. Verdict : bien dimensionnée pour le dev/test, mais à re-dimensionner (RAM) avant toute mise en charge de production. \textit{(Rappel : \code{B1s} est indisponible sur Azure for Students, \code{B2ats\_v2} est l'alternative recommandée.)}
+
+\textbf{2. Les métriques disponibles suffisent-elles à diagnostiquer un incident applicatif ?}\\
+\textbf{Non.} Les métriques de plateforme (CPU, réseau, disque, disponibilité, mémoire) décrivent l'état de l'\textbf{infrastructure}, pas celui de l'\textbf{application}. Un incident applicatif — Nginx qui renvoie des \code{500}, une requête lente, une erreur de configuration — peut survenir alors que la VM est \textbf{parfaitement saine au niveau infra} (\code{VmAvailabilityMetric = 1}, CPU bas). Ces métriques disent \textit{si la machine tourne}, pas \textit{si le service rend correctement le service}.
+
+\textbf{3. Quelles métriques manquent pour une supervision applicative complète ?}
+\begin{itemize}
+  \item \textbf{Codes de statut HTTP} et \textbf{taux d'erreurs} (\code{5xx}/\code{4xx}) issus des logs Nginx ;
+  \item \textbf{Temps de réponse / latence} (P95) ;
+  \item \textbf{Débit applicatif} (requêtes/s) et \textbf{connexions actives} Nginx ;
+  \item \textbf{Logs applicatifs} (erreurs, exceptions) centralisés dans Log Analytics ;
+  \item \textbf{Disponibilité synthétique} vue utilisateur (cf. question 4).
+\end{itemize}
+Ces signaux nécessitent l'\textbf{Azure Monitor Agent} (syslog + logs Nginx \arr{} \code{law-shopeasy-dev}) et/ou \textbf{Application Insights}.
+
+\textbf{4. Que faudrait-il ajouter pour connaître la disponibilité réelle vue par un utilisateur ?}\\
+\code{VmAvailabilityMetric = 1} indique seulement que la VM tourne \textbf{au niveau plateforme}, pas que le site répond. Pour mesurer la disponibilité \textbf{réellement perçue}, il faut une \textbf{sonde synthétique} : un test externe qui interroge périodiquement le site via l'\textbf{IP publique du Load Balancer} (\code{http://4.223.84.214}) et vérifie le \textbf{code 200 + le contenu + le temps de réponse}. Dans Azure, c'est un \textbf{URL ping test} (Application Insights / Log Analytics) ou le suivi du \textbf{Health Probe Status} du Load Balancer. Cette sonde mesure la chaîne complète (DNS \arr{} LB \arr{} VM \arr{} Nginx \arr{} réponse), c'est-à-dire l'expérience réelle de l'utilisateur.
+
+\subsection{Tableau d'analyse des VM}
+\begin{ltable}{Q[l,0.5] Q[l,1] Q[l,1.05] X[l,1.05]}
+VM & État & Risque observé & Action proposée \\
+\code{vm-...-web-1} & \code{running}, dispo \textbf{1.0}, CPU $\approx$0,3 \%, crédits CPU 63, mémoire $\approx$528 Mo / 1 Gio & \textbf{RAM contrainte} (1 Gio) \arr{} saturation possible sous charge ; \textbf{aucune supervision applicative} ; \textbf{pas de sonde de disponibilité utilisateur} & Surveiller mémoire + crédits CPU (alerte, Atelier 4) ; raccorder syslog + logs Nginx (AMA + DCR) ; ajouter une sonde de disponibilité synthétique \\
+\code{vm-...-web-2} & \code{running}, dispo \textbf{1.0}, profil identique & Idem web-1 ; \textbf{désallouée par défaut} en dev (HA), elle ne sert que les tests de répartition & Mêmes actions ; vérifier son redémarrage avant les tests de charge \\
+\end{ltable}
+
+\textbf{Recommandations d'exploitation}
+\begin{enumerate}
+  \item \textbf{Mettre en place une supervision applicative} : les métriques d'infrastructure ne suffisent pas (Q2). Raccorder les \textbf{logs Nginx + codes HTTP} à \code{law-shopeasy-dev} (Azure Monitor Agent + DCR).
+  \item \textbf{Ajouter une sonde de disponibilité synthétique} (URL ping test sur l'IP du Load Balancer) pour mesurer la disponibilité \textbf{réelle vue par l'utilisateur}.
+  \item \textbf{Surveiller mémoire et crédits CPU} (spécifiques au burstable 1 Gio) et matérialiser ces seuils en \textbf{alertes} (Atelier 4).
+\end{enumerate}
+
+\subsection{Capture}
+\screenshot{atelier03-vm-metrics.png}{Graphe de la métrique \code{Percentage CPU} de la VM web (au repos). Portal \arr{} Virtual machines \arr{} vm-shopeasy-dev-web-1 \arr{} Monitoring \arr{} Metrics.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item État des 2 VM relevé (\code{running}, provisioning \code{succeeded}, disponibilité \code{1.0}).
+  \item Métriques observées dans Azure Monitor : CPU ($\approx$0,3 \% au repos), réseau, disque, disponibilité, mémoire, crédits CPU.
+  \item 4 questions d'analyse traitées (dimensionnement, limites des métriques d'infra, métriques applicatives manquantes, disponibilité utilisateur).
+  \item Tableau d'analyse des VM + \textbf{3 recommandations} d'exploitation.
+  \item \textbf{Prêt pour l'Atelier 4 — Créer des alertes opérationnelles.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 4
+% #####################################################################
+\section{Atelier 4 — Créer des alertes opérationnelles}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — configurer des alertes permettant de détecter rapidement un incident.
+
+\textbf{\ePackage~Livrable attendu} — une \textbf{fiche d'alerte} avec nom, ressource cible, seuil, criticité, destinataire et procédure de réaction.
+\end{fiche}
+
+\subsection{Alertes retenues}
+Parmi les alertes proposées par l'énoncé, \textbf{deux sont configurées réellement} dans cet atelier ; les autres sont rattachées aux ateliers dédiés.
+\begin{ltable}{X[l,0.72] X[l,0.72] X[l,0.5] X[l,1] X[l,0.52]}
+Alerte & Seuil & Criticité & Action attendue & Statut \\
+\textbf{CPU élevé VM web} & \code{> 70 \%} (moy. 5 min) & Moyenne & Vérifier la charge, les logs et le dimensionnement & \eCheck{} Config. \\
+\textbf{VM indisponible} & \code{VmAvailabilityMetric < 1} & Haute & Redémarrage, escalade, analyse d'incident & \eCheck{} Config. \\
+\textbf{Budget dépassé} & \code{> 80 \%} du budget & Moyenne & Analyse des coûts, suppression des ressources inutiles & \arr{} Atelier 6 \\
+Activité critique (Activity Log) & modification de droits / NSG & Moyenne & Vérifier l'auteur et la légitimité du changement & \arr{} Atelier 8 \\
+\end{ltable}
+
+\subsection{Action Group — qui est notifié et comment}
+Un \textbf{Action Group} définit les destinataires d'une alerte. Ici, un récepteur \textbf{e-mail} vers l'équipe d'exploitation (en contexte réel : webhook, ITSM ou canal d'exploitation en complément).
+\begin{codebox}{bash}
+\begin{Verbatim}
+az monitor action-group create \
+  --resource-group rg-shopeasy-dev --name ag-shopeasy-ops --short-name shopops \
+  --action email EquipeOps louis.scarfone@efrei.net
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{json}
+\begin{Verbatim}
+{
+  "Nom": "ag-shopeasy-ops",
+  "ShortName": "shopops",
+  "Destinataire": "EquipeOps",
+  "Email": "louis.scarfone@efrei.net",
+  "Etat": "Enabled"
+}
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Création des alertes (Azure CLI)}
+\begin{codebox}{bash}
+\begin{Verbatim}
+AG_ID=$(az monitor action-group show -g rg-shopeasy-dev -n ag-shopeasy-ops --query id -o tsv)
+VM1_ID=$(az vm show -g rg-shopeasy-dev -n vm-shopeasy-dev-web-1 --query id -o tsv)
+
+# Alerte 1 - CPU moyen > 70% (Moyenne / Sev2)
+az monitor metrics alert create \
+  --name "alert-cpu-high-vm-shopeasy-dev-web-1" --resource-group rg-shopeasy-dev --scopes "$VM1_ID" \
+  --condition "avg Percentage CPU > 70" \
+  --window-size 5m --evaluation-frequency 1m \
+  --severity 2 --action "$AG_ID" \
+  --description "CPU moyen de la VM web superieur a 70% pendant 5 min"
+
+# Alerte 2 - VM indisponible (Haute / Sev1)
+az monitor metrics alert create \
+  --name "alert-vm-unavailable-vm-shopeasy-dev-web-1" --resource-group rg-shopeasy-dev --scopes "$VM1_ID" \
+  --condition "avg VmAvailabilityMetric < 1" \
+  --window-size 5m --evaluation-frequency 1m \
+  --severity 1 --action "$AG_ID" \
+  --description "Disponibilite de la VM web inferieure a 1 (VM indisponible)"
+\end{Verbatim}
+\end{codebox}
+Vérification (\code{az monitor metrics alert list}) :
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom                                         Active    Sev    Condition
+------------------------------------------  --------  -----  --------------------
+alert-cpu-high-vm-shopeasy-dev-web-1        True      2      Percentage CPU
+alert-vm-unavailable-vm-shopeasy-dev-web-1  True      1      VmAvailabilityMetric
+\end{Verbatim}
+\end{codebox}
+
+\begin{tipbox}[Choix du seuil CPU]
+\textbf{Seuil CPU à 70 \%} (et non 80 \%) : aligné sur l'exemple de l'énoncé. Le seuil se cale entre 70 et 80 \% selon la baseline ($\approx$0,3 \% au repos, Atelier 3) — assez haut pour ignorer les pics normaux, assez bas pour détecter une saturation soutenue avant dégradation. \textbf{Sévérités} : Sev 2 = \textit{Warning} (Moyenne), Sev 1 = \textit{Error} (Haute).
+\end{tipbox}
+
+\subsection{Fiches d'alerte (livrable)}
+\subsubsection{Fiche 1 — CPU élevé VM web}
+\begin{ltable}{Q[l,0.5] X[l,1]}
+Champ & Valeur \\
+\textbf{Nom} & \code{alert-cpu-high-vm-shopeasy-dev-web-1} \\
+\textbf{Ressource cible} & VM \code{vm-shopeasy-dev-web-1} (\code{Standard\_B2ats\_v2}) \\
+\textbf{Seuil} & CPU moyen \code{> 70 \%}, fenêtre 5 min, évaluation 1 min \\
+\textbf{Criticité} & Moyenne (Sev 2) \\
+\textbf{Destinataire} & Action Group \code{ag-shopeasy-ops} \arr{} e-mail \code{EquipeOps} \\
+\textbf{Procédure de réaction} & 1) Vérifier le trafic et les \textbf{crédits CPU} (burstable). 2) Consulter les logs Nginx (pic de requêtes ? boucle ?). 3) Si charge légitime et soutenue \arr{} \textbf{redimensionner} ou ajouter une instance. 4) Si anormale \arr{} identifier le processus, corriger. 5) Journaliser l'incident. \\
+\end{ltable}
+
+\subsubsection{Fiche 2 — VM indisponible}
+\begin{ltable}{Q[l,0.5] X[l,1]}
+Champ & Valeur \\
+\textbf{Nom} & \code{alert-vm-unavailable-vm-shopeasy-dev-web-1} \\
+\textbf{Ressource cible} & VM \code{vm-shopeasy-dev-web-1} \\
+\textbf{Seuil} & \code{VmAvailabilityMetric < 1}, fenêtre 5 min, évaluation 1 min \\
+\textbf{Criticité} & Haute (Sev 1) \\
+\textbf{Destinataire} & Action Group \code{ag-shopeasy-ops} \arr{} e-mail \code{EquipeOps} \\
+\textbf{Procédure de réaction} & 1) Vérifier l'état dans le portail (\code{PowerState}, \textit{boot diagnostics}). 2) Tenter un \textbf{redémarrage} (\code{az vm restart}). 3) Vérifier que le Load Balancer a retiré la VM du pool (continuité de service sur l'autre VM). 4) Si échec \arr{} \textbf{escalader} et analyser (incident matériel / OS). 5) Post-mortem. \\
+\end{ltable}
+
+\subsection{Questions d'analyse}
+\textbf{1. Quel risque y a-t-il à définir des seuils trop bas ?}\\
+La \textbf{fatigue d'alerte} (\textit{alert fatigue}) : l'alerte se déclenche sur des variations normales (faux positifs) et \textbf{noie} les équipes sous des notifications non prioritaires. À force, elles \textbf{ignorent} les alertes et \textbf{ratent les vrais incidents}. Exemple : \code{CPU > 40 \%} sur 1 min se déclencherait à chaque déploiement, sans qu'aucune action ne soit requise.
+
+\textbf{2. Quel risque y a-t-il à définir des seuils trop hauts ?}\\
+La \textbf{détection tardive} : on n'est prévenu qu'une fois le service \textbf{déjà dégradé ou en panne}, donc trop tard pour agir préventivement. Exemple : \code{CPU > 98 \%} sur 30 min ignore une saturation à 85 \% qui \textbf{ralentit déjà} les utilisateurs. Le seuil trop haut transforme une alerte préventive en simple constat d'incident.
+
+\textbf{3. Pourquoi faut-il documenter une action attendue pour chaque alerte ?}\\
+Parce qu'une alerte doit être \textbf{actionnable}. Sans \textbf{procédure} (runbook : quoi vérifier, qui contacter, quelle action), le destinataire reçoit un signal \textbf{sans savoir quoi en faire} \arr{} perte de temps, mauvaise réaction, ou alerte ignorée. La procédure rend l'alerte exploitable, \textbf{réduit le MTTR} et garantit une réponse cohérente. C'est ce qui distingue une \textbf{alerte} d'un simple \textbf{bruit}.
+
+\textbf{4. Comment éviter la fatigue d'alerte ?}
+\begin{itemize}
+  \item \textbf{Distinguer les criticités} : critique (action immédiate) / avertissement (analyse) / information (reporting en dashboard, pas en alerte).
+  \item \textbf{Calibrer les seuils} sur la \textbf{baseline} réelle + une \textbf{fenêtre de lissage} (5 min).
+  \item \textbf{N'alerter que sur l'actionnable} (règle-filtre : « une personne doit-elle vraiment agir ? ») ; le reste va au tableau de bord.
+  \item \textbf{Regrouper} les notifications via les \textbf{Action Groups} et \textbf{supprimer les alertes redondantes}.
+  \item \textbf{Réviser régulièrement} les règles (supprimer celles qui ne déclenchent jamais ou trop souvent).
+\end{itemize}
+
+\subsection{Captures}
+\screenshot{atelier04-alert-rules.png}{Les deux règles d'alerte actives (\code{alert-cpu-high} et \code{alert-vm-unavailable}), état \textit{Enabled}. Portal \arr{} Monitor \arr{} Alerts \arr{} Alert rules.}
+\screenshot{atelier04-action-group.png}{Action Group \code{ag-shopeasy-ops} et son récepteur e-mail \code{EquipeOps}. Portal \arr{} Monitor \arr{} Alerts \arr{} Action groups.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item \textbf{Action Group \code{ag-shopeasy-ops}} créé (récepteur e-mail \code{EquipeOps}, \code{Enabled}).
+  \item \textbf{2 alertes opérationnelles actives} : CPU > 70 \% (Moyenne) et VM indisponible (Haute), rattachées à l'Action Group.
+  \item \textbf{2 fiches d'alerte} complètes (nom, ressource, seuil, criticité, destinataire, procédure).
+  \item 4 questions d'analyse traitées (seuils trop bas/hauts, action documentée, fatigue d'alerte).
+  \item \textbf{Prêt pour l'Atelier 5 — Construire un tableau de bord d'exploitation.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 5
+% #####################################################################
+\section{Atelier 5 — Construire un tableau de bord d'exploitation}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — créer une vue synthétique permettant à une équipe SI de suivre l'état de l'application ShopEasy.
+
+\textbf{\ePackage~Livrable attendu} — capture du dashboard \textbf{ou} maquette détaillée, avec justification de chaque tuile.
+\end{fiche}
+
+\subsection{Approche retenue — un dashboard Azure réel}
+Le tableau de bord a été \textbf{réellement créé dans Azure} via \code{az portal dashboard create} (ressource \code{Microsoft.Portal/dashboards} nommée \code{ShopEasy-Exploitation}) — capture au §4. Il regroupe \textbf{9 tuiles de métriques réelles} (graphes Azure Monitor sur les VM et le Storage), \textbf{sans tuile factice ni texte de remplissage}.
+
+Le dashboard couvre les \textbf{quatre axes de métriques} du contenu minimal de l'énoncé (état des VM, CPU, trafic réseau, stockage). Les autres items — \textbf{coûts, alertes, journaux} — ne sont \textbf{pas des graphes de métriques} mais des \textbf{lames Azure dédiées} (Cost Management, Monitor Alerts, Activity Log), traitées dans leurs ateliers respectifs et épinglables au dashboard. La \textbf{base de données} n'est pas déployée (cible TP1, hors périmètre Terraform du TP2).
+
+\subsection{Les 9 tuiles du dashboard}
+\begin{ltable}{Q[c,0.18] Q[l,0.8] Q[l,0.55] Q[l,0.62] X[l,0.95]}
+\# & Tuile (métrique Azure) & Ressource & Donnée réelle & Décision facilitée \\
+1 & \textbf{Disponibilité des VM} (\code{VmAvailabilityMetric}) & web-1 + web-2 & \code{1.0} (saines) & Détecter une \textbf{indisponibilité} plateforme \\
+2 & \textbf{CPU des VM} (\code{Percentage CPU}) & web-1 + web-2 & $\approx$0,3 \% au repos & Identifier une \textbf{surcharge} \\
+3 & \textbf{Réseau entrant} (\code{Network In Total}) & web-1 + web-2 & 242 / 229 Ko & Détecter un \textbf{pic} de trafic / une attaque \\
+4 & \textbf{Réseau sortant} (\code{Network Out Total}) & web-1 + web-2 & 404 / 327 Ko & Détecter une \textbf{exfiltration} / une chute \\
+5 & \textbf{Stockage — capacité} (\code{Used capacity}) & Storage & volume faible & Surveiller la \textbf{croissance} du stockage \\
+6 & \textbf{Stockage — transactions} (\code{Transactions}) & Storage & activité blob & Surveiller l'\textbf{activité} et les coûts \\
+7 & \textbf{Crédits CPU} (\code{CPU Credits Remaining}) & web-1 + web-2 & 63 (réserve saine) & Anticiper le \textbf{bridage} (burstable) \\
+8 & \textbf{Mémoire disponible} (\code{Available Memory Bytes}) & web-1 + web-2 & $\approx$528 Mo / 1 Gio & Anticiper une \textbf{saturation mémoire} \\
+9 & \textbf{Disque lu/écrit} (\code{Disk Read/Write Bytes}) & web-1 & 2,40 / 2,16 Mo & Détecter une \textbf{saturation I/O} \\
+\end{ltable}
+Les tuiles 1 à 6 couvrent les axes métriques de l'énoncé ; les tuiles 7 à 9 ajoutent les indicateurs \textbf{propres au burstable \code{B2ats\_v2}} (crédits CPU, mémoire) et les I/O disque — les plus contraints sur cette taille.
+
+\subsection{Couverture du contenu minimal de l'énoncé}
+\begin{ltable}{Q[l,0.85] Q[l,0.6] X[l,1]}
+Item attendu (énoncé) & Sur le dashboard ? & Source / traitement \\
+État des VM & \eCheck{} Tuile 1 & \code{VmAvailabilityMetric} (graphe) \\
+CPU des VM & \eCheck{} Tuile 2 & \code{Percentage CPU} (graphe) \\
+Trafic réseau & \eCheck{} Tuiles 3-4 & \code{Network In/Out Total} (graphes) \\
+Stockage consommé & \eCheck{} Tuiles 5-6 & \code{Used capacity} + \code{Transactions} (graphes) \\
+État de la base de données & \arr{} Hors dashboard & Base SQL \textbf{non déployée} (cible TP1, hors Terraform TP2) \\
+Coûts / Budget & \arr{} Lame dédiée & \textbf{Cost Management} \arr{} Atelier 6 (épinglable) \\
+Alertes récentes & \arr{} Lame dédiée & \textbf{Azure Monitor \arr{} Alerts} \arr{} Atelier 4 \\
+Lien journaux / Activity Log & \arr{} Lame dédiée & \textbf{Activity Log} + \code{law-shopeasy-dev} (KQL) \arr{} Atelier 8 \\
+\end{ltable}
+
+\begin{tipbox}[Cockpit d'exploitation]
+Le dashboard est la \textbf{vue de supervision temps réel} (métriques). Le cockpit complet s'appuie en plus sur les \textbf{lames natives} Cost Management, Monitor Alerts et Activity Log — chacune approfondie dans son atelier et \textbf{épinglable} au même dashboard si besoin.
+\end{tipbox}
+
+\subsection{Capture — dashboard Azure réel}
+\screenshot{atelier05-dashboard.png}{Dashboard \code{ShopEasy-Exploitation} : 9 tuiles de métriques (dispo VM, CPU, réseau in/out, stockage capacité/transactions, crédits CPU, mémoire, disque). Portal \arr{} Dashboard \arr{} Shared dashboards \arr{} ShopEasy - Exploitation.}
+
+\subsection{Pourquoi ce tableau de bord}
+Un tableau de bord utile ne se limite pas à empiler des courbes : il répond aux \textbf{questions de pilotage}. Ici, les 9 tuiles permettent de voir d'un coup d'œil \textbf{si le service tourne} (disponibilité), \textbf{s'il est saturé} (CPU, crédits CPU, mémoire, disque), et \textbf{comment il consomme} (réseau, stockage) — les signaux les plus utiles pour une VM web burstable. La dépense, les incidents et la traçabilité complètent le pilotage via leurs lames dédiées, gardant le dashboard \textbf{lisible et 100 \% métriques}.
+
+\begin{etatbox}
+\begin{itemize}
+  \item \textbf{Dashboard Azure réel} \code{ShopEasy-Exploitation} créé (\code{az portal dashboard create}) : \textbf{9 tuiles de métriques} (VM + Storage), \textbf{aucune tuile markdown}.
+  \item Les 4 axes métriques de l'énoncé (état VM, CPU, réseau, stockage) sont des \textbf{tuiles réelles} ; coûts / alertes / journaux sont \textbf{mappés à leurs lames} (Ateliers 6 / 4 / 8) ; base SQL non déployée.
+  \item Tableau des 9 tuiles + couverture du contenu minimal de l'énoncé.
+  \item \textbf{Prêt pour l'Atelier 6 — Analyse FinOps.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 6
+% #####################################################################
+\section{Atelier 6 — Analyse FinOps}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — comprendre les coûts de l'environnement et proposer des optimisations réalistes.
+
+\textbf{\ePackage~Livrable attendu} — une analyse FinOps structurée avec \textbf{au moins cinq constats et cinq actions correctives}.
+\end{fiche}
+
+\subsection{Analyse des coûts}
+\textbf{Méthode.} Les données de \textbf{coût réel} (Cost Management) n'apparaissent qu'après 24--48 h sur un abonnement récent : \code{az consumption usage list} remonte déjà les \textbf{compteurs} facturés (IP \code{Standard IPv4}, disques \code{Standard HDD S4 LRS}) mais leur \code{PretaxCost} est encore \code{None}. Les montants ci-dessous sont calculés à partir des \textbf{prix réels} de l'\textbf{API Azure Retail Prices} (région \code{swedencentral}, USD, base 730 h/mois) — prix VM confirmé en direct : \textbf{\code{Standard\_B2ats\_v2} = 0,00972 \$/h}.
+
+\begin{ltable}{Q[l,1] Q[l,0.85] Q[l,0.6] Q[l,0.4]}
+Poste & Calcul & Coût \$/mois & Part \\
+\textbf{Load Balancer Standard} & forfait règles + data & \textbf{$\approx$ 18,25} & $\sim$39 \% \\
+\textbf{Compute — 2 VM \code{B2ats\_v2}} & 2 $\times$ 0,00972 $\times$ 730 & \textbf{$\approx$ 14,19} & $\sim$30 \% \\
+\textbf{3 IP publiques Standard} & 3 $\times$ 0,005 $\times$ 730 & \textbf{$\approx$ 10,95} & $\sim$23 \% \\
+2 disques OS \code{Standard HDD S4 LRS} & $\sim$1,30 chacun & $\approx$ 2,60 & $\sim$6 \% \\
+Storage Account LRS & usage faible & < 1 & $\sim$2 \% \\
+\textbf{Total} & & \textbf{$\approx$ 47 \$/mois} & 100 \% \\
+\end{ltable}
+
+Tout l'environnement tient dans \textbf{un seul groupe} \code{rg-shopeasy-dev} ($\approx$ 47 \$/mois). Les \textbf{3 postes les plus coûteux} (Load Balancer + compute + IP) représentent \textbf{$\sim$92 \%} du coût ; le \textbf{Load Balancer} et les \textbf{IP publiques} facturent \textbf{24/7, indépendamment du trafic} — seul le \textbf{compute} est élastique (réductible par désallocation).
+
+\begin{codebox}{bash}
+\begin{Verbatim}
+az resource list -g rg-shopeasy-dev --query "length([?tags.Application==null])" -o tsv      # -> 14
+az disk list -g rg-shopeasy-dev --query "length([?managedBy==null])" -o tsv                  # -> 0
+az network public-ip list -g rg-shopeasy-dev --query "length([?ipConfiguration==null])" -o tsv  # -> 0
+\end{Verbatim}
+\end{codebox}
+\begin{itemize}
+  \item \textbf{14 ressources sans tag \code{Application}} après normalisation du RG + 2 VM \arr{} coût \textbf{non imputable}.
+  \item \textbf{0 disque orphelin, 0 IP non associée} : environnement \textbf{propre}, aucun coût « invisible ».
+  \item \textbf{Coût prévisionnel} : $\approx$ \textbf{47 \$/mois} en 24/7 ($\approx$ 30 \$ avec désallocation des VM, $\approx$ 0 si destruction de l'environnement).
+  \item \textbf{Recommandations Advisor (coût)} : aucune sur cet environnement récent (Advisor a besoin d'un historique d'usage).
+\end{itemize}
+
+\subsection{Politique de tags de gouvernance}
+Politique de tags \textbf{minimale} proposée pour ShopEasy :
+\begin{ltable}{Q[l,0.6] Q[l,0.8] X[l,1]}
+Tag & Exemple & Utilité \\
+\code{Application} & \code{shopeasy} & Regrouper les coûts par application \\
+\code{Environment} & \code{dev} / \code{test} / \code{prod} & Distinguer les environnements \\
+\code{Owner} & \code{cloudops-shopeasy} & Identifier le responsable \\
+\code{CostCenter} & \code{cloud-training} & Affecter les coûts à un centre de coût \\
+\code{Criticality} & \code{low} / \code{medium} / \code{high} & Prioriser supervision et sécurité \\
+\end{ltable}
+Application au groupe de ressources et aux VM :
+\begin{codebox}{bash}
+\begin{Verbatim}
+# Groupe de ressources
+az group update -n rg-shopeasy-dev --tags Application=shopeasy Environment=dev \
+  Owner=cloudops-shopeasy CostCenter=cloud-training Criticality=high
+
+# Chaque VM (az resource tag --ids)
+az resource tag --ids "$VM_ID" --tags Application=shopeasy Environment=dev \
+  Owner=cloudops-shopeasy CostCenter=cloud-training Criticality=high Role=web
+\end{Verbatim}
+\end{codebox}
+Le nombre de ressources sans tag \code{Application} est passé de \textbf{16 à 14} (RG + 2 VM normalisés). La généralisation aux 14 restantes doit passer par \textbf{Azure Policy} (audit ou refus à la création d'une ressource sans \code{Application}/\code{Owner}).
+
+\subsection{Tableau d'optimisation FinOps}
+\begin{ltable}{Q[c,0.18] Q[l,0.95] Q[l,0.7] Q[l,0.45] X[l,1.05]}
+\# & Constat & Risque financier & Priorité & Action proposée \\
+1 & \textbf{VM allumées 24/7} (inutilisées en dev) & Dépense compute inutile ($\sim$14 \$/mois) & \textbf{Haute} & Désallouer hors usage (\code{az vm deallocate}) ; détruire l'environnement entre les séances (\code{terraform destroy}) \\
+2 & \textbf{3 IP publiques + Load Balancer} facturés à vide & $\sim$29 \$/mois indépendants du trafic & \textbf{Haute} & Supprimer les IP directes des VM (\arr{} Azure Bastion) ; ne garder le LB que si nécessaire \\
+3 & \textbf{14 ressources sans tag \code{Application}} & Coût \textbf{non imputable} & Moyenne & Généraliser la politique de tags via \textbf{Azure Policy} \\
+4 & \textbf{Aucun budget actif} & Dérive \textbf{non détectée} & Moyenne & Créer un budget \textbf{50 \$/mois} (Cost Management) + alertes 80 \% / 100 \% \\
+5 & \textbf{Disque non attaché} (orphelin) & Coût oublié & Basse & \textbf{Aucun actuellement} (0 orphelin) ; automatiser le contrôle (\code{az disk list} / \code{az network public-ip list}) \\
+6 & \textbf{VM potentiellement surdimensionnée} & Sur-paiement & Basse & \code{B2ats\_v2} déjà minimale ; surveiller \code{CPU Credits} avant tout downsize \\
+\end{ltable}
+
+\subsection{Budget mensuel (50 \$) — design et mise en œuvre}
+Budget visé : \textbf{50 \$/mois}, avec \textbf{deux seuils d'alerte} : \textbf{80 \% (40 \$)} \arr{} vigilance, et \textbf{100 \% (50 \$)} \arr{} dépassement, action requise.
+\begin{codebox}{bash}
+\begin{Verbatim}
+az consumption budget create --budget-name budget-shopeasy-dev \
+  --amount 50 --category Cost --time-grain Monthly \
+  --start-date 2026-06-01 --end-date 2027-06-01 --resource-group rg-shopeasy-dev
+\end{Verbatim}
+\end{codebox}
+\begin{notebox}[Limite rencontrée]
+\code{az consumption budget create} (commande \textbf{en préview}) renvoie \code{400 — Invalid budget configuration, please use filter interface} sur cet abonnement \textit{Azure for Students}. En pratique, le budget se crée de façon fiable via \textbf{Cost Management \arr{} Budgets \arr{} Add} (portail) ou l'API REST \code{2019-05-01-preview}. Le design (montant, grain, seuils 80/100 \%) reste celui ci-dessus.
+\end{notebox}
+
+\subsection{Questions d'analyse}
+\textbf{1. Pourquoi le cloud peut-il coûter plus cher que prévu ?}\\
+Parce que la dépense apparaît \textbf{au fil de la consommation} (OPEX) et non à l'achat (CAPEX) : elle varie avec l'activité, les \textbf{erreurs de configuration} et les \textbf{ressources oubliées}. Plusieurs pièges : ressources \textbf{facturées à vide} (Load Balancer, IP publiques même sans trafic), \textbf{surdimensionnement}, environnements de test \textbf{laissés allumés}, stockage et versions qui \textbf{s'accumulent}, et surtout \textbf{absence de tags/budget} qui prive de visibilité. On découvre alors la dérive \textbf{sur la facture}, trop tard.
+
+\textbf{2. Quelles ressources doivent être arrêtées hors période d'utilisation ?}\\
+Les \textbf{VM de développement} : \code{az vm deallocate} ramène leur coût compute à \textbf{0} ($\approx$ 14 \$/mois économisés). Le \textbf{Load Balancer} et les \textbf{IP publiques}, facturés à vide, peuvent être supprimés hors usage (recréables par Terraform). Le levier maximal reste de \textbf{détruire l'environnement entier} (\code{terraform destroy}) entre les séances \arr{} coût $\approx$ 0, recréable à l'identique par \code{terraform apply}.
+
+\textbf{3. Pourquoi les tags sont-ils indispensables pour une DSI ?}\\
+Ils permettent d'\textbf{imputer} les coûts (par application, environnement, \textbf{centre de coût}), d'\textbf{identifier le responsable} (\code{Owner}), de \textbf{prioriser} (\code{Criticality}) et d'\textbf{automatiser} la gouvernance (Azure Policy, arrêt automatique des ressources \code{dev}). Sans tags, la DSI ne peut ni répondre à « combien coûte ShopEasy en dev ? », ni imputer une dépense, ni piloter — la facture devient un bloc opaque.
+
+\textbf{4. Quelle différence entre réduction de coût et optimisation de valeur ?}\\
+\textbf{Réduire} = baisser la dépense, parfois \textbf{au détriment du service} (supprimer, sous-dimensionner aveuglément). \textbf{Optimiser} = obtenir le \textbf{meilleur rapport valeur/coût} : bon dimensionnement, suppression du \textbf{gaspillage} (ressources oubliées, surdimensionnées, facturées à vide), choix du bon niveau de service — \textbf{sans dégrader la valeur métier}. La cible FinOps est l'\textbf{optimisation}, pas la réduction aveugle.
+
+\subsection{Capture}
+\screenshot{atelier06-cost-analysis.png}{Analyse des coûts du groupe \code{rg-shopeasy-dev} dans Cost Management. Portal \arr{} Cost Management \arr{} Cost analysis (les montants réels n'apparaissent qu'après 24--48 h).}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Coûts analysés (prix réels Azure Retail Prices) : \textbf{$\approx$ 47 \$/mois en 24/7}, dont \textbf{$\sim$92 \%} sur Load Balancer + compute + IP ; environnement \textbf{propre} (0 orphelin).
+  \item Politique de tags minimale \textbf{proposée et appliquée} (RG + 2 VM, avec \code{Criticality}) ; 14 ressources restantes à généraliser via Azure Policy.
+  \item \textbf{Tableau d'optimisation FinOps} : 6 constats / risque / priorité / action ($\geq$ 5 demandés).
+  \item Budget 50 \$/mois conçu (seuils 80/100 \%) ; création CLI bloquée (API préview) \arr{} à créer via Cost Management.
+  \item \textbf{Prêt pour l'Atelier 7 — Revue de sécurité Azure.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 7
+% #####################################################################
+\section{Atelier 7 — Revue de sécurité Azure}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — identifier les principaux risques de sécurité de l'environnement et proposer un plan d'amélioration.
+
+\textbf{\ePackage~Livrable attendu} — une matrice de risques sécurité avec \textbf{au moins cinq risques}, leur criticité et les mesures correctives proposées.
+\end{fiche}
+
+\subsection{Points de contrôle}
+\begin{ltable}{Q[l,0.95] X[l,1.1] Q[l,0.85]}
+Point de contrôle & Constat réel & Verdict \\
+Rôles attribués (RBAC) & 1 compte \textbf{Owner} (hérité de l'abonnement) & \eWarn{} droits larges \\
+Utilisateurs à droits élevés & \code{louis.scarfone@efrei.net} = \textbf{Owner} & \eWarn{} \\
+Ressources exposées publiquement & 3 IP publiques (1 Load Balancer + \textbf{2 VM}) & \eWarn{} 2 IP de VM inutiles \\
+Règles NSG trop ouvertes & HTTP 80 (Internet), SSH 22 (\code{<IP\_ADMIN>/32}) & \eCheck{} aucun \code{0.0.0.0/0} sensible \\
+Accès SSH / RDP depuis Internet & SSH \textbf{restreint à l'IP admin} ; pas de RDP & \eCheck{} \\
+Chiffrement du stockage & SSE activé, \textbf{TLS 1.2}, HTTPS-only & \eCheck{} \\
+Accès public du Storage & \textbf{\code{allowBlobPublicAccess = True}} & \eWarn{} à désactiver \\
+Logs d'activité disponibles & \code{activitylog-to-law} \arr{} \code{law-shopeasy-dev} & \eCheck{} disponibles \\
+Recommandations Defender / Advisor & Defender non activé, MAJ non vérifiées\dots{} & \eWarn{} (cf. §4) \\
+\end{ltable}
+
+\subsection{Contrôle RBAC}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az role assignment list --resource-group rg-shopeasy-dev --include-inherited \
+  --query "[].{Principal:principalName, Role:roleDefinitionName, Type:principalType}" -o table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Principal                 Role    Type
+------------------------  ------  ------
+louis.scarfone@efrei.net  Owner   User
+louis.scarfone@efrei.net  Owner   User
+\end{Verbatim}
+\end{codebox}
+Le compte d'administration détient le rôle \textbf{Owner} (hérité de l'abonnement). Aucune attribution directe au niveau du RG. Pour une \textbf{équipe}, c'est un privilège trop large : il faut appliquer le \textbf{moindre privilège} (\code{Reader}/\code{Contributor} selon le besoin) et \textbf{MFA}. \textit{(Advisor signale aussi, pour la résilience, qu'un second owner « break-glass » serait souhaitable — complémentaire au moindre privilège.)}
+
+\subsection{Contrôle NSG}
+\begin{codebox}{bash}
+\begin{Verbatim}
+az network nsg rule list -g rg-shopeasy-dev --nsg-name nsg-shopeasy-dev-web \
+  --query "sort_by([].{Nom:name,Prio:priority,Sens:direction,Acces:access,Port:destinationPortRange,Source:sourceAddressPrefix}, &Prio)" -o table
+\end{Verbatim}
+\end{codebox}
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom              Prio    Sens     Acces    Port    Source
+---------------  ------  -------  -------  ------  ---------------
+Allow-HTTP       100     Inbound  Allow    80      Internet
+Allow-SSH-Admin  110     Inbound  Allow    22      <IP_ADMIN>/32
+\end{Verbatim}
+\end{codebox}
+\begin{itemize}
+  \item \textbf{HTTP (80)} ouvert depuis Internet : nécessaire pour exposer le site (trafic en clair \arr{} HTTPS en production).
+  \item \textbf{SSH (22)} restreint à l'\textbf{IP de l'administrateur} (\code{/32}), \textbf{jamais \code{0.0.0.0/0}} ; la règle par défaut \code{DenyAllInBound} bloque le reste. \textbf{Aucune règle dangereuse} (pas de RDP, pas de port d'administration ouvert à Internet).
+\end{itemize}
+
+\subsection{Exposition, chiffrement et recommandations}
+\textbf{Ressources exposées} : 3 IP publiques — \code{pip-shopeasy-dev-lb} (\code{4.223.84.214}, point d'entrée légitime) et \textbf{2 IP directes sur les VM} (\code{20.240.255.96}, \code{20.240.47.225}) qui élargissent inutilement la surface d'attaque (administration possible via Bastion à la place).
+
+\textbf{Chiffrement du Storage} :
+\begin{codebox}{console}
+\begin{Verbatim}
+Nom                    ChiffrementRepos    TLS     HttpsOnly    AccesPublicBlob
+---------------------  ------------------  ------  -----------  -----------------
+shopeasydevdocsczvc1s  True                TLS1_2  True         True
+\end{Verbatim}
+\end{codebox}
+Le chiffrement au repos (SSE), TLS 1.2 et HTTPS-only sont \textbf{corrects}, mais \textbf{\code{AllowBlobPublicAccess = True}} (défaut Terraform) : le compte \textbf{autoriserait} un conteneur public. À \textbf{désactiver} au niveau du compte (défense en profondeur) — le conteneur \code{documents} est privé, mais le garde-fou doit être posé.
+
+\textbf{Recommandations de sécurité (Microsoft Defender / Advisor)} — extrait réel :
+\begin{codebox}{console}
+\begin{Verbatim}
+Impact    Recommandation
+--------  ----------------------------------------------------------------------
+High      Machines should be configured to periodically check for missing updates
+High      Microsoft Defender for Resource Manager should be enabled
+High      Microsoft Defender CSPM should be enabled
+High      Microsoft Defender for Storage should be enabled
+High      Microsoft Defender for servers should be enabled
+High      There should be more than one owner assigned to subscriptions
+Medium    Email notification to subscription owner for high severity alerts
+\end{Verbatim}
+\end{codebox}
+Les plans \textbf{Microsoft Defender for Cloud} (CSPM, servers, storage) ne sont \textbf{pas activés} et les VM ne vérifient pas leurs \textbf{mises à jour système} : ce sont les axes de durcissement prioritaires côté plateforme.
+
+\subsection{Matrice de risques sécurité}
+\begin{ltable}{X[l,1] X[l,0.5] X[l,0.55] X[l,1.2]}
+Risque & Impact & Probabilité & Mesure corrective \\
+\textbf{Storage : accès public blob autorisé} (\code{allowBlobPublicAccess=true}) & \textbf{Élevé} & Moyenne & Désactiver l'accès public (\code{--allow-blob-public-access false}), auditer les conteneurs \\
+\textbf{IP publiques directes sur les 2 VM} & \textbf{Élevé} & Moyenne & Supprimer les IP des VM, administrer via \textbf{Azure Bastion} ; ne garder que l'IP du Load Balancer \\
+\textbf{Droits \code{Owner} larges} (compte unique tout-puissant) & \textbf{Élevé} & Faible & \textbf{Moindre privilège} (\code{Reader}/\code{Contributor}), revue régulière des rôles, \textbf{MFA} \\
+\textbf{Microsoft Defender non activé} (CSPM / servers / storage) & Moyen & Élevée & Activer les plans \textbf{Defender for Cloud} pour la détection et la posture \\
+\textbf{Mises à jour système non vérifiées} & Moyen & Moyenne & Activer \textbf{Azure Update Manager} (vérification périodique des correctifs) \\
+\textbf{Tags incomplets} (14 ressources sans \code{Application}) & Moyen & Élevée & Imposer la politique de tags via \textbf{Azure Policy} \\
+\textbf{SSH (22) exposé sur Internet} & Moyen & Faible & \textbf{Déjà restreint} à \code{<IP\_ADMIN>/32} ; cible : \textbf{Bastion} / accès \textit{just-in-time} \\
+\end{ltable}
+\textbf{7 risques} identifiés ($\geq$ 5 demandés), chacun avec impact, probabilité et mesure corrective. Les risques \textbf{élevés} (Storage public, IP de VM, droits Owner) sont à traiter en priorité.
+
+\subsection{Points forts déjà en place}
+La revue n'identifie pas que des faiblesses : plusieurs \textbf{contrôles essentiels sont déjà appliqués} — SSH restreint à l'IP admin (jamais \code{0.0.0.0/0}), conteneur de stockage \textbf{privé}, \textbf{TLS 1.2 + HTTPS-only + chiffrement au repos}, \textbf{logs d'activité disponibles} (raccordés au workspace), aucun secret versionné (\code{terraform.tfvars}/\code{tfstate} exclus). Le socle est sain ; les renforcements portent surtout sur l'\textbf{exposition réseau}, la \textbf{posture Defender} et le \textbf{moindre privilège}.
+
+\subsection{Captures}
+\screenshot{atelier07-defender-recommendations.png}{Recommandations de sécurité Microsoft Defender for Cloud (Defender non activé, mises à jour système, etc.). Portal \arr{} Microsoft Defender for Cloud \arr{} Recommendations.}
+\screenshot{atelier07-nsg-rules.png}{Règles entrantes du NSG \code{nsg-shopeasy-dev-web} (HTTP depuis Internet, SSH restreint — source admin redactée). Portal \arr{} nsg-shopeasy-dev-web \arr{} Inbound security rules.}
+
+\begin{etatbox}
+\begin{itemize}
+  \item \textbf{8 points de contrôle} vérifiés (RBAC, exposition, NSG, SSH/RDP, chiffrement, accès public Storage, logs, recommandations).
+  \item Constats réels : 1 compte Owner, 2 IP de VM exposées, \code{allowBlobPublicAccess=true}, Defender non activé, MAJ non vérifiées — face à des contrôles déjà sains (SSH restreint, stockage privé/chiffré, logs disponibles).
+  \item \textbf{Matrice de 7 risques} (impact / probabilité / mesure corrective) — le livrable demandé.
+  \item \textbf{Prêt pour l'Atelier 8 — Audit des changements et Activity Log.}
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  ATELIER 8
+% #####################################################################
+\section{Atelier 8 — Audit des changements et Activity Log}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — exploiter les journaux d'activité Azure pour comprendre ce qui a changé dans l'environnement.
+
+\textbf{\ePackage~Livrable attendu} — une \textbf{fiche d'audit} listant \textbf{trois événements significatifs} observés et leur interprétation.
+\end{fiche}
+
+\subsection{Exploration de l'Activity Log}
+\begin{codebox}{bash}
+\begin{Verbatim}
+# Operations de modification reelles (le bruit des evaluations Azure Policy est ecarte)
+az monitor activity-log list -g rg-shopeasy-dev --offset 8h --max-events 1000 \
+  --query "[?contains(operationName.value,'/write') || contains(operationName.value,'/delete') || contains(operationName.value,'roleAssignments')].{op:operationName.value, st:status.value}" \
+  -o tsv | sort | uniq -c | sort -rn
+\end{Verbatim}
+\end{codebox}
+Extrait du résumé (auteur unique \code{louis.scarfone@efrei.net}, \textbf{264 événements} \code{Succeeded} tracés sur la fenêtre) :
+\begin{codebox}{console}
+\begin{Verbatim}
+Microsoft.Compute/virtualMachines/write          (x2)   creation des 2 VM web
+Microsoft.Network/loadBalancers/write                   creation du Load Balancer
+Microsoft.Network/publicIPAddresses/write        (x3)   creation des 3 IP publiques
+Microsoft.Network/networkInterfaces/write        (x2)   creation des NIC
+Microsoft.Network/virtualNetworks/write + subnets       creation du reseau
+Microsoft.Compute/disks/write                    (x2)   creation des disques OS
+Microsoft.Storage/storageAccounts/write + containers    creation du stockage
+Microsoft.Resources/.../resourceGroups/write            creation/maj du groupe (+ tags)
+Microsoft.OperationalInsights/workspaces/write          creation du Log Analytics (Atelier 2)
+Microsoft.Insights/diagnosticSettings/write      (x3)   raccordement diagnostics (Atelier 2)
+Microsoft.Insights/actionGroups/write                   creation de l'action group (Atelier 4)
+Microsoft.Insights/metricAlerts/write                   creation des alertes (Atelier 4)
+Microsoft.Insights/metricAlerts/write   Failed   (x4)   tentatives d'alerte multi-VM rejetees
+\end{Verbatim}
+\end{codebox}
+
+\subsection{Synthèse par catégorie (travail demandé)}
+\begin{ltable}{Q[l,0.8] Q[l,0.75] X[l,1.3]}
+Catégorie & Observé ? & Détail \\
+\textbf{Créations de ressources} & \eCheck{} Oui & \code{terraform apply} (VM, LB, IP, NIC, VNet, disques, Storage, RG) + workspace, action group, alertes \\
+\textbf{Suppressions de ressources} & — Aucune & La dernière suppression date du nettoyage de fin de TP3 (\code{terraform destroy}), hors période \\
+\textbf{Modifications de configuration} & \eCheck{} Oui & \code{diagnosticSettings/write} ($\times$3), mise à jour des \textbf{tags} du RG (Atelier 6), config du Storage \\
+\textbf{Changements de droits} & — Aucun & Le rôle \code{Owner} est \textbf{hérité de l'abonnement}, non modifié aujourd'hui (aucun \code{roleAssignments/write}) \\
+\textbf{Erreurs / opérations échouées} & \eCheck{} Oui & \code{metricAlerts/write} \textbf{Failed} ($\times$4) : tentatives d'alerte sur \textbf{scope multi-VM} rejetées (cf. Atelier 4) \\
+\end{ltable}
+L'Activity Log trace \textbf{qui} (\code{louis.scarfone@efrei.net}), \textbf{quoi} (opération ARM), \textbf{quand} (horodatage) et \textbf{avec quel résultat} (\code{Started}/\code{Accepted}/\code{Succeeded}/\code{Failed}). Le bruit des évaluations \textbf{Azure Policy} (\code{policies/audit}) est écarté pour ne garder que les changements réels.
+
+\subsection{Fiche d'audit — trois événements significatifs}
+Auteur des trois événements : \code{louis.scarfone@efrei.net}.
+\begin{ltable}{X[l,0.9] X[l,0.7] X[l,0.6] X[l,0.5] X[l,1.45]}
+Événement (opération) & Ressource & Horodatage (UTC) & Statut & Interprétation \\
+Création de VM (\code{virtualMachines/write}) & \code{vm-...-web-1/2} & 2026-06-29 08:47 & \textbf{Succeeded} & \textbf{Redéploiement de l'infrastructure} via \code{terraform apply} (21 ressources). Action \textbf{légitime et attendue} (préalable au TP) ; auteur et horodatage tracés. \\
+Création du workspace (\code{workspaces/write}) & \code{law-shopeasy-dev} & 2026-06-29 08:49 & \textbf{Succeeded} & \textbf{Mise en place de la supervision centralisée} (Atelier 2). Changement de configuration \textbf{structurant} pour l'observabilité. \\
+Échec de création d'alerte (\code{metricAlerts/write}) & alerte multi-VM (web-1 + web-2) & 2026-06-29 09:09 & \textbf{Failed} & \textbf{Tentative rejetée} (scope multi-ressource invalide). Montre que l'Activity Log \textbf{trace aussi les échecs} : précieux pour \textbf{diagnostiquer} une opération qui n'a pas abouti. \\
+\end{ltable}
+Ces trois événements couvrent une \textbf{création}, une \textbf{modification de configuration} et une \textbf{erreur} — les trois axes typiques d'un audit de changements.
+
+\subsection{Questions d'analyse}
+\textbf{1. Pourquoi l'Activity Log est-il important pour l'audit ?}\\
+Parce qu'il constitue la \textbf{source de vérité} des opérations de gestion : il enregistre \textbf{qui a fait quoi, quand et avec quel résultat} sur les ressources Azure. Il permet de \textbf{reconstituer l'historique} des changements, de \textbf{détecter une action non autorisée} (création, suppression, modification de droits), de \textbf{prouver} qu'une mesure existe, et de répondre aux exigences de \textbf{conformité et de contrôle interne}. Sans lui, les changements d'infrastructure seraient \textbf{invisibles et non imputables}.
+
+\textbf{2. Quelle différence entre un log technique et un log d'activité ?}\\
+Un \textbf{log technique} (système ou applicatif : syslog, logs Nginx, logs d'application) décrit le \textbf{fonctionnement interne} d'une ressource ou d'une application — erreurs, requêtes, événements métier (\textit{data-plane}). Un \textbf{log d'activité} (Activity Log) trace les \textbf{opérations de gestion} réalisées sur les ressources Azure via ARM — création, modification, suppression, changements de droits (\textit{control-plane}). En résumé : le log technique raconte \textbf{ce que fait l'application} ; le log d'activité, \textbf{ce que l'on fait à l'infrastructure}.
+
+\textbf{3. Quelle information manque parfois pour reconstituer un incident ?}
+\begin{itemize}
+  \item Le \textbf{contexte applicatif} : l'Activity Log indique « VM modifiée » mais pas pourquoi l'application a planté.
+  \item Les \textbf{logs invité / applicatifs} s'ils ne sont \textbf{pas centralisés} (syslog, Nginx — non raccordés ici sans Azure Monitor Agent).
+  \item L'\textbf{intention} derrière une action : le log dit \textbf{qui/quoi/quand}, rarement le \textbf{pourquoi}.
+  \item Les \textbf{accès data-plane} (lecture/écriture de blobs) qui ne figurent pas dans l'Activity Log de gestion.
+  \item La \textbf{corrélation temporelle} entre un changement et un symptôme.
+\end{itemize}
+D'où l'intérêt de \textbf{centraliser} logs d'activité \textbf{et} logs techniques dans un même workspace (\code{law-shopeasy-dev}).
+
+\textbf{4. Comment une DSI peut-elle exploiter ces logs dans une démarche de contrôle interne ?}\\
+En \textbf{centralisant l'Activity Log} dans Log Analytics (déjà fait : \code{activitylog-to-law}) pour : exécuter des \textbf{requêtes KQL} régulières, \textbf{alerter} sur les opérations sensibles (changements RBAC, règles NSG, suppressions), mener des \textbf{revues périodiques} (qui a modifié quoi), \textbf{conserver des preuves d'audit} (rétention), \textbf{détecter les écarts} (modification manuelle vs IaC) et produire un \textbf{reporting de conformité}. Le journal devient un outil de \textbf{gouvernance} : traçabilité, imputabilité, détection et preuve.
+
+\subsection{Capture}
+\screenshot{atelier08-activity-log.png}{Journal d'activité du groupe \code{rg-shopeasy-dev} (opérations de gestion tracées). Portal \arr{} Monitor \arr{} Activity log (filtré sur rg-shopeasy-dev).}
+
+\begin{etatbox}
+\begin{itemize}
+  \item Activity Log exploité (\textbf{264 événements} sur 8 h) : créations, modifications de configuration et \textbf{échecs} identifiés ; suppressions et changements de droits \textbf{absents} sur la fenêtre (cohérent).
+  \item \textbf{Fiche d'audit de 3 événements} significatifs (création VM, création workspace, échec d'alerte) avec auteur, horodatage, statut et \textbf{interprétation}.
+  \item 4 questions d'analyse traitées (importance de l'audit, log technique vs d'activité, information manquante, exploitation par une DSI).
+  \item \textbf{Prêt pour l'Atelier 9 — Plan d'amélioration avant production.}
+\end{itemize}
+\end{etatbox}
+
+% #####################################################################
+%  ATELIER 9 — NOTE DSI
+% #####################################################################
+\section{Atelier 9 — Plan d'amélioration avant production (note DSI)}
+
+\begin{fiche}
+\textbf{\eTarget~Objectif} — transformer les constats techniques du TP4 en \textbf{recommandations de décision} pour la DSI.
+
+\textbf{\ePackage~Livrable attendu} — une note de recommandations DSI claire, argumentée et exploitable.
+
+\textbf{Destinataire} : Direction des Systèmes d'Information — \textbf{Auteurs} : Louis \textsc{Scarfone} \& Maxence \textsc{Bourragué}.
+\end{fiche}
+
+\subsection{Contexte et objectif}
+ShopEasy a migré son application de gestion de commandes vers Azure (conception au TP1, industrialisation Terraform au TP2, administration au TP3). Le TP4 fait passer l'environnement d'une logique de \textbf{construction} à une logique d'\textbf{exploitation} : superviser, alerter, maîtriser les coûts, sécuriser et auditer. Cette note synthétise les constats et propose un \textbf{plan d'amélioration priorisé avant toute mise en production}.
+
+\subsection{État actuel de l'exploitation}
+L'environnement (\code{rg-shopeasy-dev}, \code{swedencentral}) comprend un réseau segmenté, \textbf{deux VM web} (\code{B2ats\_v2}, Nginx) derrière un \textbf{Load Balancer} Standard, et un \textbf{Storage} privé. La supervision a été initialisée : \textbf{Log Analytics \code{law-shopeasy-dev}} créé, \textbf{Activity Log et Storage raccordés}, \textbf{2 alertes} actives et un \textbf{action group} de notification. Le socle est \textbf{sain mais incomplet} : déploiement \textbf{mono-zone}, base de données \textbf{non déployée}, logs invité/applicatifs \textbf{non centralisés}, posture Defender \textbf{non activée}.
+
+\subsection{Alertes et monitoring proposés}
+\textbf{En place} : workspace centralisé, alertes \textbf{CPU > 70 \%} (Moyenne) et \textbf{VM indisponible} (Haute) notifiées à \code{ag-shopeasy-ops}. \textbf{À compléter} : \textbf{sonde de disponibilité synthétique} (URL ping test sur l'IP du Load Balancer) pour la disponibilité \textbf{réelle vue par l'utilisateur} ; \textbf{logs Nginx/HTTP} centralisés (Azure Monitor Agent \arr{} workspace) ; alertes \textbf{disque/mémoire} (RAM contrainte à 1 Gio) et \textbf{crédits CPU} (burstable) ; enrichissement du \textbf{tableau de bord} \code{ShopEasy-Exploitation} (créé à l'Atelier 5).
+
+\subsection{Analyse FinOps}
+Coût \textbf{$\approx$ 47 \$/mois en 24/7} (prix réels Azure Retail Prices), dont \textbf{$\sim$92 \%} sur \textbf{Load Balancer + compute + IP publiques} — le LB et les IP facturent \textbf{même à trafic nul}. Environnement \textbf{propre} (aucun disque/IP orphelin), mais \textbf{14 ressources sans tag \code{Application}} et \textbf{aucun budget actif}. Leviers : \textbf{désallouer les VM} hors usage (et détruire entre séances \arr{} $\approx$ 0), \textbf{supprimer les IP des VM} (via Bastion), \textbf{généraliser les tags} (Azure Policy), \textbf{créer un budget} 50 \$ avec alertes 80 \%/100 \%.
+
+\subsection{Analyse sécurité}
+\textbf{Contrôles en place} : SSH \textbf{restreint à l'IP admin} (jamais \code{0.0.0.0/0}), stockage \textbf{chiffré (TLS 1.2, HTTPS-only) et privé}, \textbf{logs d'activité disponibles}, aucun secret versionné. \textbf{Risques identifiés} : \textbf{accès public du Storage autorisé} (\code{allowBlobPublicAccess=true}), \textbf{2 IP publiques directes sur les VM}, \textbf{droits \code{Owner} larges} (compte unique), \textbf{Microsoft Defender non activé} (CSPM/servers/storage) et \textbf{mises à jour système non vérifiées}.
+
+\subsection{Risques résiduels}
+\begin{itemize}
+  \item \textbf{Disponibilité} : déploiement \textbf{mono-zone} (pas d'Availability Zones sur \textit{Azure for Students}) et \textbf{base de données absente} \arr{} pas de SLA élevé tenable en l'état.
+  \item \textbf{Observabilité} : logs \textbf{invité/applicatifs} non centralisés \arr{} diagnostic applicatif limité.
+  \item \textbf{Sécurité} : posture \textbf{Defender non activée}, exposition réseau (IP de VM, storage public) à corriger.
+  \item \textbf{Coûts} : \textbf{budget non créé} (création CLI bloquée) \arr{} dérive non détectée tant qu'il n'est pas posé via Cost Management.
+\end{itemize}
+
+\subsection{Plan d'action priorisé}
+\begin{ltable}{X[l,1.2] Q[l,0.5] Q[l,0.7] Q[l,0.9]}
+Action & Priorité & Responsable & Gain attendu \\
+\textbf{Compléter les alertes critiques} (sonde de disponibilité, disque/mémoire) & \textbf{Haute} & Équipe Cloud & Détection d'incident côté utilisateur \\
+\textbf{Réduire l'exposition réseau} : désactiver l'accès public du Storage + supprimer les IP des VM (Bastion) & \textbf{Haute} & Sécurité / Ops & Réduction de la surface d'attaque \\
+\textbf{Activer Microsoft Defender for Cloud} (CSPM, servers, storage) & \textbf{Haute} & Sécurité & Posture et détection des menaces \\
+\textbf{Appliquer le moindre privilège} (RBAC : \code{Reader}/\code{Contributor}, MFA) & \textbf{Haute} & Sécurité & Limiter l'impact d'une compromission \\
+\textbf{Généraliser les tags obligatoires} (Azure Policy) & Moyenne & Équipe projet & Pilotage et imputation des coûts \\
+\textbf{Créer le budget Azure} (50 \$/mois, alertes 80 \%/100 \%) & Moyenne & FinOps & Contrôle des dépenses \\
+\textbf{Centraliser les logs applicatifs} (Azure Monitor Agent \arr{} workspace) & Moyenne & Ops & Diagnostic applicatif \\
+\textbf{Enrichir le tableau de bord DSI} (\code{ShopEasy-Exploitation}, Atelier 5) & Moyenne & Ops & Suivi opérationnel \\
+\textbf{Évoluer vers le multi-zone + base managée HA} & Basse & Architecture & Disponibilité de production \\
+\end{ltable}
+
+\subsection{Conclusion}
+L'environnement ShopEasy dispose d'une \textbf{base technique exploitable} — supervision initialisée, coûts chiffrés, sécurité partiellement maîtrisée, changements auditables — \textbf{mais il doit être renforcé avant toute mise en production}. Les priorités sont la \textbf{mise en place d'alertes critiques complètes}, la \textbf{réduction de l'exposition réseau} (accès public du Storage, IP des VM), l'\textbf{application du moindre privilège} et de \textbf{Microsoft Defender}, puis la \textbf{création d'un budget} et la \textbf{formalisation d'un tableau de bord}. Ces actions réduisent le \textbf{risque opérationnel}, améliorent la \textbf{visibilité de la DSI} et \textbf{maîtrisent les coûts cloud}, en s'appuyant sur les quatre piliers d'une plateforme mature : \textbf{observabilité, FinOps, sécurité et gouvernance}.
+
+\begin{etatbox}
+\begin{itemize}
+  \item Note de recommandations DSI complète en \textbf{8 sections} (contexte, état, monitoring, FinOps, sécurité, risques résiduels, plan d'action, conclusion).
+  \item \textbf{Plan d'action priorisé} (9 actions : Priorité / Responsable / Gain attendu) couvrant les axes du TP.
+  \item Synthèse argumentée des Ateliers 1 à 8, exploitable par une équipe technique \textbf{et} par la DSI.
+\end{itemize}
+\end{etatbox}
+
+
+% #####################################################################
+%  QUIZ
+% #####################################################################
+\section{Quiz de validation}
+
+\begin{enumerate}[leftmargin=2.2em]
+\item \textbf{Différence entre monitoring et observabilité ?}\\ Le \textbf{monitoring} surveille des indicateurs \textbf{prédéfinis} pour savoir \textbf{si} le système fonctionne (ex. CPU > 85 \%). L'\textbf{observabilité} vise à comprendre \textbf{pourquoi} un système se comporte d'une certaine façon, à partir des signaux qu'il produit (métriques, logs, traces). Le monitoring \textbf{constate}, l'observabilité \textbf{explique}.
+\item \textbf{À quoi sert Azure Monitor ?}\\ C'est le service \textbf{central de supervision} d'Azure : il \textbf{collecte, analyse et exploite} les métriques, les logs et les alertes des ressources, et alimente tableaux de bord, requêtes et \textbf{alertes actionnables}.
+\item \textbf{Quel est le rôle d'un Log Analytics Workspace ?}\\ Un \textbf{espace centralisé} pour stocker, \textbf{interroger (KQL)} et \textbf{corréler} les logs et métriques de plusieurs ressources. Base de l'observabilité (ici \code{law-shopeasy-dev}, qui reçoit l'Activity Log et les diagnostics du Storage).
+\item \textbf{Pourquoi définir des seuils d'alerte avec prudence ?}\\ Un seuil \textbf{trop bas} déclenche sur des variations normales \arr{} \textbf{fatigue d'alerte} (faux positifs ignorés). Un seuil \textbf{trop haut} \arr{} \textbf{détection tardive} (l'incident est déjà là). Le seuil se cale sur la \textbf{baseline} et se lisse sur une \textbf{fenêtre} (ex. 5 min).
+\item \textbf{Qu'est-ce qu'un Action Group ?}\\ Il définit \textbf{qui est notifié et comment} lorsqu'une alerte se déclenche : e-mail, SMS, webhook, ITSM. Ici \code{ag-shopeasy-ops} notifie l'équipe par e-mail.
+\item \textbf{Pourquoi les tags sont-ils importants en FinOps ?}\\ Ils permettent de \textbf{ventiler la facture} (application, environnement, \textbf{centre de coût}), d'identifier le \textbf{responsable} (\code{Owner}) et de définir des \textbf{budgets ciblés}. Sans tags, les coûts sont \textbf{non imputables}.
+\item \textbf{Quel service Azure permet de suivre les coûts ?}\\ \textbf{Azure Cost Management} (analyse des coûts, \textbf{budgets}, alertes, \textbf{coût prévisionnel}).
+\item \textbf{Pourquoi une ressource sans tag pose-t-elle un problème ?}\\ Son coût est \textbf{non imputable} (à quelle application/équipe ?), on ignore \textbf{qui en est responsable} et si elle peut être arrêtée \arr{} gouvernance et pilotage des coûts impossibles.
+\item \textbf{Quel risque présente un port SSH ouvert à Internet ?}\\ Une exposition \textbf{permanente} aux \textbf{scans automatisés} et aux \textbf{attaques par force brute}, pouvant mener à la \textbf{compromission} de la VM. On restreint à l'\textbf{IP admin} (\code{/32}) ou via \textbf{Azure Bastion}.
+\item \textbf{Que signifie le principe du moindre privilège ?}\\ Accorder \textbf{uniquement les droits strictement nécessaires} pour accomplir une tâche, afin de \textbf{limiter l'impact} d'une erreur ou d'un compte compromis. On préfère \code{Reader}/\code{Contributor} au rôle \code{Owner}.
+\item \textbf{Quel journal permet de suivre les modifications des ressources Azure ?}\\ L'\textbf{Activity Log} (journal d'activité, \textit{control-plane}) : il enregistre \textbf{qui a fait quoi, quand et avec quel résultat}.
+\item \textbf{Pourquoi faut-il surveiller les droits RBAC ?}\\ Des \textbf{droits excessifs} (trop d'\code{Owner}) augmentent l'\textbf{impact} d'une erreur ou d'une compromission. Surveiller le RBAC détecte les \textbf{écarts au moindre privilège} et les \textbf{attributions non légitimes}.
+\item \textbf{Citez deux métriques utiles pour une VM.}\\ \textbf{\code{Percentage CPU}} (saturation calcul) et \textbf{\code{Available Memory Bytes}} (mémoire). \textit{(Aussi : \code{CPU Credits Remaining} pour le burstable, \code{Network In/Out}, \code{VmAvailabilityMetric}.)}
+\item \textbf{Citez deux recommandations de sécurité.}\\ \textbf{Restreindre les ports d'administration} (SSH/RDP à une IP ou via Bastion) et \textbf{désactiver l'accès public du Storage}. \textit{(Aussi : activer Defender for Cloud, moindre privilège, MFA.)}
+\item \textbf{Pourquoi une alerte doit-elle être associée à une procédure d'action ?}\\ Pour être \textbf{actionnable}. Sans \textbf{procédure} (runbook : quoi vérifier, qui contacter, quelle action), le destinataire reçoit un signal \textbf{sans savoir quoi faire} \arr{} perte de temps, alerte ignorée. La procédure \textbf{réduit le MTTR}.
+\item \textbf{Différence entre coût constaté et coût prévisionnel ?}\\ Le \textbf{coût constaté} est la dépense \textbf{réelle déjà facturée} (historique). Le \textbf{coût prévisionnel} (\textit{forecast}) est une \textbf{projection} de la dépense à venir : il permet d'\textbf{anticiper un dépassement avant qu'il survienne}.
+\item \textbf{Pourquoi le chiffrement ne suffit-il pas à sécuriser une ressource ?}\\ Le chiffrement protège les données \textbf{au repos et en transit}, mais \textbf{pas} contre un \textbf{accès public} mal configuré, des \textbf{droits excessifs}, un \textbf{port exposé} ou l'\textbf{absence de logs}. La sécurité est \textbf{multi-couches} : réseau, identité, configuration, audit.
+\item \textbf{Quel est l'intérêt d'un tableau de bord pour une DSI ?}\\ Offrir une \textbf{vue synthétique de pilotage} : le service fonctionne-t-il, coûte-t-il trop cher, est-il sécurisé, que corriger en priorité ? Il sert à \textbf{décider}, pas seulement à afficher des courbes.
+\item \textbf{Qu'est-ce qu'une dérive de coût cloud ?}\\ Une \textbf{augmentation non maîtrisée} de la dépense, souvent due à des \textbf{ressources oubliées, surdimensionnées ou facturées à vide} (Load Balancer, IP) et à l'\textbf{absence de budget/tags}. On la découvre \textbf{trop tard, sur la facture}.
+\item \textbf{Donnez trois actions prioritaires avant une mise en production.}\\ 1) \textbf{Activer des alertes critiques} (disponibilité, CPU, VM indisponible). 2) \textbf{Réduire l'exposition et appliquer le moindre privilège} (désactiver l'accès public du Storage, supprimer les IP des VM, RBAC restreint, Defender). 3) \textbf{Maîtriser les coûts} (budget avec alertes, tags obligatoires). \textit{(Compléments : centraliser les logs, dashboard, multi-zone.)}
+\end{enumerate}
+
+\vspace{6mm}
+\begin{center}
+{\sffamily\bfseries\large\color{azuredark}\eParty~~Fin du dossier de rendu — TP4 Monitoring, FinOps \& Sécurité Azure}\\[2mm]
+{\color{black!55}ShopEasy — Louis \textsc{Scarfone} \& Maxence \textsc{Bourragué} — Bloc 4 · Cloud Computing}
+\end{center}
+
+\end{document}
