@@ -1,0 +1,1739 @@
+% =====================================================================
+%  Fiche de synthèse — Panorama du Cloud & Architecture Azure
+%  Bloc 4 (Cloud Computing) — révision théorique TP1 → TP4 (ShopEasy)
+%  Moteur : LuaLaTeX (LuaHBTeX) — compiler 2 fois
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+% ---------- Langue & fontes ----------
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{french}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}[Scale=0.80]
+\usepackage{microtype}
+\emergencystretch=3em
+
+% ---------- Respiration ----------
+\usepackage{setspace}
+\setstretch{1.08}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em plus 0.12em minus 0.05em}
+
+% ---------- Géométrie ----------
+\usepackage[a4paper,margin=2.2cm,headheight=20pt,headsep=14pt,footskip=20pt]{geometry}
+
+% ---------- Couleurs (palette Azure) ----------
+\usepackage{xcolor}
+\definecolor{azure}{HTML}{0078D4}
+\definecolor{azuredark}{HTML}{14375E}
+\definecolor{azuremid}{HTML}{2E75B6}
+\definecolor{azurelight}{HTML}{E8F1FB}
+\definecolor{azurepale}{HTML}{F3F8FD}
+\definecolor{okgreen}{HTML}{107C10}
+\definecolor{okgreenbg}{HTML}{E8F5E9}
+\definecolor{warnorange}{HTML}{B5520A}
+\definecolor{warnbg}{HTML}{FBEEDF}
+\definecolor{dangerred}{HTML}{A4262C}
+\definecolor{codebg}{HTML}{F6F8FA}
+\definecolor{codeframe}{HTML}{D8E1EC}
+\definecolor{ink}{HTML}{1B2733}
+\definecolor{rowalt}{HTML}{EBF3FC}
+\color{ink}
+
+% ---------- Divers ----------
+\usepackage{graphicx}
+\usepackage{fontawesome5}
+\usepackage{enumitem}
+\setlist{leftmargin=1.4em,topsep=2pt,itemsep=2pt,parsep=0pt}
+\usepackage{needspace}
+\usepackage{fvextra}
+
+% ---------- Emojis (Twemoji couleur) ----------
+\usepackage{twemojis}
+\newcommand{\emo}[1]{\raisebox{-0.14em}{\twemoji{#1}}}
+\newcommand{\eTarget}{\emo{1f3af}}
+\newcommand{\ePackage}{\emo{1f4e6}}
+\newcommand{\eCheck}{\emo{2705}}
+\newcommand{\eWarn}{\emo{26a0}}
+\newcommand{\eBulb}{\emo{1f4a1}}
+\newcommand{\ePin}{\emo{1f4cc}}
+\newcommand{\eBrain}{\emo{1f9e0}}
+\newcommand{\eCompass}{\emo{1f9ed}}
+\newcommand{\eGrad}{\emo{1f393}}
+\newcommand{\eLock}{\emo{1f512}}
+\newcommand{\eBooks}{\emo{1f4da}}
+\newcommand{\arr}{\ensuremath{\rightarrow}}
+
+% \code : monospace sécable (préserve les espaces)
+\makeatletter
+\def\tp@stop{\tp@stop}
+\newcommand{\code}[1]{\texttt{\tp@loop#1\tp@stop}}
+\def\tp@loop{\futurelet\tp@nxt\tp@step}
+\def\tp@step{%
+  \ifx\tp@nxt\tp@stop \let\tp@do\tp@fin
+  \else\ifx\tp@nxt\@sptoken \let\tp@do\tp@sp
+  \else \let\tp@do\tp@ch \fi\fi \tp@do}
+\def\tp@fin#1{}%
+\def\tp@ch#1{#1\penalty100 \tp@loop}
+\expandafter\def\expandafter\tp@sp\space{\space\penalty100 \tp@loop}
+\makeatother
+
+% ---------- Tableaux (tabularray) ----------
+\usepackage{tabularray}
+\UseTblrLibrary{booktabs}
+\NewDocumentEnvironment{ltable}{m}{%
+  \par\addvspace{4pt}\begin{tblr}{
+    width=\linewidth,
+    colspec={#1},
+    row{1}={bg=azuredark,fg=white,font=\sffamily\bfseries\small},
+    row{2-Z}={font=\small},
+    row{even}={bg=rowalt},
+    hline{1,Z}={1.1pt,solid,azuredark},
+    hline{2}={0.5pt,solid,azuredark!45},
+    colsep=6pt, rowsep=3.6pt,
+    stretch=1.12,
+  }%
+}{%
+  \end{tblr}\par\addvspace{4pt}%
+}
+
+% ---------- Boîtes (tcolorbox) ----------
+\usepackage[most]{tcolorbox}
+\tcbset{
+  boxbase/.style={
+    enhanced, breakable, sharp corners, boxrule=0pt, leftrule=4pt,
+    left=4.5mm, right=4.5mm, top=3.6mm, bottom=3.6mm,
+    before skip=12pt, after skip=12pt,
+    fonttitle=\sffamily\bfseries, coltitle=white,
+    attach boxed title to top left={xshift=0mm,yshift=-2.6mm},
+    boxed title style={sharp corners, boxrule=0pt, left=2.5mm,right=2.5mm,top=0.9mm,bottom=0.9mm},
+  },
+}
+% Définition (bleu azur)
+\newtcolorbox{defbox}{boxbase, colback=azurelight, colframe=azure,
+  colbacktitle=azure, title={\ePin~Définition}}
+% À retenir (bleu foncé)
+\newtcolorbox{keybox}{boxbase, colback=azurepale, colframe=azuredark,
+  colbacktitle=azuredark, title={\eBrain~À retenir}}
+% Point de vigilance (orange)
+\newtcolorbox{notebox}[1][Point de vigilance]{boxbase, colback=warnbg, colframe=warnorange,
+  colbacktitle=warnorange, title={\eWarn~#1}}
+% Astuce / note (bleu clair)
+\newtcolorbox{tipbox}[1][Astuce]{boxbase, colback=azurepale, colframe=azuremid,
+  colbacktitle=azuremid, title={\eBulb~#1}}
+% Synthèse / validation (vert)
+\newtcolorbox{etatbox}[1][En résumé]{boxbase, colback=okgreenbg, colframe=okgreen,
+  colbacktitle=okgreen, title={\eCheck~#1}}
+
+% Carte « chiffre-clé » pour la page de garde
+\newcommand{\statcard}[2]{%
+  \begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, leftrule=3pt, colframe=azure,
+     colback=azurepale, width=0.305\linewidth, halign=center, valign=center, height=2.3cm,
+     left=1mm, right=1mm, top=1mm, bottom=1mm, nobeforeafter]
+     {\sffamily\bfseries\fontsize{20}{22}\selectfont\color{azuredark}#1}\\[1.5mm]
+     {\sffamily\small\color{black!58}#2}
+  \end{tcolorbox}%
+}
+
+% Question / réponse de révision
+\newcommand{\qa}[3]{\par\addvspace{1.5pt}%
+  \textbf{\color{azuredark}#1.}~\textbf{#2}\quad#3\par}
+
+% Bloc « diagramme » monospace (sans coupure de ligne)
+\newenvironment{diagram}{%
+  \par\addvspace{8pt}\begin{tcolorbox}[enhanced, sharp corners, boxrule=0.7pt,
+    colback=codebg, colframe=codeframe, left=3mm, right=3mm, top=2.6mm, bottom=2.6mm]
+  \footnotesize\ttfamily\setstretch{1.0}\obeylines\obeyspaces}{%
+  \end{tcolorbox}\par\addvspace{10pt}}
+
+% ---------- Sections (titlesec) ----------
+\usepackage{titlesec}
+\titleformat{\section}
+  {\sffamily\LARGE\bfseries\color{azuredark}}
+  {\tcbox[on line, sharp corners, boxrule=0pt, colback=azure, colupper=white,
+     left=2.2mm,right=2.2mm,top=0.6mm,bottom=0.6mm]{\thesection}}
+  {0.7em}{}[\vspace{1mm}{\color{azure}\titlerule[1.6pt]}]
+\titlespacing*{\section}{0pt}{3.6ex plus 0.8ex}{2.0ex}
+\titleformat{\subsection}
+  {\sffamily\large\bfseries\color{azuremid}}{\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{2.8ex plus 0.5ex}{1.1ex}
+\titleformat{\subsubsection}
+  {\sffamily\bfseries\color{azuredark}}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{1.9ex plus 0.3ex}{0.5ex}
+
+% ---------- En-têtes / pieds (fancyhdr) ----------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\small\color{azuredark}\textbf{Fiche de synthèse}~\textcolor{azure}{\textbullet}~Panorama du Cloud \& Azure}
+\fancyhead[R]{\sffamily\small\color{black!55}\nouppercase{\leftmark}}
+\fancyfoot[C]{\sffamily\small\color{black!55}\thepage}
+\fancyfoot[R]{\sffamily\scriptsize\color{black!42}Bloc 4 · Cloud Computing}
+\fancyfoot[L]{\sffamily\scriptsize\color{black!42}TP1 → TP4 · ShopEasy}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrule}{\vspace{-2pt}{\color{azure!70}\rule{\headwidth}{1.1pt}}}
+
+% ---------- Liens ----------
+\usepackage[hidelinks]{hyperref}
+\hypersetup{colorlinks=true, linkcolor=azuredark, urlcolor=azuremid,
+  pdftitle={Fiche de synthese - Panorama du Cloud et Azure}, pdfauthor={Louis SCARFONE}}
+
+\newcommand{\thinrule}{\par\vspace{1mm}{\color{azure!30}\hrule height 0.5pt}\vspace{1mm}}
+
+\begin{document}
+
+% =====================================================================
+%  PAGE DE GARDE
+% =====================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\setlength{\parskip}{0pt}
+\raggedright
+
+\begin{tcolorbox}[enhanced, sharp corners, boxrule=0pt, colback=azuredark,
+   width=\linewidth, left=13mm, right=13mm, top=14mm, bottom=14mm,
+   borderline north={5pt}{0pt}{azure}, borderline south={2pt}{0pt}{azure}]
+  \raggedright
+  {\sffamily\bfseries\large\color{azure!75}\faMicrosoft~~MICROSOFT AZURE \quad\textbullet\quad BLOC 4 — CLOUD COMPUTING}
+
+  \vspace{9mm}
+  {\sffamily\bfseries\color{white}\fontsize{32}{38}\selectfont Fiche de synthèse}
+
+  \vspace{3mm}
+  {\sffamily\color{azurelight}\LARGE Panorama du Cloud \& Architecture \textbf{Azure}}
+
+  \vspace{8mm}
+  {\color{azure}\rule{5.2cm}{2.5pt}}
+
+  \vspace{5mm}
+  {\sffamily\color{white}\large Révision théorique complète des \textbf{4 TP} — du \textbf{panorama du cloud} et de l'architecture (TP1), à l'\textbf{Infrastructure as Code} (TP2), l'\textbf{administration \& automatisation} (TP3) et le \textbf{monitoring, FinOps \& sécurité} (TP4). Fil rouge : la migration de l'application \textbf{ShopEasy} vers Azure.}
+\end{tcolorbox}
+
+\vspace{1.6cm}
+
+\begin{minipage}[t]{0.5\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Auteur}\\[3.5mm]
+  {\large Louis \textsc{Scarfone}}\\[2mm]
+  {\large Maxence \textsc{Bourragué}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.46\linewidth}
+  {\sffamily\bfseries\large\color{azuredark}Cadre}\\[3.5mm]
+  Mastère Dev Manager Full Stack — RNCP niveau 7\\[2mm]
+  Cas fil rouge : \textbf{ShopEasy}\\[2mm]
+  Azure for Students — région \texttt{swedencentral}
+\end{minipage}
+
+\vspace{1.7cm}
+
+\noindent
+\statcard{4 TP}{couverts intégralement}\hfill
+\statcard{18}{sections thématiques}\hfill
+\statcard{72}{questions-réponses}
+
+\vfill
+{\sffamily\large\bfseries\color{azuredark}Juin 2026}\hfill
+{\sffamily\color{black!45}Support de révision — évaluation théorique}
+\end{titlepage}
+
+% =====================================================================
+%  SOMMAIRE
+% =====================================================================
+\thispagestyle{fancy}
+{\sffamily\Huge\bfseries\color{azuredark}Sommaire}
+\vspace{2mm}{\color{azure}\titlerule[1.6pt]}\vspace{4mm}
+\hypersetup{linkcolor=azuredark}
+{\setlength{\parskip}{1pt}\tableofcontents}
+\newpage
+
+\setcounter{section}{-1}
+
+% #####################################################################
+\section{Vue d'ensemble du projet et des 4 TP}
+
+\subsection{Le fil rouge ShopEasy}
+
+\textbf{ShopEasy} est une PME qui exploite une application interne de gestion de commandes (consultation clients, saisie de commandes, génération de factures, dépôt de documents justificatifs). L'\textbf{existant} est un \textbf{serveur physique unique} dans les locaux :
+
+\begin{itemize}
+\item un serveur \textbf{Ubuntu} unique (mono-serveur) ;
+\item \textbf{Apache/Nginx} exposant l'application web ;
+\item application \textbf{PHP ou Node.js} installée localement ;
+\item base \textbf{MySQL} installée sur le \textbf{même serveur} ;
+\item \textbf{documents clients} dans un répertoire local ;
+\item \textbf{sauvegardes manuelles et irrégulières} ;
+\item \textbf{aucune supervision} centralisée ;
+\item un \textbf{compte administrateur partagé} par plusieurs personnes.
+\end{itemize}
+
+Le projet consiste à \textbf{migrer} cet existant vers Azure en adoptant une posture d'\textbf{architecte cloud junior} : analyser, concevoir, déployer, automatiser, administrer, superviser, sécuriser et optimiser.
+
+\subsection{Progression pédagogique des 4 TP}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[2,l,m] X[2,l,m] X[2,l,m] X[3,l,m]}
+TP & Thème & Logique & Outils clés & Livrables phares \\
+TP1 & Architecture cloud Azure & \textbf{Concevoir \& déployer} manuellement & Portail / Azure CLI & Analyse de l'existant, architecture cible, note DSI \\
+TP2 & Infrastructure as Code & \textbf{Industrialiser} (reproductible) & Terraform (HCL) & Projet \code{.tf}, note technique, drift \\
+TP3 & Administration \& automatisation & \textbf{Exploiter} au quotidien & Azure CLI, Bash, Python (SDK) & Scripts (inventaire, vm-power, healthcheck), rapport d'exploitation \\
+TP4 & Monitoring, FinOps \& sécurité & \textbf{Piloter \& sécuriser} avant prod & Azure Monitor, Cost Management, Defender & Indicateurs, alertes, dashboard, matrice de risques, note DSI \\
+\end{ltable}
+
+\begin{keybox}
+\textbf{Fil conducteur :} TP1 \emph{construit} l'architecture \arr{} TP2 la \emph{décrit en code} \arr{} TP3 l'\emph{administre} \arr{} TP4 la \emph{supervise, optimise et sécurise}. On passe d'une logique de \textbf{construction} à une logique d'\textbf{exploitation} d'un système d'information.
+\end{keybox}
+
+\subsection{Architecture cible ShopEasy (vue logique)}
+
+\begin{diagram}
+                         Internet / Utilisateurs
+                                  │  HTTP/HTTPS (80/443)
+                                  ▼
+                  ┌───────────────────────────────┐
+                  │   Azure Load Balancer (public) │  ← IP publique, sonde de santé
+                  └───────────────┬───────────────┘
+        Resource Group : rg-shopeasy-dev  (région swedencentral)
+ ┌──────────────────── Virtual Network 10.x.0.0/16 ────────────────────┐
+ │  subnet snet-web (NSG nsg-web)      subnet snet-data (NSG nsg-data)  │
+ │   ┌──────────┐  ┌──────────┐         ┌───────────────────┐ ┌──────┐ │
+ │   │ VM web-1 │  │ VM web-2 │ ──SQL──► │ Azure SQL Database│ │Storage│ │
+ │   │  Nginx   │  │  Nginx   │ ─HTTPS─► │     (privée)      │ │ (Blob)│ │
+ │   └──────────┘  └──────────┘         └───────────────────┘ └──────┘ │
+ │   subnet snet-admin (Azure Bastion, optionnel)                      │
+ └─────────────────────────────────────────────────────────────────────┘
+ Plan transverse : Microsoft Entra ID + RBAC · Azure Monitor · Cost Management
+\end{diagram}
+
+\begin{notebox}[Contraintes \emph{Azure for Students}]
+Contraintes rencontrées dans les TP : région \code{francecentral} \textbf{bloquée} par policy \arr{} déploiement en \code{swedencentral} ; taille \code{Standard\_B1s} \textbf{indisponible} \arr{} remplacée par \code{Standard\_B2ats\_v2} (burstable, recommandée par Microsoft) ; déploiement multi-zone indisponible ; providers à enregistrer manuellement. \textbf{À savoir : ces contraintes sont propres à l'abonnement étudiant, pas à Azure en général.}
+\end{notebox}
+
+% #####################################################################
+\section{Fondamentaux du Cloud Computing}
+
+\subsection{Le SI traditionnel et ses limites}
+
+Dans une \textbf{architecture traditionnelle (on-premise)}, l'entreprise \textbf{achète ou loue des serveurs physiques}, les installe, configure le réseau, installe les systèmes, gère les sauvegardes, applique les correctifs et anticipe la capacité. Ce modèle reste pertinent pour des contraintes fortes de \textbf{souveraineté}, de \textbf{latence locale} ou de \textbf{systèmes industriels}, mais présente des limites :
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Limite & Description \\
+Délai de mise à disposition & Commander, recevoir, installer et configurer du matériel prend du temps. \\
+Surdimensionnement & Acheter de la capacité pour les pics, inutilisée le reste du temps. \\
+Coût initial (CAPEX) & Investissements importants \textbf{avant} de produire de la valeur. \\
+Maintenance opérationnelle & Correctifs, remplacement matériel, sauvegardes, supervision, reprise à la charge de l'entreprise. \\
+Point de défaillance unique (SPOF) & Une architecture mono-serveur concentre tous les risques. \\
+\end{ltable}
+
+\subsection{Définition du Cloud Computing}
+
+\begin{defbox}
+\textbf{Cloud Computing :} modèle de \textbf{fourniture de ressources informatiques à la demande}, accessibles via le réseau, configurables rapidement, mesurables et \textbf{facturées selon l'usage} (ou selon une capacité réservée).
+\end{defbox}
+
+Le cloud propose des ressources (calcul, stockage, réseau, bases de données, sécurité, supervision, IA, services applicatifs) provisionnées via une \textbf{console}, une \textbf{API} ou un outil d'\textbf{Infrastructure as Code}. Le changement n'est pas que technique : le cloud transforme la \textbf{manière de piloter le SI} (tester rapidement, déployer automatiquement, mesurer finement les coûts, adapter la capacité à la demande).
+
+\subsection{Les 4 propriétés fondamentales du cloud}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[2,l,m] X[2,l,m]}
+Propriété & Définition & Implication \\
+Élasticité & Capacité à \textbf{augmenter ou diminuer} les ressources selon le besoin. & Absorber les pics sans surpayer le reste du temps. \\
+Facturation à l'usage & Transformation des dépenses d'\textbf{investissement (CAPEX)} en dépenses \textbf{opérationnelles (OPEX)}. & Flexibilité, mais \textbf{risque} : une ressource oubliée continue de coûter. \\
+Automatisation & Les ressources se créent par console, API ou code (IaC). & Une architecture cloud doit être décrite, versionnée, reproductible. \\
+Services managés & Le fournisseur prend en charge une partie de l'administration. & Transfère une partie de la responsabilité sans la supprimer : elle se \textbf{transforme}. \\
+\end{ltable}
+
+\subsection{CAPEX vs OPEX}
+
+\begin{itemize}
+\item \textbf{CAPEX} (\emph{Capital Expenditure}) : dépense d'\textbf{investissement} (achat de matériel), capital immobilisé, modèle traditionnel.
+\item \textbf{OPEX} (\emph{Operational Expenditure}) : dépense d'\textbf{exploitation} récurrente, payée à la consommation, modèle cloud.
+\end{itemize}
+
+\begin{tipbox}
+Le passage \textbf{CAPEX \arr{} OPEX} est un bénéfice majeur du cloud (pas d'avance de capital, paiement à l'usage), \textbf{mais} il déplace le risque vers la \textbf{dérive de coûts} : d'où l'importance du \textbf{FinOps} (§13).
+\end{tipbox}
+
+% #####################################################################
+\section{Modèles de service : IaaS, PaaS, SaaS}
+
+Les modèles IaaS, PaaS et SaaS décrivent le \textbf{niveau d'abstraction} du service consommé : \textbf{plus le service est managé, plus le fournisseur prend en charge de responsabilités techniques} ; plus il est « bas niveau », plus le client conserve de \textbf{contrôle} mais aussi d'\textbf{administration}.
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[2,l,m] X[2,l,m] X[1.4,l,m]}
+Modèle & Description & Responsabilités du client & Exemples Azure \\
+IaaS & Infrastructure à la demande : machines, disques, réseau. & OS, correctifs, runtime, application, données, sécurité. & Virtual Machines, Virtual Network, Managed Disks \\
+PaaS & Plateforme managée pour déployer du code ou des données. & Code, configuration applicative, données, droits. & App Service, Azure SQL Database \\
+SaaS & Logiciel complet consommé comme un service. & Utilisateurs, données, configuration fonctionnelle. & Microsoft 365, Dynamics 365 \\
+\end{ltable}
+
+\begin{tipbox}[Message clé]
+Le choix IaaS/PaaS/SaaS est un \textbf{arbitrage} entre contrôle, responsabilité, rapidité de déploiement, compétences nécessaires, coût opérationnel et exigences de conformité.
+\end{tipbox}
+
+\textbf{Application à ShopEasy :}
+\begin{itemize}
+\item Architecture \textbf{IaaS} (proche de l'existant) : VM pour l'app + base installée manuellement.
+\item Architecture \textbf{mixte} (retenue) : \textbf{VM} pour l'application (IaaS) + \textbf{Azure SQL Database} pour la base (PaaS) + \textbf{Storage Account} pour les fichiers (PaaS).
+\item Architecture \textbf{plus managée} (cible future) : \textbf{App Service} + Azure SQL + Storage.
+\end{itemize}
+
+En partant d'un existant \textbf{100\,\% à sa charge}, ShopEasy bascule vers un \textbf{mix IaaS + PaaS} : Azure prend en charge la base et le stockage (PaaS), ShopEasy garde la maîtrise de la couche applicative (IaaS) le temps de la migration, et ajoute une \textbf{couche de gouvernance} (identités, supervision, coûts).
+
+% #####################################################################
+\section{Organisation et concepts de base d'Azure}
+
+\subsection{Les niveaux logiques d'Azure}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Concept & Rôle \\
+Tenant (Microsoft Entra ID) & Représente l'\textbf{annuaire d'identité} de l'organisation : utilisateurs, groupes, applications, identités managées. \\
+Subscription (abonnement) & Conteneur de \textbf{facturation et de gouvernance}. Les ressources y sont créées ; porte droits et coûts. \\
+Resource Group & Conteneur \textbf{logique} regroupant les ressources d'une application, d'un environnement ou d'un projet. \\
+Resource (ressource) & Service concret déployé : VM, VNet, Storage Account, Azure SQL Database, etc. \\
+Management Group & Niveau au-dessus des subscriptions : organise plusieurs abonnements par domaine ou entité. \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{Resource Group :} conteneur logique de ressources partageant un \textbf{cycle de vie commun}. Il sert à \textbf{administrer, sécuriser (RBAC), taguer, suivre les coûts et supprimer ensemble} un ensemble de ressources cohérent.
+\end{defbox}
+
+\begin{notebox}[Erreur fréquente]
+Mélanger toutes les ressources dans un seul groupe. Un Resource Group doit traduire une \textbf{logique de cycle de vie} (application, environnement, projet). Supprimer le RG supprime \textbf{toutes} les ressources qu'il contient.
+\end{notebox}
+
+\subsection{Régions et Availability Zones}
+
+\begin{defbox}
+\textbf{Région Azure :} zone \textbf{géographique} dans laquelle des services peuvent être déployés. Influence la \textbf{latence}, les \textbf{coûts}, les \textbf{services disponibles}, les \textbf{contraintes réglementaires} (résidence des données) et les possibilités de \textbf{haute disponibilité}.
+\end{defbox}
+
+\begin{defbox}
+\textbf{Availability Zone (zone de disponibilité) :} emplacement \textbf{physiquement séparé} au sein d'une région (alimentation, refroidissement et réseau \textbf{indépendants}). Déployer dans plusieurs zones réduit le risque d'indisponibilité lié à la panne d'un \textbf{datacenter}.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+ & Région & Availability Zone \\
+Échelle & Géographique (ex. France Central, Sweden Central) & Datacenter(s) au sein d'une région \\
+Sert à & Latence, conformité, résidence des données & Résilience face à une panne locale \\
+\end{ltable}
+
+\textbf{Question type :} \emph{Différence région / zone de disponibilité ?} \arr{} La \textbf{région} est une zone géographique ; la \textbf{zone de disponibilité} est un ensemble de datacenters physiquement séparés \textbf{au sein} d'une région, pour la résilience.
+
+\subsection{Conventions de nommage}
+
+Un nommage standardisé facilite la recherche, l'automatisation, l'audit et l'analyse des coûts. Convention type : \code{<type>-<application>-<environnement>[-région]}.
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] Q[l,m]}
+Objet & Convention & Exemple \\
+Resource Group & \code{rg-application-env} & \code{rg-shopeasy-dev} \\
+Virtual Network & \code{vnet-application-env} & \code{vnet-shopeasy-dev} \\
+Subnet & \code{snet-rôle} & \code{snet-web} \\
+NSG & \code{nsg-rôle} & \code{nsg-web} \\
+VM & \code{vm-rôle-num} & \code{vm-web-01} \\
+Storage Account & nom court, unique mondial, minuscules, sans tiret & \code{stshopeasyls01} \\
+\end{ltable}
+
+\begin{notebox}
+Les noms de \textbf{Storage Account} et de \textbf{serveur SQL} doivent être \textbf{uniques au niveau mondial} (d'où l'ajout d'un suffixe). Le Storage Account n'accepte ni tiret ni majuscule (3–24 caractères).
+\end{notebox}
+
+% #####################################################################
+\section{Le Well-Architected Framework}
+
+\begin{defbox}
+\textbf{Azure Well-Architected Framework (WAF) :} cadre de réflexion permettant d'\textbf{évaluer et justifier une architecture} selon \textbf{5 piliers}. Il structure les arbitrages et les décisions.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Pilier & Questions à se poser \\
+Reliability (fiabilité) & Que se passe-t-il si une ressource tombe ? L'application continue-t-elle ? Sauvegarde et reprise existent-elles ? \\
+Security (sécurité) & Les accès sont-ils limités ? Les données protégées ? Les flux filtrés ? Les journaux permettent-ils un audit ? \\
+Cost Optimization (coûts) & Les ressources sont-elles bien dimensionnées ? Les coûts suivis ? Les environnements inutiles arrêtés ? \\
+Operational Excellence (exploitation) & L'exploitation est-elle standardisée ? Les changements traçables ? La supervision suffisante ? \\
+Performance Efficiency (performance) & Les ressources répondent-elles aux besoins ? L'architecture absorbe-t-elle la croissance ? \\
+\end{ltable}
+
+\begin{keybox}
+Une architecture cloud réussie \textbf{ne consiste pas à empiler des services}. Elle doit répondre à un \textbf{besoin métier}, \textbf{réduire les risques}, rester \textbf{exploitable} et conserver un \textbf{coût acceptable}. Critiquer une architecture, c'est identifier ses \textbf{points forts, ses risques, ses hypothèses et ses arbitrages} — pas la rejeter.
+\end{keybox}
+
+% #####################################################################
+\section{Réseau Azure : VNet, subnets, NSG, équilibrage}
+
+\subsection{Virtual Network (VNet)}
+
+\begin{defbox}
+\textbf{Azure Virtual Network (VNet) :} réseau \textbf{privé et isolé} dans Azure, comparable à un réseau local virtuel. Il permet aux ressources de communiquer entre elles, avec Internet ou avec un réseau d'entreprise. Il définit une \textbf{plage d'adresses IP privées} (ex. \code{10.10.0.0/16}) et contient des \textbf{subnets}.
+\end{defbox}
+
+\begin{itemize}
+\item Les VNet utilisent des \textbf{plages privées RFC 1918} (\code{10.0.0.0/8}, \code{172.16.0.0/12}, \code{192.168.0.0/16}), \textbf{non routables sur Internet} \arr{} communications internes isolées, pas de conflit avec des adresses publiques.
+\item L'exposition vers l'extérieur est \textbf{explicite} (IP publique + Load Balancer), jamais par le VNet lui-même.
+\end{itemize}
+
+\subsection{Subnets et segmentation réseau}
+
+\begin{defbox}
+\textbf{Subnet (sous-réseau) :} subdivision d'un VNet permettant d'organiser les ressources \textbf{par fonction ou niveau d'exposition} (web, applicatif, données, administration).
+\end{defbox}
+
+\textbf{Pourquoi segmenter} (plutôt qu'un seul grand réseau « à plat ») :
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Raison & Explication \\
+Sécurité / cloisonnement & NSG différents par couche \arr{} limite les \textbf{mouvements latéraux} (une VM web compromise ne joint pas directement la base). \\
+Moindre privilège réseau & Chaque subnet n'autorise que les flux nécessaires (ex. SQL \code{1433} \textbf{uniquement depuis le subnet web}). \\
+Lisibilité / exploitation & Découpage par fonction \arr{} réseau compréhensible, auditable, documentable. \\
+Gouvernance / évolutivité & Route tables, Private Endpoints, bastion associables à un subnet précis ; plages réservées pour la croissance. \\
+Conformité & Isoler les données sensibles dans une zone dédiée facilite le respect du \textbf{RGPD}. \\
+\end{ltable}
+
+\begin{tipbox}
+Segmenter = appliquer la \textbf{défense en profondeur} au niveau réseau. La grande plage \code{/16} est l'espace global ; les \code{/24} matérialisent les \textbf{zones de confiance} distinctes. Azure \textbf{réserve 5 adresses par subnet} \arr{} un \code{/24} (256 adresses) offre \textbf{251} adresses utilisables.
+\end{tipbox}
+
+\subsection{Network Security Group (NSG)}
+
+\begin{defbox}
+\textbf{Network Security Group (NSG) :} ensemble de \textbf{règles de filtrage} du trafic réseau, associable à un \textbf{subnet} ou à une \textbf{interface réseau}. Chaque règle définit une \textbf{priorité}, une \textbf{source}, une \textbf{destination}, un \textbf{protocole}, un \textbf{port} et une \textbf{action} (autoriser/refuser).
+\end{defbox}
+
+\begin{itemize}
+\item Les règles sont évaluées par \textbf{ordre de priorité} (du plus petit au plus grand) ; la première qui correspond s'applique.
+\item Le sens est filtré \textbf{séparément} : \textbf{Inbound} (entrant) et \textbf{Outbound} (sortant).
+\item Azure applique des \textbf{règles par défaut invisibles} : en entrée \code{AllowVnetInBound}, \code{AllowAzureLoadBalancerInBound}, puis \code{DenyAllInBound} (65500) ; en sortie \code{AllowVnetOutBound}, \code{AllowInternetOutBound}, puis \code{DenyAllOutBound}.
+\item Les règles personnalisées (priorité < 65000) sont évaluées \textbf{avant} ces défauts.
+\end{itemize}
+
+\textbf{Règles types pour ShopEasy :}
+
+\begin{ltable}{Q[l,m,font=\bfseries] Q[c,m] X[l,m] X[1.6,l,m]}
+Flux & Port & Source & Justification \\
+HTTP & 80 & Internet (ou LB) & Accès à l'application web de test \\
+HTTPS & 443 & Internet & Cible production (flux chiffrés) \\
+SSH & 22 & \textbf{IP admin uniquement} & Administration Linux contrôlée \\
+SQL & 1433 & \textbf{Subnet web uniquement} & Empêcher l'exposition directe de la base \\
+\end{ltable}
+
+\begin{notebox}[Erreur classique]
+Ouvrir SSH (22) à \code{0.0.0.0/0} (tout Internet) \arr{} exposition permanente aux \textbf{scans automatisés} et aux \textbf{attaques par force brute}. \textbf{Toujours} restreindre à l'IP admin, ou mieux : \textbf{Azure Bastion} + MFA + accès \emph{just-in-time}.
+\end{notebox}
+
+\begin{tipbox}[Inbound vs Outbound]
+Par défaut Azure \textbf{autorise tout l'Outbound} et \textbf{restreint l'Inbound}. Restreindre aussi l'Outbound limite l'\textbf{exfiltration} et les communications malveillantes (rappel C2) depuis une VM compromise.
+\end{tipbox}
+
+\subsection{Équilibrage de charge et haute disponibilité}
+
+\begin{defbox}
+\textbf{Load Balancer :} service qui \textbf{répartit le trafic} entrant sur plusieurs instances derrière un \textbf{point d'entrée unique} (une IP/DNS). Il améliore la \textbf{disponibilité} et permet de \textbf{monter en charge}.
+\end{defbox}
+
+\begin{defbox}
+\textbf{Sonde de santé (health probe) :} vérifie en continu que chaque backend répond (ex. HTTP 200 sur \code{/}). Une instance défaillante est \textbf{automatiquement retirée} du pool ; elle est \textbf{réintégrée} dès qu'elle répond à nouveau. C'est la sonde qui rend la redondance \textbf{effective}.
+\end{defbox}
+
+\textbf{Azure Load Balancer vs Application Gateway :}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+Critère & Azure Load Balancer & Application Gateway \\
+Niveau OSI & Couche \textbf{4} (TCP/UDP) & Couche \textbf{7} (HTTP/HTTPS) \\
+Comprend le contenu & Non (\emph{hash} 5-tuple) & Oui (URL, en-têtes, cookies) \\
+Fonctions & Répartition réseau simple & Routage par chemin/hôte, \textbf{terminaison TLS}, affinité de session, \textbf{WAF} \\
+Complexité / coût & Plus simple, moins cher & Plus riche, plus complexe \\
+Cas d'usage & Première architecture web & Cible production (sécurité applicative, HTTPS, WAF) \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{WAF (Web Application Firewall) :} pare-feu \textbf{applicatif} (couche 7) protégeant contre les attaques web (injections, XSS\dots). Disponible avec Application Gateway.
+\end{defbox}
+
+\begin{keybox}
+La haute disponibilité \textbf{ne vient pas d'un service isolé}. Elle résulte d'une \textbf{combinaison} : plusieurs instances, plusieurs \textbf{zones} si possible, sondes de santé, sauvegardes, supervision et procédures de reprise. Un Load Balancer \textbf{seul} ne rend pas une application hautement disponible.
+\end{keybox}
+
+\subsection{Azure Bastion}
+
+\begin{defbox}
+\textbf{Azure Bastion :} service permettant de se connecter en \textbf{SSH/RDP} à des VM \textbf{sans IP publique} ni port d'administration exposé, via le portail. Cible de production recommandée pour supprimer l'exposition directe du SSH (gain \textbf{sécurité} \emph{et} \textbf{FinOps} — moins d'IP publiques).
+\end{defbox}
+
+% #####################################################################
+\section{Calcul : machines virtuelles et alternatives managées}
+
+\subsection{Azure Virtual Machines (IaaS)}
+
+\begin{defbox}
+\textbf{Azure Virtual Machine (VM) :} serveur \textbf{virtuel} où le client choisit l'image système, la taille, le disque, le réseau et la configuration. Modèle \textbf{IaaS} : contrôle complet de l'OS et de la stack, mais administration (patchs, durcissement, supervision système) à la charge du client.
+\end{defbox}
+
+\textbf{Dimensionnement} — tient compte de : CPU, mémoire, disque, trafic réseau, OS, contraintes applicatives et budget. Un mauvais dimensionnement entraîne soit une \textbf{mauvaise performance}, soit un \textbf{gaspillage financier}.
+
+\begin{tipbox}[VM burstable (série B)]
+Une VM burstable (ex. \code{Standard\_B2ats\_v2}) fonctionne à \textbf{crédits CPU}. Au repos, elle accumule des crédits ; sous charge, elle les consomme pour « burster ». \textbf{Si le CPU reste élevé longtemps, les crédits s'épuisent et la VM est bridée (throttling)} \arr{} surveiller \code{CPU Credits Remaining} en plus de \code{Percentage CPU}. Adaptée au dev/test, à faible charge.
+\end{tipbox}
+
+\subsection{\texorpdfstring{Cycle de vie d'une VM : \texttt{stop} vs \texttt{deallocate}}{Cycle de vie d'une VM : stop vs deallocate}}
+
+Une VM peut être : créée, démarrée, \textbf{arrêtée (stopped)}, \textbf{désallouée (deallocated)}, redémarrée, supprimée.
+
+\begin{notebox}[Point FinOps essentiel — \code{stop} $\neq$ \code{deallocate}]
+\textbf{Arrêt (stop)} : l'OS est arrêté mais la VM \textbf{reste allouée} sur l'hôte \arr{} le \textbf{compute continue d'être facturé}. \\
+\textbf{Désallocation (deallocate)} : la VM est arrêtée \textbf{et} les ressources de calcul sont \textbf{libérées} (état \emph{Stopped (deallocated)}) \arr{} le \textbf{compute n'est plus facturé}. \\
+Pour réduire les coûts d'un environnement de dev, il faut \textbf{désallouer}, pas seulement arrêter.
+\end{notebox}
+
+\begin{tipbox}
+Même \textbf{désallouée}, une VM continue de facturer son \textbf{disque OS managé} et son \textbf{IP publique statique} (réservée). Seul le \textbf{compute} est libéré.
+\end{tipbox}
+
+\subsection{VM vs App Service (PaaS)}
+
+\begin{defbox}
+\textbf{Azure App Service :} plateforme \textbf{managée (PaaS)} pour héberger des applications web. Réduit les responsabilités liées à l'OS, aux patchs et à une partie de l'exploitation.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+Critère & Virtual Machines (IaaS) & App Service (PaaS) \\
+Contrôle système & Élevé (OS, services, config) & Limité (plateforme managée) \\
+Administration & Lourde (patchs, durcissement, supervision) & Simplifiée (focalisation sur le code) \\
+Migration de l'existant & Adaptée au \emph{lift-and-shift} & Peut demander une adaptation applicative \\
+Pédagogie & Comprendre réseau \& IaaS & Comprendre le PaaS \\
+\end{ltable}
+
+\subsection{cloud-init}
+
+\begin{defbox}
+\textbf{cloud-init :} mécanisme de \textbf{provisionnement automatique au premier démarrage} d'une VM Linux (installation de paquets, écriture de fichiers, exécution de commandes). Transmis via \code{custom\_data} (encodé base64). Permet d'installer Nginx, publier une page, etc., \textbf{sans connexion SSH} — provisionnement reproductible.
+\end{defbox}
+
+% #####################################################################
+\section{Stockage Azure}
+
+\subsection{Storage Account et types de stockage}
+
+\begin{defbox}
+\textbf{Storage Account :} compte de stockage Azure pouvant héberger plusieurs types de données. Nom \textbf{unique mondialement}, minuscules, sans tiret.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+Service & Usage & Exemple ShopEasy \\
+Blob Storage & Stockage \textbf{objet} pour fichiers non structurés & Factures PDF, images, exports, archives \\
+Managed Disks & Disques attachés aux VM & Disque système d'une VM \\
+Azure Files & Partage de fichiers SMB/NFS managé & Partage entre applications \\
+Tables / Queues & Données clé-valeur / files d'attente & (selon besoin) \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{Stockage objet (Blob) :} stockage de fichiers \textbf{non structurés} accessibles par API/SDK, \textbf{durable et redondé}, \textbf{découplé} des VM (les fichiers survivent à la destruction d'une VM), à la \textbf{scalabilité quasi illimitée} et au paiement à l'usage.
+\end{defbox}
+
+\textbf{Pourquoi le Blob plutôt qu'un disque local de VM ?} Durabilité/redondance gérées par Azure, découplage des VM, scalabilité, accès partagé par plusieurs instances, fonctions intégrées (versioning, soft-delete, cycle de vie, tags, journaux).
+
+\subsection{Niveaux d'accès (tiers) et cycle de vie}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] Q[c,m] Q[c,m]}
+Tier & Usage & Coût stockage & Coût d'accès \\
+Hot & Données fréquemment consultées & Élevé & Faible \\
+Cool & Données peu consultées ($\geq$ 30 j) & Moyen & Moyen \\
+Archive & Données très froides ($\geq$ 90 j) & Très faible & Élevé (réhydratation) \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{Lifecycle management policy :} règle automatisant la \textbf{transition} des blobs entre tiers (Hot \arr{} Cool \arr{} Archive) puis leur \textbf{suppression}, selon leur ancienneté. \textbf{Réduit les coûts} sans intervention manuelle. Ex. ShopEasy : Cool à 30 j, Archive à 90 j, suppression à 365 j.
+\end{defbox}
+
+\subsection{Redondance}
+
+\begin{ltable}{Q[l,m,font=\bfseries] Q[l,m] X[l,m]}
+Sigle & Signification & Portée \\
+LRS & \emph{Locally Redundant Storage} & Réplication \textbf{locale} (un datacenter) — suffisant en dev \\
+ZRS & \emph{Zone Redundant Storage} & Réplication sur \textbf{plusieurs zones} d'une région \\
+GRS & \emph{Geo Redundant Storage} & Réplication \textbf{géographique} (région secondaire) \\
+\end{ltable}
+
+\subsection{Sécurité du stockage}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Propriété & Apport \\
+Chiffrement au repos (SSE) & Activé \textbf{par défaut} sur StorageV2 (clés Microsoft) \\
+HTTPS-only + TLS 1.2 min & Données chiffrées \textbf{en transit}, refus des protocoles obsolètes \\
+Accès public désactivé & Empêche qu'un conteneur soit rendu public \textbf{par erreur} (défense en profondeur) \\
+Versioning & Conserve \textbf{chaque version} d'un blob \arr{} restauration après écrasement \\
+Soft-delete & Récupération d'un blob/conteneur supprimé pendant N jours \\
+Conteneur privé & Accès \textbf{authentifié uniquement} (clé, SAS à durée limitée, ou \textbf{RBAC}) \\
+\end{ltable}
+
+\begin{notebox}[Exposition des données]
+Rendre un stockage public « pour simplifier un test » est une erreur classique \arr{} \textbf{fuite de documents} clients (RGPD). En production, l'accès doit être \textbf{privé} ou strictement contrôlé. \emph{Test décisif :} un accès anonyme à un blob d'un compte fermé renvoie \code{409 PublicAccessNotPermitted}.
+\end{notebox}
+
+% #####################################################################
+\section{Bases de données managées}
+
+\subsection{Azure SQL Database (PaaS)}
+
+\begin{defbox}
+\textbf{Azure SQL Database :} base de données SQL \textbf{managée} (PaaS). Azure prend en charge la maintenance de la plateforme, les \textbf{sauvegardes automatiques}, la \textbf{haute disponibilité} (selon configuration) et le chiffrement. Le client se concentre sur les \textbf{données, le schéma et les droits applicatifs}.
+\end{defbox}
+
+\subsection{SQL sur VM (IaaS) vs Azure SQL Database (PaaS)}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+Critère & Base sur VM (IaaS) & Azure SQL Database (PaaS) \\
+Administration OS & À la charge du client (OS + moteur SQL) & \textbf{Aucune} (gérée par Azure) \\
+Sauvegardes & À concevoir et opérer & \textbf{Automatiques} (\emph{point-in-time restore}, PITR) \\
+Mises à jour & À planifier & \textbf{Automatiques} \\
+Haute disponibilité & À construire (cluster, réplication) & \textbf{Intégrée} selon le niveau (SLA jusqu'à 99,99\,\%) \\
+Sécurité & Durcissement à la charge du client & \textbf{TDE par défaut}, pare-feu, Entra ID, audit, Defender \\
+Coût & VM + licence SQL + disque + exploitation & Paiement du \textbf{service} (DTU/vCore) \\
+Flexibilité & Contrôle total & Périmètre base, mais \textbf{scaling rapide} \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{DTU vs vCore :} deux modèles d'achat d'Azure SQL. \textbf{DTU} (\emph{Database Transaction Unit}) = mesure composite (CPU + mémoire + I/O) packagée par niveau (Basic, Standard, Premium). \textbf{vCore} = choix séparé du nombre de cœurs et de la mémoire (plus flexible, transparent).
+\end{defbox}
+
+\begin{tipbox}[Notions de sécurité \& reprise]
+\textbf{TDE} (\emph{Transparent Data Encryption}) : chiffrement \textbf{au repos}, activé par défaut. \quad \textbf{PITR} (\emph{Point-In-Time Restore}) : restauration à un instant passé grâce aux sauvegardes automatiques. \quad \textbf{Failover group / géo-réplication} : \textbf{bascule} vers une réplique (autre région) pour la continuité d'activité.
+\end{tipbox}
+
+\subsection{Sécurité de la base}
+
+\begin{itemize}
+\item \textbf{Ne jamais exposer la base directement à Internet.} Le serveur SQL ShopEasy est créé avec \textbf{pare-feu fermé} (0 règle = aucune IP autorisée).
+\item Pour un accès de test : ajouter \textbf{temporairement} une règle limitée à l'IP admin, \textbf{documentée et supprimée} après.
+\item \textbf{Cible production :} \code{publicNetworkAccess = Disabled} + \textbf{Private Endpoint} dans le subnet data \arr{} la base n'est joignable que depuis le réseau privé, jamais depuis Internet.
+\item Appliquer le \textbf{moindre privilège} aux comptes applicatifs ; surveiller CPU, DTU/vCore, connexions, stockage, latence.
+\end{itemize}
+
+\begin{defbox}
+\textbf{Private Endpoint :} interface réseau privée donnant accès à un service PaaS (SQL, Storage) \textbf{via une IP privée du VNet}, supprimant toute exposition publique.
+\end{defbox}
+
+% #####################################################################
+\section{Identité, droits et gouvernance}
+
+\subsection{Microsoft Entra ID et RBAC}
+
+\begin{defbox}
+\textbf{Microsoft Entra ID} (ex-Azure AD) : service d'\textbf{identité et d'authentification} d'Azure (utilisateurs, groupes, applications, identités managées). \\
+\textbf{Azure RBAC} (\emph{Role-Based Access Control}) : modèle d'\textbf{attribution des droits par rôle}. On accorde un \textbf{rôle} à une \textbf{identité} sur un \textbf{scope} (étendue).
+\end{defbox}
+
+\textbf{Composants d'une attribution :} \emph{qui} (utilisateur/groupe/identité) + \emph{quel rôle} + \emph{sur quel scope}.
+
+\textbf{Scopes (du plus large au plus précis) :} Management Group \arr{} Subscription \arr{} Resource Group \arr{} Resource. Un droit accordé à un niveau est \textbf{hérité} par les niveaux inférieurs.
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Rôle intégré & Usage \\
+Owner & Administration complète \textbf{y compris la gestion des droits}. À \textbf{limiter fortement}. \\
+Contributor & Gestion des ressources \textbf{sans} gestion des droits. À encadrer. \\
+Reader & Consultation sans modification. Adapté à l'audit, au suivi. \\
+Cost Management Reader & Consultation des coûts (FinOps). \\
+\end{ltable}
+
+\subsection{Principe du moindre privilège}
+
+\begin{defbox}
+\textbf{Principe du moindre privilège :} un utilisateur, une application ou une identité technique ne doit disposer que des \textbf{permissions strictement nécessaires} à sa mission, \textbf{pendant la durée nécessaire}. Limite l'impact d'une erreur, d'un compte compromis ou d'une mauvaise manipulation.
+\end{defbox}
+
+\begin{notebox}[Erreur de gouvernance]
+Donner le rôle \textbf{Owner} à toute une équipe « pour simplifier ». Le rôle \code{Contributor} (ou plus restreint) suffit souvent ; \code{Reader} pour la lecture seule. À compléter par le \textbf{MFA} et une \textbf{revue périodique} des rôles (voire \textbf{PIM} — élévation temporaire des droits).
+\end{notebox}
+
+\subsection{Le compte administrateur partagé (anti-pattern)}
+
+Risques du compte admin partagé (existant ShopEasy) :
+\begin{itemize}
+\item \textbf{Perte de traçabilité / d'imputabilité} (impossible de savoir qui a fait quoi) \arr{} audit et conformité compromis ;
+\item \textbf{Non-respect du moindre privilège} (tous ont tous les droits) ;
+\item \textbf{Révocation difficile} (départ d'un collaborateur = changer le secret pour tous) ;
+\item \textbf{Surface d'attaque accrue} (secret partagé, pas de MFA individualisé).
+\end{itemize}
+\arr{} \textbf{Correctif :} comptes \textbf{nominatifs} Entra ID + \textbf{RBAC} + \textbf{MFA}.
+
+\subsection{Tags et gouvernance}
+
+\begin{defbox}
+\textbf{Tag :} métadonnée \textbf{clé=valeur} associée à une ressource, pour la \textbf{gouvernance} : attribution des coûts, identification du responsable, automatisation, filtrage.
+\end{defbox}
+
+\textbf{Tags recommandés :} \code{Application}, \code{Environment} (dev/test/prod), \code{Owner}, \code{CostCenter}, \code{Criticality} (low/medium/high), \code{ManagedBy}, \code{DataSensitivity}.
+
+\begin{tipbox}
+\textbf{snake\_case vs PascalCase :} les tags posés par Terraform (TP2) étaient en \code{snake\_case} (\code{cost\_center}) ; l'exploitation (TP3) les a normalisés en \code{PascalCase} (\code{CostCenter}). Modifier des tags hors Terraform crée un \textbf{drift} (§10.9).
+\end{tipbox}
+
+\subsection{Azure Policy et niveaux de gouvernance}
+
+\begin{defbox}
+\textbf{Azure Policy :} service permettant d'\textbf{imposer ou d'auditer} des règles de configuration (ex. refuser une ressource sans tag \code{Owner}, interdire une région, exiger le chiffrement). Encadre les écarts et la conformité.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Niveau de gouvernance & Exemple \\
+Management Group & Organiser plusieurs subscriptions par domaine/entité \\
+Subscription & Isoler facturation, responsabilités, environnements \\
+Resource Group & Regrouper les ressources d'une application/projet \\
+Tags & Suivre coût, propriétaire, criticité, environnement \\
+Azure Policy & Imposer/auditer des règles de configuration \\
+RBAC & Contrôler les autorisations \\
+\end{ltable}
+
+% #####################################################################
+\section{Infrastructure as Code \& Terraform (TP2)}
+
+\subsection{Le problème des infrastructures créées manuellement}
+
+Créer des ressources « au clic » dans le portail est utile pour découvrir, mais devient risqué dès qu'une équipe gère plusieurs environnements. Les manipulations manuelles :
+\begin{itemize}
+\item sont \textbf{difficiles à rejouer} exactement ;
+\item dépendent de la \textbf{mémoire} ou des notes de l'administrateur ;
+\item génèrent des \textbf{écarts entre environnements} ;
+\item compliquent les \textbf{revues de sécurité} et l'\textbf{estimation des coûts} ;
+\item rendent la \textbf{suppression} risquée.
+\end{itemize}
+
+\begin{notebox}
+Deux environnements créés manuellement ne sont presque \textbf{jamais identiques} : une règle réseau oubliée, un tag absent ou une option non activée crée un incident difficile à diagnostiquer.
+\end{notebox}
+
+\subsection{Définition de l'Infrastructure as Code (IaC)}
+
+\begin{defbox}
+\textbf{Infrastructure as Code (IaC) :} gestion des ressources d'infrastructure au moyen de \textbf{fichiers texte} décrivant l'\textbf{état attendu} (réseaux, VM, bases, stockage, règles de sécurité, identités, politiques). Ces fichiers sont \textbf{versionnés (Git), relus en revue de code, testés et appliqués de façon répétable}.
+\end{defbox}
+
+\begin{keybox}
+L'IaC ne consiste \textbf{pas seulement} à automatiser la création d'une ressource. Elle rend l'infrastructure \textbf{explicite, versionnée, auditable, reproductible et gouvernable} : l'infrastructure devient un \textbf{actif logiciel}.
+\end{keybox}
+
+\textbf{Bénéfices pour l'entreprise :}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Bénéfice & Explication \\
+Reproductibilité & Une même config appliquée à plusieurs environnements. \\
+Traçabilité & Changements suivis dans Git (auteur, date, justification, diff). \\
+Réduction des erreurs & Actions manuelles répétitives remplacées par des fichiers contrôlés. \\
+Standardisation & Modèles communs de réseau, sécurité, tags partagés par l'équipe. \\
+Vitesse de livraison & Environnements créés vite et \textbf{détruits proprement}. \\
+Auditabilité & Règles de sécurité et gouvernance \textbf{visibles dans le code}. \\
+Optimisation des coûts & Ressources faciles à inventorier, taguer, ajuster, supprimer. \\
+\end{ltable}
+
+\subsection{Terraform : principes et positionnement}
+
+\begin{defbox}
+\textbf{Terraform :} outil d'IaC \textbf{déclaratif}, \textbf{multi-cloud}, développé par \textbf{HashiCorp}. Il permet de \textbf{définir, prévisualiser et appliquer} des changements d'infrastructure. Configuration écrite en \textbf{HCL} (\emph{HashiCorp Configuration Language}).
+\end{defbox}
+
+\begin{defbox}
+\textbf{Déclaratif vs impératif :} \textbf{impératif} = décrire les \textbf{étapes à exécuter} (« crée un VNet, puis un subnet, puis attache un NSG »). \textbf{Déclaratif} = décrire l'\textbf{état final attendu} (« l'infrastructure doit contenir ce VNet, ces subnets, ce NSG »). \textbf{Terraform calcule lui-même} les actions nécessaires \arr{} d'où l'importance du \code{plan}.
+\end{defbox}
+
+\textbf{Multi-cloud :} le même outil pilote Azure, AWS, Google Cloud, Kubernetes, GitHub\dots via des \textbf{providers}.
+
+\subsection{Les providers Terraform}
+
+\begin{defbox}
+\textbf{Provider :} plugin qui sait dialoguer avec l'\textbf{API} d'une plateforme et \textbf{traduit} les ressources Terraform en appels concrets.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Provider Azure & Rôle \\
+\code{azurerm} & Provider \textbf{standard} pour Azure Resource Manager (RG, VNet, NSG, VM, LB, Storage). Choix prioritaire, lisible, documenté. \\
+\code{azapi} & Plus proche des API ARM (fonctionnalités récentes/spécifiques). \\
+\code{azuread} & Orienté identités Microsoft Entra ID. \\
+\code{random} & Génère des valeurs aléatoires (ex. suffixe unique d'un Storage Account). \\
+\end{ltable}
+
+\begin{tipbox}
+\textbf{Versionnage des providers} — opérateur pessimiste \texttt{\textasciitilde>} : \texttt{\textasciitilde> 4.0} autorise toutes les versions \code{4.x} mais \textbf{pas} la \code{5.0} (qui pourrait introduire des \emph{breaking changes}).
+\end{tipbox}
+
+\subsection{Le workflow Terraform}
+
+\begin{defbox}
+Cycle de vie d'un projet Terraform : \textbf{écrire \arr{} \code{init} \arr{} \code{fmt} \arr{} \code{validate} \arr{} \code{plan} \arr{} \code{apply} \arr{} (\code{destroy})}.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Commande (conceptuel) & Rôle \\
+\code{init} & Initialise le projet : télécharge les \textbf{providers}, configure le \textbf{backend}, crée \code{.terraform/}. \\
+\code{fmt} & \textbf{Formate} le code au style canonique HCL. \\
+\code{validate} & Vérifie la \textbf{syntaxe et la cohérence} (en local, sans contacter Azure). \\
+\code{plan} & \textbf{Prévisualise} les changements : compare l'état réel (via le \emph{state}) à la config souhaitée. \\
+\code{apply} & \textbf{Applique} les changements prévus. \\
+\code{destroy} & \textbf{Supprime} les ressources gérées (arrêter la facturation entre séances). \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{Symboles du plan} (à savoir lire) : \texttt{+} = ressource à \textbf{créer} ; \texttt{-} = ressource à \textbf{détruire} ; \texttt{\textasciitilde} = ressource à \textbf{modifier en place} (\emph{update in-place}) ; \texttt{-/+} = ressource à \textbf{remplacer} (destruction \textbf{puis} recréation — peut entraîner une interruption ou une perte de données locales).
+\end{defbox}
+
+\begin{keybox}
+Lire le \code{plan} avant l'\code{apply} est le garde-fou du modèle déclaratif. Une \textbf{destruction} ou un \textbf{remplacement} imprévu (\texttt{-/+}) dans le plan est un \textbf{signal d'alerte}.
+\end{keybox}
+
+\subsection{Le langage HCL : variables, locals, outputs}
+
+Un bloc HCL suit la forme \code{resource "type" "nom\_logique" \{ argument = "valeur" \}}. Le \textbf{nom logique} est interne au projet ($\neq$ nom Azure).
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[2,l,m] X[1.2,l,m]}
+Élément & Rôle & Métaphore \\
+Variable (d'entrée) & Paramètre configurable du projet (projet, région, taille VM, CIDR SSH). Évite le \textbf{codage en dur}. & Ce qui \textbf{entre} \\
+Local & Valeur \textbf{calculée} réutilisable (préfixe de nommage, tags communs). Principe \textbf{DRY}. & Ce qui est \textbf{calculé} \\
+Output (sortie) & Information \textbf{exposée après déploiement} (IP du LB, nom du RG), sans fouiller le portail. & Ce qui est \textbf{exposé} \\
+\end{ltable}
+
+\begin{tipbox}
+\code{terraform.tfvars} porte les \textbf{valeurs concrètes} d'un environnement. Il ne doit \textbf{jamais} contenir de secret en clair ni d'IP réelle versionnée \arr{} on l'\textbf{exclut du dépôt} (\code{.gitignore}) et on versionne un \code{terraform.tfvars.example} \textbf{anonymisé}.
+\end{tipbox}
+
+\subsection{\texorpdfstring{\texttt{count} et déploiement multiple}{count et déploiement multiple}}
+
+\begin{defbox}
+\textbf{\code{count} :} méta-argument créant \textbf{plusieurs exemplaires} d'une ressource, indexés par \code{count.index} (0, 1\dots). Permet de déployer N instances identiques \textbf{sans dupliquer le code} (DRY). Ex. : \code{count = 2} pour les 2 VM web.
+\end{defbox}
+
+\subsection{Le state Terraform}
+
+\begin{defbox}
+\textbf{State (\code{terraform.tfstate}) :} fichier (JSON) qui établit le \textbf{lien entre les ressources déclarées dans le code et les ressources réellement créées} dans Azure. C'est la \textbf{source de vérité} de Terraform sur ce qu'il gère. Sans state, Terraform ne sait plus quelles ressources il pilote.
+\end{defbox}
+
+\textbf{Risques du state local :} perte du fichier, conflits entre administrateurs, absence de verrouillage (corruption si \code{apply} simultanés), présence de \textbf{secrets en clair} (mots de passe, clés d'accès), difficile à intégrer en CI/CD.
+
+\begin{notebox}
+Le state \textbf{contient des données sensibles en clair} (ex. \code{admin\_password}, \code{primary\_access\_key}, \code{secret}) \textbf{et} l'inventaire complet de l'infrastructure \arr{} ne \textbf{jamais} le publier dans un dépôt non sécurisé. Le \code{.gitignore} empêche sa publication mais ne résout ni le partage, ni le verrouillage.
+\end{notebox}
+
+\begin{defbox}
+\textbf{Backend distant (state distant) :} stockage centralisé du state, sur Azure un \textbf{Storage Account + container Blob dédiés} (backend \code{azurerm}). Apporte : \textbf{partage} (équipe + CI/CD lisent le même state), \textbf{verrouillage} (un seul \code{apply} à la fois, via un \emph{lease} \arr{} pas de corruption), suppression du state des postes individuels. À \textbf{sécuriser} : RBAC, chiffrement, restrictions réseau, \textbf{clé séparée par environnement} (\code{shopeasy/dev/...}, \code{shopeasy/prod/...}).
+\end{defbox}
+
+\subsection{Le drift (dérive)}
+
+\begin{defbox}
+\textbf{Drift (dérive) :} écart entre l'\textbf{état réel} de l'infrastructure et l'\textbf{état décrit} dans le code Terraform. Se produit après une \textbf{modification manuelle} (portail) hors processus.
+\end{defbox}
+
+\begin{itemize}
+\item Au prochain \code{plan}, Terraform \textbf{détecte l'écart} et propose de \textbf{réaligner} sur le code.
+\item \textbf{Pourquoi c'est dangereux :} l'infrastructure devient \textbf{imprévisible}, la \textbf{sécurité s'affaiblit} (une règle ouverte à la main échappe à la revue), la \textbf{confiance dans le code} se perd, et un \code{apply} peut \textbf{annuler silencieusement} un correctif manuel.
+\item \textbf{Règle d'équipe :} tout changement passe \textbf{par le code} (modif \code{.tf} \arr{} \textbf{pull request} \arr{} revue \arr{} \code{plan} \arr{} \code{apply}). Le portail sert à \textbf{observer et diagnostiquer}, pas à modifier.
+\end{itemize}
+
+\subsection{Modules}
+
+\begin{defbox}
+\textbf{Module Terraform :} ensemble \textbf{réutilisable} de configurations (ex. module \code{network}, \code{compute}, \code{storage}). Factorise une logique commune réutilisable sur dev/recette/prod sans duplication. Un module doit être assez \textbf{générique} pour être réutilisable, sans être trop abstrait pour rester compréhensible.
+\end{defbox}
+
+\subsection{Dépendances et graphe}
+
+Terraform construit automatiquement un \textbf{graphe de dépendances} à partir des \textbf{références entre ressources} (ex. un VNet qui utilise \code{azurerm\_resource\_group.rg.name} dépend du RG \arr{} le RG est créé en premier). La plupart du temps les \textbf{dépendances implicites} suffisent ; \code{depends\_on} ne sert que lorsque la dépendance n'est pas visible dans les attributs.
+
+\begin{notebox}
+Un usage \textbf{excessif de \code{depends\_on}} masque souvent un mauvais découpage du code.
+\end{notebox}
+
+\subsection{Sécurité d'un projet Terraform}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Risque & Mesure corrective \\
+State exposé & Backend distant sécurisé, RBAC, chiffrement \\
+SSH ouvert à Internet & Filtrage par IP, Azure Bastion, désactivation du SSH public \\
+Secrets dans Git & \textbf{Key Vault}, variables d'environnement, variables CI sécurisées, scan (\code{gitleaks}) \\
+Droits trop larges & Identité Terraform au \textbf{moindre privilège} (pas Owner sur tout) \\
+Absence de tags & Politique de tagging obligatoire (Azure Policy) \\
+\end{ltable}
+
+\begin{tipbox}[Gestion des secrets]
+Jamais de secret dans les \code{.tf} ni dans un \code{tfvars} versionné. Utiliser \textbf{Azure Key Vault}, des \textbf{variables d'environnement}, des \textbf{variables sécurisées en CI/CD}, et pratiquer la \textbf{rotation} des identifiants.
+\end{tipbox}
+
+\subsection{Comparaison Terraform / ARM / Bicep / scripts}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m] X[l,m]}
+Outil & Forces & Limites & Cas d'usage \\
+Terraform & Multi-cloud, large écosystème, modules, \code{plan} lisible & Gestion rigoureuse du \textbf{state} & Standard IaC transverse, multi-cloud \\
+ARM Templates & Natif Azure, complet & Syntaxe \textbf{JSON verbeuse} & Déploiements proches de l'API \\
+Bicep & Natif Azure, \textbf{plus lisible} qu'ARM & Moins multi-cloud & Équipes centrées Azure \\
+Scripts CLI & Simples pour actions ponctuelles & Peu déclaratifs, peu reproductibles & Administration, dépannage \\
+\end{ltable}
+
+\subsection{Terraform, CI/CD et travail en équipe}
+
+\textbf{Workflow Git recommandé :} branche \arr{} modif \code{.tf} \arr{} \code{fmt} + \code{validate} \arr{} \code{plan} \arr{} \textbf{revue de code} \arr{} validation sécurité/FinOps \arr{} \code{apply} via pipeline contrôlé \arr{} archivage du plan et des logs.
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Rôle d'équipe & Responsabilité \\
+Développeur & Propose les changements applicatifs \\
+DevOps / Cloud Engineer & Structure le code Terraform, maintient les modules \\
+Architecte & Valide la cohérence avec les principes d'architecture \\
+RSSI / Sécurité & Vérifie droits, ouvertures réseau, protection des secrets \\
+FinOps & Suit coûts, tags, dérives budgétaires \\
+\end{ltable}
+
+\textbf{Validations automatiques en CI/CD :} \code{fmt -check}, \code{validate}, \code{tflint} (bonnes pratiques), \code{tfsec}/\code{checkov} (sécurité statique de l'IaC), \code{gitleaks} (secrets), \code{plan} sur chaque PR + approbation avant \code{apply}.
+
+\begin{keybox}
+\textbf{Résultat attendu d'un projet Terraform :} pas seulement « une infrastructure qui fonctionne », mais une infrastructure \textbf{décrite proprement, lisible, versionnable, sécurisée et maîtrisée dans son cycle de vie}.
+\end{keybox}
+
+% #####################################################################
+\section{Administration \& automatisation : CLI, Bash, Python (TP3)}
+
+\subsection{Du provisionnement à l'exploitation}
+
+\begin{defbox}
+\textbf{Provisionner $\neq$ exploiter.} Le \textbf{provisionnement} (TP1/TP2) crée les ressources (Terraform décrit l'état cible). L'\textbf{exploitation} (TP3) commence \textbf{après} le déploiement : administrer, inventorier, surveiller, automatiser, sécuriser et documenter au quotidien.
+\end{defbox}
+
+\begin{keybox}
+Une VM peut être \textbf{parfaitement déployée} (Terraform) et \textbf{mal exploitée} : pas de tag propriétaire, port SSH ouvert, aucune alerte CPU, aucune procédure d'arrêt, aucun suivi de coût. C'est précisément ce que traite l'exploitation.
+\end{keybox}
+
+\textbf{Familles d'actions d'exploitation :}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[1.4,l,m]}
+Famille & Objectif & Exemples \\
+Inventaire & Savoir ce qui existe & Lister ressources, exports CSV, tags \\
+Administration & Modifier/piloter & Start/stop VM, resize, update tags \\
+Supervision & Observer l'état & Azure Monitor, métriques, logs, alertes \\
+Automatisation & Réduire les actions manuelles & Scripts Bash, Python, runbooks planifiés \\
+Sécurité & Réduire l'exposition & RBAC, NSG, diagnostic settings, audit \\
+FinOps & Maîtriser les coûts & Budgets, tags, arrêt des VM, suppression des orphelins \\
+Documentation & Transmettre et pérenniser & Rapport d'exploitation, procédures, runbooks \\
+\end{ltable}
+
+\subsection{Azure CLI}
+
+\begin{defbox}
+\textbf{Azure CLI (\code{az}) :} outil en ligne de commande pour gérer les ressources Azure, depuis un poste, \textbf{Azure Cloud Shell} ou un pipeline CI/CD.
+\end{defbox}
+
+\textbf{Pourquoi la CLI plutôt que le portail pour une tâche répétitive ?} Une commande est \textbf{rejouable à l'identique}, \textbf{documentable}, \textbf{intégrable à un script} et exécutable dans un \textbf{pipeline}. Le portail est manuel, peu reproductible, difficile à tracer et source d'erreurs.
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Format de sortie & Usage \\
+JSON & Traitement programmatique, scripts, Python, \code{jq} \\
+Table & Lecture humaine rapide \\
+TSV & Extraction simple dans une variable Bash (sans guillemets ni en-tête) \\
+YAML / None & Lecture structurée / masquer la sortie \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{JMESPath (option \code{--query}) :} langage de \textbf{filtrage et transformation} des sorties JSON (sélectionner des champs, filtrer, renommer des colonnes). Ex. : ne lister que les VM en cours d'exécution, ou les ressources sans tag.
+\end{defbox}
+
+\subsection{Bash pour l'automatisation}
+
+Bash sert à \textbf{enchaîner des commandes}, factoriser des variables, contrôler les erreurs et produire des fichiers de sortie (inventaires, rapports, contrôles).
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Bonne pratique & Pourquoi \\
+\code{set -euo pipefail} & Arrêt sur erreur, variable non définie ou échec dans un pipe \\
+Variables centralisées & Éviter de répéter les noms de ressources ; rejouable ailleurs \\
+Paramétrage (\code{\$\{1:-défaut\}}) & Script réutilisable sur un autre environnement \\
+Vérification préalable & Sortie propre si la ressource n'existe pas \\
+Répertoires de sortie / horodatage & Conserver les rapports, ne pas écraser l'historique \\
+Messages explicites & Lisibilité par un autre membre de l'équipe \\
+Idempotence & Relances sans effet de bord indésirable \\
+Journalisation & Garder la \textbf{preuve} des contrôles/actions (audit) \\
+Pas d'action destructive sans confirmation & Garde-fou (refus sur un RG \code{*prod*}, confirmation avant \code{deallocate}) \\
+\end{ltable}
+
+\begin{tipbox}
+\textbf{Exemples de scripts d'exploitation ShopEasy :} \code{inventory.sh} (inventaire + synthèse), \code{vm-power.sh} (start/stop/deallocate/status avec garde-fous), \code{healthcheck.sh} (contrôle de santé renvoyant un \textbf{code de sortie} 0/1 exploitable en CI/cron).
+\end{tipbox}
+
+\subsection{Python et le SDK Azure}
+
+\begin{defbox}
+\textbf{SDK Azure pour Python :} bibliothèques permettant d'interagir par programme avec les services Azure. Python devient préférable à Bash quand le besoin dépasse l'enchaînement de commandes : \textbf{traitement structuré, croisement/enrichissement de données, appels API, génération de rapports, intégration} avec d'autres systèmes.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Bibliothèque & Rôle \\
+\code{azure-identity} & Authentification (\code{DefaultAzureCredential}) \\
+\code{azure-mgmt-resource} & Gestion des resource groups et ressources ARM \\
+\code{azure-mgmt-compute} & Gestion des machines virtuelles \\
+\code{azure-mgmt-monitor} & Accès à certaines fonctions de monitoring \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{\code{DefaultAzureCredential} :} chaîne d'authentification qui tente successivement plusieurs sources (variables d'environnement, \textbf{identité managée}, session \code{az login}\dots) pour obtenir un \textbf{token Microsoft Entra ID}, \textbf{sans coder de secret} dans le script.
+\end{defbox}
+
+\textbf{Bash ou Python ?} Bash pour enchaîner des commandes, contrôles rapides, exports bruts. \textbf{Python + SDK} pour enrichir/croiser des données, produire un format structuré (CSV/JSON), intégrer une API.
+
+\subsection{Runbook}
+
+\begin{defbox}
+\textbf{Runbook :} \textbf{procédure d'exploitation documentée} décrivant comment réaliser une action de façon fiable (démarrer/arrêter un environnement, vérifier la santé d'un service, restaurer un fichier, réagir à une alerte). L'ensemble des scripts du TP3 forme un \textbf{mini-runbook} permettant à une autre personne de reprendre l'administration \textbf{sans dépendre du portail}.
+\end{defbox}
+
+\subsection{Control-plane vs data-plane (RBAC du stockage)}
+
+\begin{defbox}
+\textbf{Control-plane vs data-plane :} Azure sépare la gestion \textbf{de} la ressource (créer/configurer un Storage Account via ARM = \emph{control-plane}) de l'accès \textbf{au contenu} de la ressource (lire/écrire des blobs = \emph{data-plane}).
+\end{defbox}
+
+\begin{notebox}
+Être \textbf{Owner} de l'abonnement donne les droits \emph{control-plane} mais \textbf{pas} \emph{data-plane}. Pour déposer un blob avec \code{--auth-mode login}, il faut un \textbf{rôle data-plane} précis (ex. \code{Storage Blob Data Contributor}) attribué \textbf{au scope du compte} — préférable à la clé d'accès partagée (\code{--auth-mode key}), secret à large portée non auditable par identité.
+\end{notebox}
+
+\subsection{IaC vs script d'exploitation}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+ & IaC (Terraform) & Script d'exploitation (Bash/Python) \\
+Nature & \textbf{Déclaratif} (état cible) & \textbf{Impératif} (actions ponctuelles) \\
+Rôle & \textbf{Construit} et fait évoluer l'infra & \textbf{Exploite} l'existant (inventaire, arrêt, contrôle) \\
+Exemple & Créer le VNet, les VM, le LB & Lister les VM, désallouer, vérifier la santé \\
+\end{ltable}
+
+\emph{L'un construit, l'autre administre.}
+
+% #####################################################################
+\section{Monitoring \& observabilité (TP3/TP4)}
+
+\subsection{Monitoring, observabilité, audit, sécurité}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[1.4,l,m]}
+Concept & Question centrale & Exemple ShopEasy \\
+Monitoring & \emph{Est-ce que ça fonctionne ?} & La CPU d'une VM dépasse 85\,\% \\
+Observabilité & \emph{Pourquoi ça ne fonctionne pas ?} & Les logs montrent une erreur de connexion à la base \\
+Audit & \emph{Qui a fait quoi ?} & Un utilisateur a modifié une règle réseau \\
+Sécurité & \emph{Le système est-il protégé ?} & Un port d'administration est exposé à Internet \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{Monitoring :} collecter et \textbf{surveiller des indicateurs prédéfinis} pour vérifier que le système fonctionne (\emph{si} ça marche). \textbf{Le monitoring constate.} \\
+\textbf{Observabilité :} \textbf{comprendre l'état interne} d'un système à partir des signaux qu'il produit (\emph{pourquoi} il se comporte ainsi). \textbf{L'observabilité explique.} Essentielle pour les architectures distribuées.
+\end{defbox}
+
+\subsection{Les trois signaux classiques}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+Signal & Définition & Exemple \\
+Métrique & Valeur \textbf{numérique} mesurée dans le temps & CPU \%, mémoire, latence, nombre de requêtes \\
+Log & \textbf{Événement textuel} détaillé produit par une ressource/app & Erreur applicative, changement de configuration \\
+Trace & Suivi d'une \textbf{requête à travers plusieurs composants} & Parcours d'une requête dans un système distribué \\
+\end{ltable}
+
+\begin{tipbox}
+Une \textbf{métrique} indique souvent qu'un problème existe ; un \textbf{log} aide à comprendre le contexte ; une \textbf{trace} suit le chemin d'une requête. \emph{Métriques} = numérique agrégé, alerte rapide sur seuil, coût prévisible ; \emph{logs} = événements détaillés, diagnostic, coût lié au volume ingéré.
+\end{tipbox}
+
+\subsection{Azure Monitor et ses composants}
+
+\begin{defbox}
+\textbf{Azure Monitor :} service \textbf{central de supervision} d'Azure. Il \textbf{collecte, analyse et exploite} métriques, logs et alertes des ressources, et alimente tableaux de bord et requêtes.
+\end{defbox}
+
+Chaîne conceptuelle : \textbf{Sources} (VM, SQL, Storage, VNet) \arr{} \textbf{Collecte} (metrics, logs, events) \arr{} \textbf{Analyse} (dashboards, requêtes, workbooks) \arr{} \textbf{Action} (alertes, tickets, corrections).
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Composant & Rôle \\
+Azure Monitor Metrics & Stockage/analyse de \textbf{métriques numériques} dans le temps \\
+Azure Monitor Logs & Centralisation/analyse de \textbf{logs} \\
+Log Analytics Workspace & Espace pour \textbf{stocker, interroger (KQL) et corréler} les logs \\
+Alert Rules & Règles déclenchées quand une \textbf{condition} est atteinte \\
+Action Groups & Destinataires/actions associés à une alerte \\
+Workbooks & Rapports interactifs (texte + visualisations + requêtes) \\
+Dashboards & Tableaux de bord synthétiques dans le portail \\
+Activity Log & Journal des \textbf{opérations de gestion} (voir §15) \\
+\end{ltable}
+
+\begin{defbox}
+\textbf{Log Analytics Workspace :} espace \textbf{centralisé} pour stocker, \textbf{interroger en KQL} (\emph{Kusto Query Language}) et \textbf{corréler} les logs/métriques de plusieurs ressources. Base de l'observabilité. SKU type \code{PerGB2018} (facturation à l'ingestion), rétention paramétrable (ex. 30 j en dev).
+\end{defbox}
+
+\begin{defbox}
+\textbf{Diagnostic settings :} configuration qui \textbf{exporte} les logs/métriques d'une ressource vers un workspace Log Analytics (ou Storage, Event Hub). Ex. ShopEasy : raccordement du \textbf{Storage} (transactions + logs blob) et de l'\textbf{Activity Log} au workspace.
+\end{defbox}
+
+\begin{tipbox}[Métriques de plateforme]
+Certaines métriques (CPU, réseau, disque, disponibilité) remontent \textbf{nativement, sans agent}. Les \textbf{logs invité} (syslog, logs Nginx) et compteurs mémoire/disque fins nécessitent l'\textbf{Azure Monitor Agent (AMA)} + une \textbf{Data Collection Rule (DCR)} pointant vers le workspace.
+\end{tipbox}
+
+\subsection{Construire une stratégie de monitoring}
+
+\begin{notebox}[Piège]
+Vouloir tout surveiller sans priorisation. Une stratégie efficace \textbf{commence par les objectifs métier et opérationnels}, pas par les courbes techniques.
+\end{notebox}
+
+\textbf{Question à se poser avant de créer une alerte :} \emph{« Si cette alerte se déclenche, une personne doit-elle \textbf{vraiment agir} ? »} Si non \arr{} c'est une \textbf{information de dashboard}, pas une alerte.
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+Axe & Indicateurs & Interprétation \\
+Disponibilité & État des VM, taux d'erreur HTTP, santé des backends LB & Indisponibilité / dégradation \\
+Performance & CPU, mémoire, disque, latence, temps de réponse & Saturation / sous-dimensionnement \\
+Capacité & Taille stockage, nombre de requêtes/connexions & Anticiper la croissance \\
+Sécurité & Connexions suspectes, changements IAM/RBAC, ports exposés & Comportements anormaux \\
+Coût & Coût par service/tag, budget consommé & Dérives financières \\
+Qualité d'exploitation & Nombre d'incidents, MTTR, alertes critiques & Efficacité opérationnelle \\
+\end{ltable}
+
+\subsection{SLI, SLO, SLA}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+Sigle & Définition & Exemple \\
+SLI (\emph{Service Level Indicator}) & \textbf{Indicateur} mesurable & Taux de disponibilité \\
+SLO (\emph{Service Level Objective}) & \textbf{Objectif interne} fixé sur un indicateur & 99,5\,\% de disponibilité/mois \\
+SLA (\emph{Service Level Agreement}) & \textbf{Engagement contractuel} avec un client/partenaire & 99,9\,\% garantis (pénalités si non respecté) \\
+\end{ltable}
+
+\subsection{Alertes et gestion des incidents}
+
+\begin{defbox}
+\textbf{Alerte :} signal \textbf{automatique} déclenché quand une \textbf{condition} (seuil) est franchie. Une bonne alerte doit être \textbf{actionnable} : associée à un \textbf{destinataire}, une \textbf{criticité} et une \textbf{procédure de traitement} (runbook).
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Élément & Description \\
+Condition & Situation qui déclenche (ex. CPU moyen > 80\,\%) \\
+Période / fenêtre & Durée d'évaluation (ex. 5 min) — \textbf{lisse} les pics transitoires \\
+Fréquence d'évaluation & Cadence de test de la condition (ex. 1 min) \\
+Sévérité & Niveau : Sev 0 (critique) \arr{} Sev 4 (information) \\
+Action Group & Qui/quoi est notifié (e-mail, SMS, webhook, ITSM) \\
+Runbook & Procédure de diagnostic et correction \\
+\end{ltable}
+
+\begin{tipbox}
+\textbf{Action Group :} définit \textbf{qui est notifié et comment}. \quad \textbf{Average} surveille une \textbf{charge soutenue} (CPU) ; \textbf{Maximum} capte un \textbf{pic instantané}. \quad \textbf{Baseline :} état normal de référence (CPU au repos $\approx$ 0,3\,\%) qui sert à \textbf{calibrer le seuil}. \quad \textbf{MTTR} (\emph{Mean Time To Repair}) : temps moyen de résolution — une procédure claire le \textbf{réduit}.
+\end{tipbox}
+
+\textbf{Cycle de gestion d'incident :} Détecter \arr{} Qualifier \arr{} Diagnostiquer \arr{} Corriger \arr{} Capitaliser.
+
+\subsection{La fatigue d'alerte}
+
+\begin{notebox}[Alert fatigue]
+\emph{« Trop d'alertes tue l'alerte. »} Des seuils \textbf{trop bas} \arr{} faux positifs \arr{} les équipes \textbf{ignorent} les notifications et \textbf{ratent} les vrais incidents.
+\end{notebox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Mauvais réglage & Conséquence \\
+Seuil trop bas / fenêtre trop courte & \textbf{Faux positifs}, fatigue d'alerte (ex. \code{CPU > 40 \%} sur 1 min se déclenche à chaque déploiement) \\
+Seuil trop haut / fenêtre trop longue & \textbf{Détection tardive} : on est prévenu une fois le service déjà dégradé (ex. \code{CPU > 98 \%} sur 30 min) \\
+Scope trop large & On ne sait pas \textbf{quelle} ressource est en cause \\
+\end{ltable}
+
+\textbf{Comment l'éviter :} distinguer les criticités (critique = action immédiate / avertissement = analyse / info = dashboard) ; calibrer sur la \textbf{baseline} + fenêtre de lissage ; n'alerter que sur l'\textbf{actionnable} ; regrouper via les Action Groups ; \textbf{réviser régulièrement} les règles.
+
+\subsection{Sonde synthétique \& disponibilité réelle}
+
+\begin{defbox}
+\textbf{Sonde de disponibilité synthétique (URL ping test) :} test \textbf{externe} qui interroge périodiquement le site (via l'IP du Load Balancer) et vérifie le \textbf{code 200 + le contenu + le temps de réponse}. Mesure la disponibilité \textbf{réellement perçue par l'utilisateur} (chaîne complète DNS \arr{} LB \arr{} VM \arr{} Nginx \arr{} réponse).
+\end{defbox}
+
+\begin{tipbox}
+La métrique \code{VmAvailabilityMetric = 1} indique seulement que la VM \textbf{tourne au niveau plateforme}, \textbf{pas} que le site répond correctement. Les métriques d'\textbf{infrastructure} (CPU, réseau, dispo plateforme) \textbf{ne suffisent pas} à diagnostiquer un incident \textbf{applicatif} (Nginx qui renvoie des 500, requête lente) \arr{} il faut des \textbf{logs applicatifs / codes HTTP / latence} (via AMA ou \textbf{Application Insights}).
+\end{tipbox}
+
+\subsection{Tableau de bord (dashboard)}
+
+\begin{defbox}
+\textbf{Dashboard d'exploitation :} vue \textbf{synthétique de pilotage} répondant aux questions de décision : \emph{le service fonctionne-t-il ? coûte-t-il trop cher ? est-il sécurisé ? que corriger en priorité ?} Il sert à \textbf{décider}, pas seulement à afficher des courbes. Pour une DSI : état des VM, CPU, trafic, stockage, \textbf{coûts}, \textbf{alertes récentes}, lien vers les \textbf{journaux}.
+\end{defbox}
+
+% #####################################################################
+\section{FinOps : maîtrise des coûts}
+
+\subsection{Définition}
+
+\begin{defbox}
+\textbf{FinOps :} discipline combinant \textbf{Finance, technologie et Opérations} pour \textbf{comprendre, piloter et optimiser les dépenses cloud}. Ce n'est \textbf{pas} seulement réduire les coûts : il s'agit de \textbf{maximiser la valeur} produite par les ressources consommées.
+\end{defbox}
+
+\begin{keybox}
+Le cloud rend la dépense \textbf{plus flexible} (OPEX) mais aussi \textbf{plus facile à disperser}. Sans tags, budgets, alertes et gouvernance, on ne sait plus \emph{qui consomme quoi, pourquoi et pour quelle valeur métier}.
+\end{keybox}
+
+\subsection{Les trois grands objectifs FinOps}
+
+\begin{enumerate}
+\item \textbf{Rendre les coûts visibles} — comprendre les dépenses par service, projet, équipe, environnement.
+\item \textbf{Responsabiliser les équipes} — associer la consommation à des usages et à des \textbf{propriétaires}.
+\item \textbf{Optimiser en continu} — ajuster ressources, architectures, modes de facturation et pratiques.
+\end{enumerate}
+
+\subsection{Réduction vs optimisation}
+
+\begin{defbox}
+\textbf{Réduire $\neq$ optimiser.} \textbf{Réduire} = baisser la dépense, parfois \textbf{au détriment du service} (supprimer, sous-dimensionner aveuglément). \textbf{Optimiser} = obtenir le \textbf{meilleur rapport valeur/coût} : bon dimensionnement, suppression du \textbf{gaspillage} (ressources oubliées, surdimensionnées, facturées à vide), choix du bon niveau de service, \textbf{sans dégrader la valeur métier}. La cible FinOps est l'\textbf{optimisation}.
+\end{defbox}
+
+\subsection{Outils Azure utiles au FinOps}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Outil & Rôle \\
+Azure Cost Management & Analyse, suivi et optimisation des coûts, \textbf{budgets}, alertes \\
+Azure Pricing Calculator & \textbf{Estimer} un coût \textbf{avant} déploiement \\
+Budgets & Définir un seuil financier + notifications \\
+Cost alerts & Notification lors de dépassements/anomalies \\
+Tags & Affecter les coûts par projet/app/équipe/environnement \\
+Reservations / Savings Plans & Réduction pour des usages \textbf{prévisibles} (engagement 1–3 ans) \\
+Azure Advisor & Recommandations (coût, sécurité, performance, fiabilité) \\
+\end{ltable}
+
+\subsection{Coût constaté vs coût prévisionnel}
+
+\begin{defbox}
+\textbf{Coût constaté :} dépense \textbf{réelle déjà facturée} (historique). N'apparaît qu'après \textbf{24–48 h} sur un abonnement récent. \\
+\textbf{Coût prévisionnel (\emph{forecast}) :} \textbf{projection} de la dépense à venir selon la tendance \arr{} \textbf{anticiper} un dépassement \textbf{avant} qu'il survienne.
+\end{defbox}
+
+\begin{tipbox}
+À défaut de coût constaté, on estime via l'\textbf{API Azure Retail Prices} (prix unitaires officiels). Ex. ShopEasy : \code{Standard\_B2ats\_v2} $\approx$ 0,00972 \$/h.
+\end{tipbox}
+
+\subsection{Pièges de coût : ressources facturées à vide \& orphelines}
+
+\begin{notebox}
+Certaines ressources facturent \textbf{même à trafic nul} : \textbf{Load Balancer}, \textbf{IP publiques statiques}, \textbf{disques managés}, \textbf{base provisionnée}. Seul le \textbf{compute d'une VM} est élastique (annulable par \textbf{désallocation}).
+\end{notebox}
+
+\begin{defbox}
+\textbf{Ressource orpheline :} ressource facturée mais \textbf{non utilisée} (disque non attaché, IP publique non associée). À détecter et supprimer (« coûts invisibles »).
+\end{defbox}
+
+\textbf{Exemple chiffré ShopEasy} ($\approx$ 47 \$/mois en 24/7) : Load Balancer ($\sim$ 39\,\%) + compute 2 VM ($\sim$ 30\,\%) + 3 IP publiques ($\sim$ 23\,\%) = \textbf{$\sim$ 92\,\%} du coût.
+
+\subsection{Leviers d'optimisation FinOps}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m]}
+Levier & Effet & Limite \\
+Désallouer les VM hors usage & Annule le coût compute & Indisponibilité de l'environnement \\
+Détruire l'environnement entre séances (\code{terraform destroy}) & Coût \arr{} $\approx$ 0, recréable à l'identique & Environnements non permanents \\
+Réduire les IP publiques (Bastion) & Économie + surface d'attaque réduite & Plus d'accès web direct par VM \\
+Dimensionner correctement & Évite le surdimensionnement & Surveiller \code{CPU Credits} avant downsize d'un burstable \\
+Lifecycle policy sur le Blob & Plafonne l'accumulation des versions & — \\
+Réservations / Savings Plans & Réduction sur usage stable & Engagement \\
+Tags + budgets + alertes & Imputation + détection des dérives & Le budget \textbf{alerte mais ne bloque pas} la dépense \\
+\end{ltable}
+
+\begin{notebox}
+Un \textbf{budget Azure ne remplace pas une gouvernance} : il alerte sur un montant mais ne dit pas \textbf{quelle} ressource est en cause, \textbf{qui} est responsable, ni laquelle peut être arrêtée. Sans \textbf{tags} et organisation, on voit la dérive sans pouvoir agir.
+\end{notebox}
+
+% #####################################################################
+\section{Sécurité cloud (TP4)}
+
+\subsection{Le modèle de responsabilité partagée}
+
+\begin{defbox}
+\textbf{Responsabilité partagée :} dans le cloud, la sécurité est \textbf{partagée} entre le fournisseur et le client.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Responsabilité & Périmètre \\
+Fournisseur cloud (Microsoft) & Datacenters, matériel, hyperviseur, disponibilité des services Azure, sécurité physique \\
+Client & Comptes, \textbf{rôles}, \textbf{données}, \textbf{configuration réseau}, \textbf{chiffrement}, \textbf{journalisation}, gouvernance \\
+Partagé & Mises à jour, supervision, continuité — selon le service (IaaS > PaaS > SaaS) \\
+\end{ltable}
+
+\begin{keybox}
+\textbf{Utiliser Azure ne rend pas une application sécurisée automatiquement.} Une mauvaise configuration IAM, un stockage public ou un port d'administration ouvert introduisent des \textbf{risques majeurs}. La sécurité est de la responsabilité du client sur \textbf{ce qu'il administre}.
+\end{keybox}
+
+\subsection{Identité et accès}
+
+La sécurité cloud \textbf{commence par l'identité} : Microsoft Entra ID + RBAC gèrent \textbf{qui peut accéder à quoi avec quels droits}.
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Notion & Rôle \\
+Utilisateur & Personne physique ou compte associé \\
+Groupe & Ensemble d'utilisateurs aux droits communs \\
+Rôle RBAC & Ensemble d'autorisations (Owner/Contributor/Reader) \\
+Scope & Niveau d'application des droits (MG / subscription / RG / resource) \\
+\end{ltable}
+
+\arr{} \textbf{Moindre privilège} (§9.2), \textbf{comptes nominatifs}, \textbf{MFA}, \textbf{revue des rôles}.
+
+\subsection{Sécurité réseau}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Bonne pratique & Justification \\
+Fermer les ports inutiles & Réduit la surface d'attaque \\
+Limiter SSH/RDP à des IP autorisées (ou Bastion) & Évite l'administration exposée publiquement \\
+Isoler les bases de données & Une base ne doit pas être joignable directement depuis Internet \\
+Segmenter les subnets & Sépare web / applicatif / données (mouvements latéraux limités) \\
+Journaliser les changements & Facilite l'audit et l'investigation \\
+\end{ltable}
+
+\subsection{Microsoft Defender for Cloud}
+
+\begin{defbox}
+\textbf{Microsoft Defender for Cloud :} service de \textbf{gestion de la posture de sécurité (CSPM)} et de \textbf{protection des charges de travail (CWP)}. Analyse la posture, propose des recommandations et protège les workloads.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Concept & Définition \\
+Secure Score & Indicateur \textbf{synthétique} de la posture de sécurité \\
+Recommendations & Actions proposées pour corriger les faiblesses \\
+Regulatory compliance & Suivi de conformité selon des cadres (CIS, ISO\dots) \\
+Workload protection & Protections avancées selon les services (servers, storage, SQL\dots) \\
+\end{ltable}
+
+\begin{keybox}
+\textbf{Une recommandation de sécurité doit être traduite en action.} Toutes ne se valent pas : on les \textbf{priorise} selon l'exposition de la ressource, la sensibilité des données, le coût de correction, l'impact opérationnel, les exigences de conformité et la criticité métier. Une DSI attend une \textbf{priorisation}, pas une liste brute de problèmes.
+\end{keybox}
+
+\subsection{Chiffrement}
+
+\begin{defbox}
+\textbf{Chiffrement au repos} (données stockées, ex. SSE/TDE) et \textbf{en transit} (HTTPS/TLS 1.2). Activé par défaut sur de nombreux services Azure.
+\end{defbox}
+
+\begin{notebox}
+\textbf{Le chiffrement ne suffit pas} à sécuriser une ressource. Il protège les données au repos et en transit, mais \textbf{pas} contre un \textbf{accès public} mal configuré, des \textbf{droits excessifs}, un \textbf{port exposé} ou l'\textbf{absence de logs}. La sécurité est \textbf{multi-couches} : réseau, identité, configuration, audit — le chiffrement n'en est qu'une.
+\end{notebox}
+
+\subsection{Risques typiques (cas ShopEasy) et mesures}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[1.3,l,m]}
+Risque & Impact & Mesure corrective \\
+SSH ouvert à Internet & Intrusion, force brute, compromission VM & Restreindre à l'IP admin, \textbf{Azure Bastion}, MFA, \emph{just-in-time} \\
+Base de données exposée & Vol/altération des données & Accès privé, \textbf{Private Endpoint}, pare-feu fermé, comptes limités \\
+Stockage public & Fuite de documents (RGPD) & \code{allowBlobPublicAccess=false}, RBAC/SAS limités \\
+Droits trop larges (Owner) & Erreur/compromission à fort impact & \textbf{RBAC moindre privilège}, revue, MFA, PIM \\
+Absence de logs/alertes & Incidents non détectés & Azure Monitor, Activity Log, diagnostic settings, Defender \\
+Defender non activé & Pas de détection ni de posture & Activer les plans Defender (CSPM, servers, storage) \\
+MAJ système non vérifiées & Vulnérabilités non corrigées & \textbf{Azure Update Manager} \\
+\end{ltable}
+
+% #####################################################################
+\section{Audit, traçabilité \& gouvernance avancée}
+
+\subsection{Pourquoi auditer ?}
+
+L'audit répond aux questions : \emph{Qui a modifié cette ressource ? Quand un changement a-t-il eu lieu ? Quelle action a provoqué un incident ? Les ressources critiques sont-elles correctement journalisées ? Peut-on \textbf{prouver} qu'une mesure de sécurité existe ?}
+
+\subsection{Sources de traces dans Azure}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Source & Utilité \\
+Activity Log & Opérations de \textbf{gestion} sur les ressources Azure (\emph{control-plane}) \\
+Resource Logs & Logs spécifiques produits par certains services (\emph{data-plane}) \\
+Entra ID logs & Connexions, identités, activités liées aux comptes \\
+Diagnostic settings & Export des logs vers Log Analytics / Storage / Event Hub \\
+Defender for Cloud & Alertes et recommandations de sécurité \\
+Azure Policy & Conformité des ressources aux règles de gouvernance \\
+\end{ltable}
+
+\subsection{L'Activity Log}
+
+\begin{defbox}
+\textbf{Activity Log (journal d'activité) :} journal des \textbf{opérations de gestion} réalisées sur les ressources via ARM (création, modification, suppression, changement de droits). Il trace \textbf{qui} (auteur), \textbf{quoi} (opération), \textbf{quand} (horodatage) et \textbf{avec quel résultat} (\emph{Started}/\emph{Succeeded}/\emph{Failed}). C'est la \textbf{source de vérité} des changements d'infrastructure.
+\end{defbox}
+
+\begin{defbox}
+\textbf{Log technique vs log d'activité :} \textbf{log technique} (système/applicatif : syslog, logs Nginx) \arr{} décrit le \textbf{fonctionnement interne} d'une ressource/app (\emph{data-plane}) — « ce que fait l'application ». \textbf{Log d'activité} (Activity Log) \arr{} trace les \textbf{opérations de gestion} sur l'infrastructure (\emph{control-plane}) — « ce que l'on fait à l'infrastructure ».
+\end{defbox}
+
+\begin{tipbox}
+L'Activity Log trace aussi les \textbf{échecs} (\emph{Failed}), précieux pour \textbf{diagnostiquer} une opération qui n'a pas abouti. Centraliser l'Activity Log dans Log Analytics permet des \textbf{requêtes KQL}, des \textbf{alertes} sur opérations sensibles (RBAC, NSG, suppressions), des \textbf{revues périodiques} et un \textbf{reporting de conformité}.
+\end{tipbox}
+
+\subsection{Notion de preuve}
+
+\begin{defbox}
+\textbf{Preuve d'exploitation :} en contexte professionnel, il ne suffit \textbf{pas de dire} qu'une ressource est sécurisée — il faut pouvoir le \textbf{démontrer}. Preuves possibles : capture de configuration, export de logs, tableau de bord, rapport d'audit, historique d'activité, règle Azure Policy, preuve de revue d'accès.
+\end{defbox}
+
+\begin{tipbox}[Information parfois manquante pour reconstituer un incident]
+Le \textbf{contexte applicatif} (le « pourquoi »), les \textbf{logs invité/applicatifs non centralisés}, l'\textbf{intention} derrière une action, les \textbf{accès data-plane}, et la \textbf{corrélation temporelle} entre un changement et un symptôme. \arr{} D'où l'intérêt de \textbf{centraliser} logs d'activité \textbf{et} logs techniques dans un même workspace.
+\end{tipbox}
+
+% #####################################################################
+\section{Disponibilité, résilience \& analyse de risques}
+
+\subsection{Notions clés de résilience}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Notion & Définition \\
+SPOF (\emph{Single Point Of Failure}) & \textbf{Point de défaillance unique} : composant dont la panne arrête tout le système (ex. serveur unique ShopEasy). \\
+RPO (\emph{Recovery Point Objective}) & \textbf{Perte de données maximale acceptable} (en temps) \arr{} dépend de la fréquence des sauvegardes. \\
+RTO (\emph{Recovery Time Objective}) & \textbf{Temps de reprise maximal acceptable} après un incident. \\
+MTTR (\emph{Mean Time To Repair}) & Temps moyen de résolution d'un incident. \\
+Redondance & Duplication de composants pour tolérer une panne (ex. 2 VM + LB). \\
+Application sans état (\emph{stateless}) & App ne stockant pas de session locale \arr{} répartition de charge transparente. \\
+\end{ltable}
+
+\begin{keybox}
+Supprimer un \textbf{SPOF} applicatif = déployer \textbf{plusieurs instances} derrière un \textbf{Load Balancer} avec \textbf{sonde de santé}. Pour une vraie résilience : ajouter le \textbf{multi-zone} (Availability Zones), une base \textbf{hautement disponible} (failover group), un stockage \textbf{redondé} (ZRS/GRS), des \textbf{sauvegardes testées} et des objectifs \textbf{RPO/RTO} définis.
+\end{keybox}
+
+\subsection{Analyse de scénarios d'incident (ShopEasy)}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[1.3,l,m] X[1.5,l,m]}
+Scénario & Impact & Réponse attendue \\
+Une VM web tombe & Service continue sur l'autre VM (sonde la retire), capacité ÷ 2 & Plusieurs VM + LB + sonde \textbf{(déjà couvert)} ; multi-zone + autoscale pour aller plus loin \\
+Le Load Balancer est mal configuré & Trafic mal routé/rejeté même si les VM sont saines & Vérifier sonde/règle/pool, \textbf{IaC} pour une config reproductible, alertes sur la santé du LB \\
+La base devient indisponible & Erreurs fonctionnelles malgré un web disponible & Niveau SQL avec \textbf{HA/SLA}, \textbf{PITR}, failover group, monitoring SQL \\
+Le Storage est mal configuré & Documents inaccessibles ou \textbf{exposés} & Accès privé, versioning + soft-delete, Private Endpoint, alertes \\
+Une zone est indisponible & Perte simultanée si les VM sont dans le même datacenter & \textbf{Déploiement multi-zone} + LB zone-redundant \\
+\end{ltable}
+
+\subsection{Matrice de risques (méthode)}
+
+\begin{defbox}
+\textbf{Analyse de risques :} identifier les \textbf{scénarios défavorables}, estimer leur \textbf{probabilité} et leur \textbf{impact}, proposer une \textbf{mesure corrective}, et \textbf{prioriser}.
+\end{defbox}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Priorité & Critère \\
+Haute & Risque de compromission, indisponibilité majeure, coût important imminent \\
+Moyenne & Amélioration nécessaire mais sans urgence immédiate \\
+Basse & Optimisation utile mais non bloquante \\
+\end{ltable}
+
+% #####################################################################
+\section{Méthodologie : choix de services \& note DSI}
+
+\subsection{Partir du besoin, pas du service}
+
+\begin{keybox}
+Un bon architecte \textbf{ne commence pas par choisir des services}. Il part des \textbf{besoins} : qui utilise l'application ? quelles données ? quels niveaux de disponibilité attendus ? quelles contraintes de sécurité ? quel budget acceptable ?
+\end{keybox}
+
+\textbf{Questions de cadrage (par besoin) :} \emph{Quelle fonction doit être rendue ? Quel niveau de service attendu ? Quelle responsabilité voulons-nous garder ? Quel risque réduire ? Quel coût accepter ?}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m] X[l,m] X[l,m]}
+Besoin & Option simple & Option cible & Critère de choix \\
+Application web & VM & App Service ou VM + LB & Contrôle, migration, exploitation \\
+Base SQL & SQL sur VM & \textbf{Azure SQL Database} & Administration, sauvegarde, disponibilité \\
+Documents & Disque VM & \textbf{Storage Account} & Durabilité, partage, versioning \\
+Accès admin & SSH public & \textbf{Bastion} / restriction IP & Sécurité et audit \\
+Monitoring & Aucun & \textbf{Azure Monitor} & Exploitabilité \\
+Coûts & Estimation manuelle & \textbf{Pricing Calculator + Budget} & Gouvernance FinOps \\
+\end{ltable}
+
+\subsection{Lecture critique d'une architecture}
+
+Questions de revue : les ressources exposées à Internet sont-elles identifiées ? la base est-elle protégée des accès directs ? existe-t-il une supervision ? les coûts sont-ils estimés et attribuables ? l'architecture a-t-elle un \textbf{SPOF} ? les droits d'administration sont-ils limités ? les données importantes sont-elles sauvegardées/versionnées ? les choix sont-ils justifiés par le \textbf{besoin métier} ?
+
+\subsection{La note de recommandations DSI}
+
+\begin{defbox}
+\textbf{Note DSI :} document de \textbf{décision} à destination de la Direction des Systèmes d'Information. Elle ne se limite \textbf{pas} à une liste de services techniques : elle relie \textbf{constats techniques}, \textbf{impacts métier}, \textbf{risques}, \textbf{coûts} et \textbf{priorités}. Une DSI attend une décision \textbf{argumentée, lisible et priorisée}.
+\end{defbox}
+
+\textbf{Structure recommandée :} (1) Contexte (situation, limites, enjeux métier) ; (2) Constats / état actuel ; (3) Risques (techniques, financiers, sécurité) ; (4) Recommandations (actions, priorité, justification) ; (5) Plan d'action (court / moyen / long terme) ; (6) Indicateurs de suivi ; (7) Conclusion.
+
+\subsection{Les 4 piliers d'une plateforme cloud mature}
+
+\begin{keybox}
+Une plateforme Azure mature repose sur \textbf{4 piliers opérationnels} : \textbf{Observabilité}, \textbf{FinOps}, \textbf{Sécurité} et \textbf{Gouvernance}. Ils transforment une architecture \textbf{technique} en un \textbf{système d'information exploitable} par une organisation. \emph{Une infrastructure cloud n'est pas prête pour la production si elle n'est pas surveillée, auditée, gouvernée et optimisée.}
+\end{keybox}
+
+% #####################################################################
+\section{Annexes}
+
+\subsection{Correspondance conceptuelle AWS $\leftrightarrow$ Azure}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+AWS & Azure \\
+VPC & \textbf{Virtual Network (VNet)} \\
+Subnet & \textbf{Subnet} \\
+Security Group & \textbf{Network Security Group (NSG)} \\
+EC2 & \textbf{Virtual Machine} \\
+Elastic Load Balancing & \textbf{Azure Load Balancer / Application Gateway} \\
+S3 & \textbf{Storage Account / Blob Storage} \\
+RDS & \textbf{Azure SQL Database / Azure Database for MySQL-PostgreSQL} \\
+IAM & \textbf{Microsoft Entra ID + RBAC + Managed Identities} \\
+CloudWatch & \textbf{Azure Monitor} \\
+AWS Pricing Calculator & \textbf{Azure Pricing Calculator} \\
+CloudFormation & \textbf{ARM Templates / Bicep} (Terraform = multi-cloud) \\
+\end{ltable}
+
+\subsection{Récapitulatif des services Azure du projet}
+
+\begin{ltable}{Q[l,m,font=\bfseries] Q[l,m] Q[l,m] X[l,m]}
+Service & Catégorie & Modèle & Rôle dans ShopEasy \\
+Resource Group & Organisation & Gouvernance & Cycle de vie commun, droits, coûts \\
+Virtual Network + Subnets & Réseau & IaaS & Réseau privé isolé, segmentation \\
+Network Security Group & Réseau/Séc. & IaaS & Filtrage des flux (80/443/22/1433) \\
+Azure Load Balancer & Réseau & IaaS & Répartition de charge L4 + sonde \\
+Application Gateway & Réseau & IaaS & (Cible prod) L7 + TLS + WAF \\
+Azure Bastion & Réseau/Séc. & PaaS & Accès SSH/RDP sans IP publique \\
+Virtual Machines & Calcul & IaaS & 2 serveurs web (Nginx) redondants \\
+Azure App Service & Calcul & PaaS & (Alternative) hébergement web managé \\
+Storage Account (Blob) & Stockage & PaaS & Documents clients, exports, archives \\
+Azure SQL Database & Données & PaaS & Base relationnelle managée \\
+Microsoft Entra ID + RBAC & Identité & Gouvernance & Identités, droits, moindre privilège \\
+Azure Monitor & Observabilité & Gouvernance & Métriques, logs, alertes, dashboards \\
+Log Analytics Workspace & Observabilité & Gouvernance & Centralisation et requêtes KQL \\
+Azure Cost Management & FinOps & Gouvernance & Suivi, budgets, alertes de coût \\
+Microsoft Defender for Cloud & Sécurité & Gouvernance & Posture, recommandations, Secure Score \\
+Azure Policy & Gouvernance & Gouvernance & Imposer/auditer des règles \\
+Terraform & IaC & Outil & Décrire l'infra en code (déclaratif) \\
+Azure CLI / SDK Python & Administration & Outil & Exploiter, automatiser, inventorier \\
+\end{ltable}
+
+\subsection{Glossaire des termes et sigles}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Terme / sigle & Définition \\
+Availability Zone (AZ) & Datacenter(s) physiquement séparé(s) au sein d'une région (résilience) \\
+Backend pool & Ensemble des instances cibles d'un Load Balancer \\
+Baseline & État normal de référence d'une métrique (calibrage des seuils) \\
+Bicep & Langage IaC natif Azure, plus lisible qu'ARM \\
+Blob Storage & Stockage objet pour fichiers non structurés \\
+CAPEX / OPEX & Dépense d'investissement / d'exploitation \\
+CIDR & Notation des plages d'adresses IP (ex. \code{10.10.0.0/16}) \\
+Cloud-init & Provisionnement automatique au 1\textsuperscript{er} démarrage d'une VM Linux \\
+Control-plane / data-plane & Gérer la ressource (ARM) / accéder à son contenu \\
+CSPM & \emph{Cloud Security Posture Management} (posture de sécurité) \\
+DefaultAzureCredential & Chaîne d'authentification SDK sans secret en dur \\
+DRY & \emph{Don't Repeat Yourself} (ne pas dupliquer le code) \\
+Drift & Écart entre l'état réel et le code IaC \\
+DTU / vCore & Modèles d'achat de capacité Azure SQL \\
+Élasticité & Capacité d'ajuster les ressources à la demande \\
+FinOps & Discipline de pilotage et d'optimisation des coûts cloud \\
+HCL & \emph{HashiCorp Configuration Language} (langage Terraform) \\
+IaaS / PaaS / SaaS & Infrastructure / Platform / Software as a Service \\
+IaC & \emph{Infrastructure as Code} \\
+JMESPath & Langage de requête des sorties JSON (\code{--query}) \\
+KQL & \emph{Kusto Query Language} (requêtes Log Analytics) \\
+Load Balancer & Répartiteur de trafic (couche 4) \\
+LRS / ZRS / GRS & Redondance locale / de zone / géographique \\
+Managed Identity & Identité Azure gérée, sans secret, pour l'authentification de services \\
+MFA & \emph{Multi-Factor Authentication} \\
+Moindre privilège & N'accorder que les droits strictement nécessaires \\
+\end{ltable}
+
+\begin{ltable}{Q[l,m,font=\bfseries] X[l,m]}
+Terme / sigle & Définition \\
+MTTR & Temps moyen de résolution d'un incident \\
+NSG & \emph{Network Security Group} (filtrage réseau) \\
+Observabilité & Comprendre le « pourquoi » d'un comportement système \\
+PIM & \emph{Privileged Identity Management} (élévation temporaire de droits) \\
+PITR & \emph{Point-In-Time Restore} (restauration à un instant donné) \\
+Private Endpoint & Accès privé à un service PaaS via une IP du VNet \\
+Provider & Plugin Terraform pilotant une plateforme (ex. \code{azurerm}) \\
+RBAC & \emph{Role-Based Access Control} (droits par rôle) \\
+Region & Zone géographique de déploiement \\
+Resource Group & Conteneur logique de ressources (cycle de vie commun) \\
+RGPD & Règlement général sur la protection des données \\
+RPO / RTO & Perte de données / temps de reprise maximaux acceptables \\
+Runbook & Procédure d'exploitation documentée \\
+SAS & \emph{Shared Access Signature} (jeton d'accès à durée limitée au stockage) \\
+Secure Score & Indicateur synthétique de posture (Defender) \\
+SLI / SLO / SLA & Indicateur / objectif interne / engagement contractuel de niveau de service \\
+SPOF & \emph{Single Point Of Failure} (point de défaillance unique) \\
+SSE / TDE & Chiffrement au repos (Storage / SQL) \\
+State (tfstate) & Lien entre code Terraform et ressources réelles \\
+Subnet & Sous-réseau d'un VNet \\
+Tag & Métadonnée clé=valeur de gouvernance \\
+Tenant & Annuaire d'identité (Entra ID) \\
+Terraform & Outil IaC déclaratif multi-cloud (HashiCorp) \\
+VNet & \emph{Virtual Network} (réseau privé Azure) \\
+WAF & \emph{Web Application Firewall} (pare-feu applicatif L7) \\
+Well-Architected Framework & Cadre d'évaluation d'architecture (5 piliers) \\
+\end{ltable}
+
+\subsection{Banque de questions-réponses type (révision)}
+
+\subsubsection{A — Cloud, modèles \& Azure de base}
+\qa{1}{Qu'est-ce que le cloud computing ?}{Un modèle de fourniture de ressources informatiques à la demande, via le réseau, configurables, mesurables et facturées à l'usage.}
+\qa{2}{Citez les propriétés fondamentales du cloud.}{Élasticité, facturation à l'usage, automatisation, services managés.}
+\qa{3}{Différence CAPEX / OPEX ?}{CAPEX = investissement (achat) ; OPEX = dépense d'exploitation récurrente à l'usage (modèle cloud).}
+\qa{4}{Différence IaaS / PaaS / SaaS ?}{Niveau d'abstraction croissant : IaaS = infrastructure (VM, réseau) ; PaaS = plateforme managée (App Service, Azure SQL) ; SaaS = logiciel complet (M365).}
+\qa{5}{Azure SQL Database : IaaS ou PaaS ?}{PaaS.}
+\qa{6}{Que signifie PaaS ?}{\emph{Platform as a Service}.}
+\qa{7}{Rôle d'un Resource Group ?}{Regrouper des ressources à cycle de vie commun pour les administrer, sécuriser (RBAC), taguer, suivre en coût et supprimer ensemble.}
+\qa{8}{Différence région / zone de disponibilité ?}{Région = zone géographique ; zone de disponibilité = datacenters physiquement séparés au sein d'une région.}
+\qa{9}{Les 5 piliers du Well-Architected Framework ?}{Fiabilité, Sécurité, Optimisation des coûts, Excellence opérationnelle, Efficacité des performances.}
+
+\subsubsection{B — Réseau \& disponibilité}
+\qa{10}{Quel service crée un réseau privé logique ?}{Azure Virtual Network (VNet).}
+\qa{11}{À quoi sert un NSG ?}{Filtrer le trafic réseau entrant/sortant (par port, protocole, source/destination, priorité).}
+\qa{12}{Pourquoi plusieurs subnets ?}{Séparer les rôles (web/données/admin) et appliquer des règles de sécurité différentes (cloisonnement, moindre privilège réseau).}
+\qa{13}{Pourquoi ne pas ouvrir SSH à tout Internet ?}{Pour réduire la surface d'attaque (scans, force brute) ; restreindre à l'IP admin ou via Bastion.}
+\qa{14}{Pourquoi ne pas exposer le port SQL (1433) à Internet ?}{La base contient des données sensibles ; l'exposer en fait une cible. Accès depuis le subnet web uniquement / Private Endpoint.}
+\qa{15}{Différence règle entrante / sortante ?}{Inbound filtre le trafic arrivant vers la ressource ; Outbound filtre le trafic qui en part. Évalués séparément.}
+\qa{16}{Différence Load Balancer / Application Gateway ?}{LB = couche 4 (TCP/UDP), simple ; App Gateway = couche 7 (HTTP/HTTPS) avec routage applicatif, terminaison TLS et WAF.}
+\qa{17}{À quoi sert un répartiteur de charge ?}{Distribuer le trafic sur plusieurs instances derrière un point d'entrée unique \arr{} disponibilité + montée en charge.}
+\qa{18}{Pourquoi une sonde de santé ?}{Pour ne router que vers les instances saines : elle retire automatiquement une VM défaillante et la réintègre quand elle répond.}
+\qa{19}{Mesure pour réduire l'impact d'une panne de VM ?}{Plusieurs VM derrière un Load Balancer avec sonde (+ multi-zone).}
+\qa{20}{Pourquoi le multi-zone améliore la disponibilité ?}{Les zones sont des datacenters physiquement séparés ; une panne locale n'affecte qu'une zone.}
+
+\subsubsection{C — Stockage \& base de données}
+\qa{21}{Quel service remplace le stockage local de documents ?}{Azure Storage Account (Blob Storage).}
+\qa{22}{Pourquoi le stockage objet plutôt qu'un disque local de VM ?}{Durabilité/redondance, découplage des VM, scalabilité, accès partagé, fonctions intégrées (versioning, lifecycle).}
+\qa{23}{Pourquoi éviter un conteneur public par défaut ?}{Risque de fuite de données (documents clients, RGPD) ; accès doit être privé/authentifié.}
+\qa{24}{Intérêt du versioning ?}{Conserver chaque version d'un blob \arr{} restaurer après écrasement/suppression ; couplé au soft-delete.}
+\qa{25}{Pourquoi le versioning peut-il augmenter les coûts ?}{Les anciennes versions s'accumulent et sont facturées comme du stockage ; à plafonner via lifecycle policy.}
+\qa{26}{Quel service remplace une base SQL sur serveur ?}{Azure SQL Database (PaaS managée).}
+\qa{27}{Avantages d'Azure SQL vs SQL sur VM ?}{Pas d'administration OS, sauvegardes automatiques (PITR), HA intégrée, patchs auto, TDE par défaut.}
+
+\subsubsection{D — Identité, gouvernance, tags}
+\qa{28}{Que signifie RBAC ?}{\emph{Role-Based Access Control} : attribution de droits par rôle sur un scope.}
+\qa{29}{Principe du moindre privilège ?}{N'accorder que les droits strictement nécessaires, le temps nécessaire.}
+\qa{30}{Pourquoi le rôle Owner pour tous est une erreur ?}{Droits trop larges \arr{} impact majeur en cas d'erreur/compromission. Préférer Reader/Contributor + MFA.}
+\qa{31}{Risque d'un compte administrateur partagé ?}{Perte de traçabilité/imputabilité, révocation difficile, droits trop larges.}
+\qa{32}{Pourquoi taguer les ressources ?}{Imputer les coûts, identifier le responsable, filtrer, automatiser la gouvernance (FinOps + Policy).}
+\qa{33}{À quoi sert Azure Policy ?}{Imposer ou auditer des règles de configuration (ex. refuser une ressource sans tag Owner).}
+
+\subsubsection{E — Terraform / IaC}
+\qa{34}{Terraform est-il impératif ou déclaratif ?}{Déclaratif : on décrit l'état final ; Terraform calcule les actions. D'où l'importance du \code{plan}.}
+\qa{35}{Rôle d'un provider ?}{Plugin qui traduit les ressources Terraform en appels à l'API d'une plateforme (\code{azurerm} pour Azure).}
+\qa{36}{À quoi sert le state (\code{tfstate}) ?}{Lier le code aux ressources réelles ; source de vérité de ce que Terraform gère.}
+\qa{37}{Pourquoi \code{plan} avant \code{apply} ?}{Prévisualiser les changements ; une destruction/un remplacement imprévu est un signal d'alerte.}
+\qa{38}{Que signifie le symbole \texttt{-/+} dans un plan ?}{Ressource à remplacer (destruction puis recréation) \arr{} risque d'interruption / perte de données locales.}
+\qa{39}{Pourquoi le state local est-il problématique en équipe ?}{Pas de partage/verrouillage, risque de perte, secrets en clair, conflits \arr{} backend distant sécurisé.}
+\qa{40}{Qu'est-ce que le drift ?}{Écart entre l'infrastructure réelle et le code, créé par une modification manuelle ; détecté au \code{plan}.}
+\qa{41}{Différence variable / local / output ?}{Variable = entrée paramétrable ; local = valeur calculée interne ; output = information exposée après déploiement.}
+\qa{42}{Intérêt de \code{count} ?}{Déployer plusieurs instances identiques sans dupliquer le code.}
+\qa{43}{Intérêt des modules ?}{Réutiliser une logique commune (réseau, compute) sur plusieurs environnements sans duplication.}
+\qa{44}{Pourquoi éviter les secrets dans les fichiers Terraform ?}{Risque de compromission ; utiliser Key Vault / variables d'environnement / variables CI sécurisées.}
+\qa{45}{Différence changement Terraform / changement manuel ?}{Terraform = versionné, relu, tracé via plan/apply (source de vérité) ; manuel = drift, non tracé, peut être annulé.}
+\qa{46}{Comment Terraform contribue au FinOps ?}{Ressources visibles, nommées, taguées, destructibles \arr{} inventaire et nettoyage facilités.}
+
+\subsubsection{F — Administration (CLI, Bash, Python)}
+\qa{47}{Différence provisionnement / exploitation ?}{Le provisionnement crée les ressources ; l'exploitation les administre, surveille et optimise dans le temps.}
+\qa{48}{Pourquoi Azure CLI plutôt que le portail pour une tâche répétitive ?}{Commande rejouable, documentable, scriptable, intégrable en pipeline.}
+\qa{49}{À quoi sert \code{--query} (JMESPath) ?}{Filtrer et transformer les sorties JSON.}
+\qa{50}{Format de sortie utile dans un script Bash ?}{TSV (\code{-o tsv}) : extraction directe dans une variable.}
+\qa{51}{Différence \code{az vm stop} / \code{az vm deallocate} ?}{\code{stop} arrête l'OS mais la VM reste allouée (compute facturé) ; \code{deallocate} libère le compute (non facturé).}
+\qa{52}{Rôle de \code{DefaultAzureCredential} ?}{Authentification SDK qui réutilise plusieurs sources (dont \code{az login}) sans secret en dur.}
+\qa{53}{Différence métrique / log ?}{Métrique = valeur numérique dans le temps ; log = événement textuel détaillé.}
+\qa{54}{Qu'est-ce qu'un runbook ?}{Procédure d'exploitation documentée (démarrer, arrêter, vérifier la santé).}
+\qa{55}{Différence IaC / script d'exploitation ?}{IaC (déclaratif) construit l'infra ; script (impératif) l'exploite ponctuellement.}
+\qa{56}{Pourquoi journaliser les actions d'un script ?}{Traçabilité (qui/quoi/quand), diagnostic, preuve d'audit.}
+
+\subsubsection{G — Monitoring, FinOps, sécurité (TP4)}
+\qa{57}{Différence monitoring / observabilité ?}{Le monitoring constate (« ça marche ? ») ; l'observabilité explique (« pourquoi ? »).}
+\qa{58}{Rôle d'un Log Analytics Workspace ?}{Centraliser, interroger (KQL) et corréler logs et métriques.}
+\qa{59}{Qu'est-ce qu'un Action Group ?}{Définit qui est notifié et comment lors d'une alerte (e-mail, SMS, webhook).}
+\qa{60}{Pourquoi définir les seuils d'alerte avec prudence ?}{Trop bas \arr{} fatigue d'alerte (faux positifs ignorés) ; trop haut \arr{} détection tardive.}
+\qa{61}{Pourquoi une alerte doit-elle être associée à une procédure ?}{Pour être actionnable et réduire le MTTR ; sinon ce n'est que du bruit.}
+\qa{62}{Quel journal trace les modifications sur les ressources Azure ?}{L'Activity Log (control-plane).}
+\qa{63}{Différence log technique / log d'activité ?}{Technique = fonctionnement de l'app (data-plane) ; activité = opérations de gestion de l'infra (control-plane).}
+\qa{64}{Pourquoi le cloud peut-il coûter plus cher que prévu ?}{Dépense à la consommation, ressources facturées à vide/oubliées/surdimensionnées, absence de tags/budget.}
+\qa{65}{Différence coût constaté / prévisionnel ?}{Constaté = déjà facturé (historique) ; prévisionnel (forecast) = projection pour anticiper un dépassement.}
+\qa{66}{Réduction vs optimisation des coûts ?}{Réduire = baisser la dépense (parfois au détriment du service) ; optimiser = meilleur rapport valeur/coût sans dégrader la valeur métier.}
+\qa{67}{Pourquoi un budget ne remplace pas une gouvernance ?}{Il alerte sur un montant mais ne dit pas quelle ressource/qui ; ne bloque pas la dépense ; nécessite tags + organisation.}
+\qa{68}{Modèle de responsabilité partagée ?}{Le fournisseur sécurise l'infrastructure physique ; le client reste responsable de la config, des identités, des données et des accès.}
+\qa{69}{Pourquoi le chiffrement ne suffit pas ?}{Il ne protège pas d'un accès public, de droits excessifs, d'un port exposé ou d'une absence de logs ; sécurité multi-couches.}
+\qa{70}{Citez deux mesures de sécurité prioritaires.}{RBAC + moindre privilège (+ MFA) et NSG restrictifs (+ désactiver les accès publics inutiles).}
+\qa{71}{Trois actions prioritaires avant une mise en production ?}{Activer des alertes critiques ; réduire l'exposition + moindre privilège (+ Defender) ; maîtriser les coûts (budget + tags).}
+\qa{72}{Quelle évolution permet d'automatiser le déploiement ?}{L'Infrastructure as Code (Terraform / Bicep), idéalement avec un pipeline CI/CD.}
+
+\vspace{4mm}
+\begin{etatbox}[Cette fiche couvre l'intégralité des TP1 → TP4]
+Fondamentaux du cloud, modèles de service, réseau, calcul, stockage, bases de données, identité/gouvernance, Infrastructure as Code (Terraform), administration (CLI/Bash/Python), observabilité, FinOps, sécurité, audit, disponibilité et méthodologie. Les définitions (\ePin), pièges (\eWarn), points clés (\eBrain) et la banque de Q/R sont conçus pour répondre à \textbf{tout type de question théorique} en évaluation écrite.
+\end{etatbox}
+
+\begin{center}
+\vspace{2mm}
+{\sffamily\small\color{black!45}— Fin de la fiche de synthèse —}
+\end{center}
+
+\end{document}

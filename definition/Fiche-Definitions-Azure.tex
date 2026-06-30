@@ -1,0 +1,388 @@
+% =====================================================================
+%  Dictionnaire des définitions — Panorama du Cloud & Azure (Bloc 4)
+%  Définitions complètes, ordre alphabétique (glossaire intégré)
+%  Fil rouge : ShopEasy — TP1 → TP4
+%  Moteur : LuaLaTeX — compiler 2 fois
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{french}
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}[Scale=0.84]
+\usepackage{microtype}
+\emergencystretch=2em
+
+\usepackage[a4paper,margin=2.3cm,headheight=18pt,headsep=12pt,footskip=18pt]{geometry}
+
+\usepackage{xcolor}
+\definecolor{azure}{HTML}{0078D4}
+\definecolor{azuredark}{HTML}{14375E}
+\definecolor{azuremid}{HTML}{2E75B6}
+\definecolor{ink}{HTML}{1B2733}
+\definecolor{rulegrey}{HTML}{C9D6E5}
+\color{ink}
+
+\usepackage{needspace}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Definitions - Panorama du Cloud et Azure}, pdfauthor={Bloc 4 Cloud Computing}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\linespread{1.05}
+
+% Flèche & code inline
+\newcommand{\arr}{\,$\rightarrow$\,}
+\newcommand{\co}[1]{\texttt{\small #1}}
+
+% Séparateur de lettre (A, B, C…)
+\newcommand{\lettre}[1]{%
+  \par\addvspace{9pt}\needspace{4.5\baselineskip}%
+  \markright{#1}%
+  {\noindent\sffamily\bfseries\Large\color{azure}#1}%
+  \nobreak\vspace{0.4mm}{\color{azure!45}\hrule height 1pt}\nobreak\vspace{3mm}\par}
+
+% Définition : Terme — explication (avec indentation pendante)
+\newcommand{\df}[2]{%
+  \par\addvspace{4pt}\needspace{2\baselineskip}%
+  \hangindent=1.1em\hangafter=1
+  {\sffamily\bfseries\color{azuredark}#1} — #2\par}
+
+% En-têtes / pied de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\sffamily\small\color{azuredark}\textbf{Définitions A–Z}~\textcolor{azure}{\textbullet}~Panorama du Cloud \& Azure}
+\fancyhead[R]{\sffamily\small\color{azure}\textbf{\rightmark}}
+\fancyfoot[C]{\sffamily\small\color{black!55}\thepage}
+\fancyfoot[R]{\sffamily\scriptsize\color{black!42}Bloc 4 · Cloud Computing}
+\fancyfoot[L]{\sffamily\scriptsize\color{black!42}TP1 → TP4 · ShopEasy}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\headrule}{\vspace{-2pt}{\color{azure!70}\rule{\headwidth}{1pt}}}
+
+\begin{document}
+
+% ---------- Titre (bandeau compact) ----------
+\thispagestyle{fancy}
+\noindent\colorbox{azuredark}{%
+  \parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+    \sffamily\color{white}\vspace{1.6mm}
+    {\bfseries\LARGE Dictionnaire des définitions}\\[1mm]
+    {\large Panorama du Cloud \& Architecture \textbf{Azure}}\\[1.4mm]
+    {\footnotesize\color{white!85} Bloc 4 · Cloud Computing — toutes les définitions et concepts clés des TP1 \arr{} TP4 (fil rouge \textbf{ShopEasy}), en ordre alphabétique.}
+    \vspace{1.6mm}}}
+
+\vspace{4mm}
+
+% =====================================================================
+\lettre{A}
+
+\df{Action Group}{dans Azure Monitor, objet qui définit \emph{qui} est notifié et \emph{comment} lorsqu'une alerte se déclenche (e-mail, SMS, webhook, ITSM\dots). Il sépare la détection (la règle d'alerte) de la notification et permet de regrouper plusieurs destinataires ou actions.}
+
+\df{Activity Log (journal d'activité)}{journal des opérations de \emph{gestion} (\emph{control-plane}) réalisées sur les ressources Azure via ARM : création, modification, suppression, changement de droits. Il trace \emph{qui} a fait \emph{quoi}, \emph{quand} et \emph{avec quel résultat} (réussite ou échec). C'est la source de vérité pour auditer les changements d'infrastructure.}
+
+\df{Alerte}{signal automatique déclenché lorsqu'une condition (un seuil) est franchie sur une métrique ou un log. Une bonne alerte est \textbf{actionnable} : elle associe un seuil, une fenêtre d'évaluation, une fréquence, une sévérité, un destinataire (Action Group) et une procédure de traitement. Une alerte qui n'appelle aucune action n'est qu'une information de tableau de bord.}
+
+\df{Alert fatigue (fatigue d'alerte)}{phénomène où des alertes trop nombreuses (seuils trop bas, faux positifs) finissent par être ignorées par les équipes, qui ratent alors les vrais incidents. On l'évite en calibrant les seuils sur la \emph{baseline}, en distinguant les criticités et en n'alertant que sur l'actionnable.}
+
+\df{Application Gateway}{répartiteur de charge Azure de \textbf{couche 7} (HTTP/HTTPS) : il comprend le contenu applicatif (URL, en-têtes, cookies) et permet le routage par chemin ou par hôte, la terminaison TLS, l'affinité de session et surtout un pare-feu applicatif (WAF). Plus riche que le Load Balancer (couche 4), il est la cible de production pour un frontal web.}
+
+\df{ARM (Azure Resource Manager)}{couche de gestion d'Azure par laquelle passent toutes les opérations sur les ressources (création, configuration, suppression). C'est le \emph{control-plane} : le portail, Azure CLI et Terraform dialoguent tous avec ARM.}
+
+\df{Automatisation}{propriété du cloud : les ressources se créent et se pilotent par console, API ou code (Infrastructure as Code) plutôt que manuellement. Elle rend les déploiements reproductibles, versionnés et contrôlés, et réduit les erreurs humaines.}
+
+\df{Availability Zone (zone de disponibilité)}{emplacement \textbf{physiquement séparé} au sein d'une région Azure, doté d'une alimentation, d'un refroidissement et d'un réseau indépendants. Répartir des ressources sur plusieurs zones protège contre la panne d'un datacenter (résilience). À distinguer de la \emph{région}, qui est une zone géographique.}
+
+\df{Azure Advisor}{service de recommandations personnalisées sur les ressources, couvrant le coût, la sécurité, la fiabilité et la performance. Il s'appuie sur l'historique d'usage pour proposer des optimisations.}
+
+\df{Azure App Service}{plateforme \textbf{managée} (PaaS) d'hébergement d'applications web. Elle réduit les responsabilités liées au système d'exploitation, aux correctifs et à une partie de l'exploitation : le client se concentre sur le code. Alternative aux machines virtuelles pour une application web standard.}
+
+\df{Azure Bastion}{service permettant de se connecter en SSH/RDP à des machines virtuelles \textbf{sans IP publique} ni port d'administration exposé sur Internet, via le portail. Il réduit la surface d'attaque (et le nombre d'IP publiques facturées) en supprimant l'exposition directe du SSH/RDP.}
+
+\df{Azure CLI}{outil en ligne de commande (\co{az}) pour administrer Azure depuis un poste, Azure Cloud Shell ou un pipeline CI/CD. Contrairement au portail, une commande est rejouable à l'identique, documentable, scriptable et intégrable à l'automatisation.}
+
+\df{Azure Cost Management}{service de suivi, d'analyse et d'optimisation des coûts Azure : visualisation des dépenses (par service, ressource ou tag), définition de \emph{budgets} et d'alertes, coût prévisionnel. C'est le pilier outillé du FinOps.}
+
+\df{Azure Monitor}{service \textbf{central} de supervision d'Azure. Il collecte, analyse et exploite les métriques, les logs et les alertes des ressources, et alimente tableaux de bord, requêtes et notifications. Chaîne conceptuelle : sources \arr{} collecte \arr{} analyse \arr{} action.}
+
+\df{Azure Policy}{service de gouvernance permettant d'\textbf{imposer} ou d'\textbf{auditer} des règles de configuration sur les ressources (par exemple refuser une ressource sans tag \co{Owner}, interdire une région, exiger le chiffrement). Il encadre les écarts et la conformité.}
+
+\df{Azure SQL Database}{base de données relationnelle \textbf{managée} (PaaS). Azure prend en charge la maintenance de la plateforme, les sauvegardes automatiques (PITR), la haute disponibilité selon le niveau de service, les correctifs et le chiffrement (TDE). Le client se concentre sur les données, le schéma et les droits applicatifs.}
+
+% =====================================================================
+\lettre{B}
+
+\df{Backend distant (remote state)}{stockage \textbf{centralisé} du fichier d'état Terraform (sur Azure : un Storage Account et un container Blob dédiés). Il permet le travail en équipe en partageant un même état et en le \emph{verrouillant} (un seul \co{apply} à la fois), évite la perte du fichier local et s'intègre en CI/CD. À sécuriser : RBAC, chiffrement, clé séparée par environnement.}
+
+\df{Backend pool}{ensemble des instances (machines virtuelles) cibles vers lesquelles un Load Balancer répartit le trafic. Les membres déclarés sains par la sonde de santé reçoivent le trafic ; un membre défaillant en est automatiquement retiré.}
+
+\df{Bash}{langage de script shell utilisé pour automatiser l'exploitation : enchaîner des commandes Azure CLI, factoriser des variables, contrôler les erreurs (\co{set -euo pipefail}), produire des rapports et des contrôles relançables. Bonnes pratiques : paramétrage, journalisation, idempotence et garde-fous avant toute action destructive.}
+
+\df{Baseline}{mesure de référence de l'état \emph{normal} d'une métrique (par exemple un CPU au repos $\approx$ 0,3 \%). Elle sert à calibrer correctement les seuils d'alerte pour éviter à la fois les faux positifs et la détection trop tardive.}
+
+\df{Bicep}{langage d'Infrastructure as Code \textbf{natif Azure}, plus lisible que les modèles ARM (JSON). C'est une alternative à Terraform pour des équipes centrées sur Azure, mais moins multi-cloud.}
+
+\df{Blob Storage}{service de stockage \textbf{objet} d'Azure pour fichiers non structurés (documents, images, exports, archives). Durable, redondé, découplé des machines virtuelles, à la scalabilité quasi illimitée et au paiement à l'usage ; accessible par API ou SDK. Préférable au disque local d'une VM pour des fichiers partagés et pérennes.}
+
+\df{Budget}{dans Cost Management, seuil financier (souvent mensuel) assorti d'alertes (par exemple à 80 \% et 100 \%). Un budget \emph{alerte} sur une dérive mais ne \emph{bloque pas} la dépense : il doit être complété par des tags et une gouvernance pour savoir quelle ressource agir.}
+
+% =====================================================================
+\lettre{C}
+
+\df{CAPEX / OPEX}{\emph{Capital Expenditure} (dépense d'investissement, par exemple l'achat de serveurs) et \emph{Operational Expenditure} (dépense d'exploitation récurrente, payée à l'usage). Le cloud fait passer le système d'information du modèle CAPEX au modèle OPEX, plus flexible mais exposé au risque de dérive des coûts.}
+
+\df{Chiffrement (au repos / en transit)}{protection des données stockées (\emph{au repos} : SSE pour le stockage, TDE pour SQL, souvent activés par défaut) et des données circulant sur le réseau (\emph{en transit} : HTTPS/TLS 1.2). Le chiffrement est nécessaire mais \textbf{insuffisant seul} : il ne protège ni d'un accès public mal configuré, ni de droits excessifs, ni d'un port exposé.}
+
+\df{CIDR}{notation des plages d'adresses IP (par exemple \co{10.10.0.0/16}). Un VNet utilise des plages \emph{privées} (RFC 1918) découpées en subnets ; Azure réserve 5 adresses par subnet.}
+
+\df{Cloud computing}{modèle de fourniture de ressources informatiques \textbf{à la demande} (calcul, stockage, réseau, bases de données, services applicatifs), accessibles via le réseau, configurables rapidement, mesurables et facturées selon l'usage. Il transforme la façon de concevoir, exploiter et financer le système d'information.}
+
+\df{cloud-init}{mécanisme de provisionnement automatique exécuté au \textbf{premier démarrage} d'une VM Linux (installer des paquets, écrire des fichiers, lancer des commandes), transmis via \co{custom\_data}. Il permet d'installer et de configurer un serveur (par exemple Nginx) sans connexion SSH, de façon reproductible.}
+
+\df{Control-plane vs data-plane}{Azure distingue la \emph{gestion} d'une ressource (la créer ou la configurer via ARM = \emph{control-plane}) de l'\emph{accès à son contenu} (lire ou écrire des blobs = \emph{data-plane}). Les droits sont distincts : être \co{Owner} (control-plane) ne donne pas automatiquement l'accès aux données, qui exige un rôle data-plane comme \co{Storage Blob Data Contributor}.}
+
+\df{Convention de nommage}{règle standardisée de nommage des ressources (par exemple \co{rg-shopeasy-dev}, \co{vnet-shopeasy-dev}) facilitant la lecture, la recherche, l'audit, l'automatisation et l'analyse des coûts. Certains noms (Storage Account, serveur SQL) doivent en outre être uniques au niveau mondial.}
+
+\df{Coût constaté vs coût prévisionnel}{le coût \emph{constaté} est la dépense réelle déjà facturée (historique, visible après 24 à 48 h sur un abonnement récent). Le coût \emph{prévisionnel} (\emph{forecast}) est une projection de la dépense à venir selon la tendance, qui permet d'anticiper un dépassement avant qu'il ne survienne.}
+
+\df{count (Terraform)}{méta-argument créant plusieurs exemplaires d'une même ressource, indexés par \co{count.index} (0, 1\dots). Il permet de déployer N instances identiques (par exemple deux VM web) sans dupliquer le code, conformément au principe DRY.}
+
+\df{CSPM / CWP}{\emph{Cloud Security Posture Management} (gestion de la posture de sécurité : évaluation, recommandations, conformité) et \emph{Cloud Workload Protection} (protection avancée des charges de travail). Ce sont les deux volets de Microsoft Defender for Cloud.}
+
+% =====================================================================
+\lettre{D}
+
+\df{Dashboard (tableau de bord)}{vue synthétique de pilotage répondant aux questions de décision : le service fonctionne-t-il ? coûte-t-il trop cher ? est-il sécurisé ? que corriger en priorité ? Pour une DSI, il agrège état des VM, CPU, trafic, stockage, coûts, alertes récentes et liens vers les journaux. Il sert à \emph{décider}, pas seulement à afficher des courbes.}
+
+\df{Déclaratif vs impératif}{approche \emph{déclarative} : on décrit l'\textbf{état final souhaité} et l'outil calcule les actions nécessaires (cas de Terraform). Approche \emph{impérative} : on décrit la suite d'\textbf{étapes} à exécuter (cas d'un script). Le caractère déclaratif explique l'importance du \co{plan}.}
+
+\df{DefaultAzureCredential}{mécanisme du SDK Azure (Python, etc.) qui tente successivement plusieurs sources d'authentification (variables d'environnement, identité managée, session \co{az login}\dots) pour obtenir un jeton Microsoft Entra ID, \textbf{sans coder de secret} dans le script.}
+
+\df{Defender for Cloud (Microsoft)}{service de sécurité couvrant la \emph{posture} (CSPM : Secure Score, recommandations, conformité réglementaire) et la \emph{protection des charges de travail} (CWP). Il aide à détecter les faiblesses et à prioriser les actions de durcissement.}
+
+\df{Désallocation (deallocate) vs arrêt (stop)}{\co{stop} arrête le système d'exploitation mais la VM reste \emph{allouée} sur l'hôte : le compute continue d'être facturé. \co{deallocate} arrête \emph{et libère} les ressources de calcul : le compute n'est plus facturé (le disque OS et l'IP publique statique, eux, restent facturés). En environnement de développement, on désalloue pour réduire les coûts.}
+
+\df{Diagnostic settings}{configuration qui \textbf{exporte} les logs et les métriques d'une ressource vers une destination d'analyse (Log Analytics Workspace, Storage, Event Hub). Indispensable pour centraliser l'observabilité et l'audit.}
+
+\df{Drift (dérive)}{écart entre l'état \emph{réel} de l'infrastructure et l'état \emph{décrit} dans le code Terraform, généralement causé par une modification manuelle dans le portail. Terraform le détecte au \co{plan} et propose de réaligner sur le code. Le drift rend l'infrastructure imprévisible et affaiblit la sécurité ; la règle est de tout faire passer par le code.}
+
+\df{DRY (Don't Repeat Yourself)}{principe consistant à ne pas dupliquer le code ou les valeurs. En Infrastructure as Code, on centralise le nommage et les tags (locals), et l'on emploie \co{count} et des modules pour éviter la répétition.}
+
+\df{DTU / vCore}{deux modèles d'achat de capacité pour Azure SQL : la \emph{DTU} (\emph{Database Transaction Unit}) est une mesure composite (CPU + mémoire + I/O) packagée par niveau (Basic, Standard\dots) ; le \emph{vCore} permet de choisir séparément le nombre de cœurs et la mémoire (plus flexible et transparent).}
+
+% =====================================================================
+\lettre{E}
+
+\df{Élasticité}{capacité du cloud à augmenter ou diminuer les ressources selon le besoin (nombre d'instances, taille, capacités managées). Elle permet d'absorber les pics de charge sans surdimensionner en permanence — un avantage majeur par rapport au modèle traditionnel.}
+
+\df{Entra ID (Microsoft Entra ID)}{annuaire et service d'identité et d'authentification d'Azure (ex-Azure AD) : utilisateurs, groupes, applications, identités managées. C'est le point de départ de la sécurité (qui peut accéder à quoi), couplé au RBAC pour l'attribution des droits.}
+
+% =====================================================================
+\lettre{F}
+
+\df{Failover group}{mécanisme de bascule d'Azure SQL vers une réplique (souvent dans une autre région) en cas d'incident, afin d'assurer la continuité d'activité.}
+
+\df{FinOps}{discipline combinant Finance, technologie et Opérations pour comprendre, piloter et \textbf{optimiser} les dépenses cloud. L'objectif est de maximiser la valeur produite par les ressources, et pas seulement de réduire la facture. Trois axes : rendre les coûts visibles, responsabiliser les équipes, optimiser en continu.}
+
+% =====================================================================
+\lettre{G}
+
+\df{Gouvernance}{ensemble des règles et outils encadrant l'usage du cloud pour éviter que sa flexibilité ne devienne du désordre : conventions de nommage, tags, RBAC, Azure Policy, budgets, et organisation en management groups, subscriptions et resource groups.}
+
+% =====================================================================
+\lettre{H}
+
+\df{Haute disponibilité}{capacité d'un service à rester accessible malgré des pannes. Elle ne provient pas d'un service isolé mais d'une \textbf{combinaison} : plusieurs instances, plusieurs zones, sondes de santé, sauvegardes, supervision et procédures de reprise.}
+
+\df{HCL (HashiCorp Configuration Language)}{langage de configuration de Terraform, conçu pour décrire de façon lisible les ressources (blocs \co{resource}, variables, locals, outputs).}
+
+% =====================================================================
+\lettre{I}
+
+\df{IaaS / PaaS / SaaS}{modèles de service selon le niveau d'abstraction. \emph{IaaS} : infrastructure à la demande (VM, réseau) — le client gère l'OS et l'application. \emph{PaaS} : plateforme managée — le client gère le code et les données (ex. App Service, Azure SQL). \emph{SaaS} : logiciel complet consommé tel quel (ex. Microsoft 365). Plus le service est managé, moins le client a d'administration mais aussi de contrôle.}
+
+\df{IaC (Infrastructure as Code)}{gestion de l'infrastructure au moyen de fichiers texte décrivant l'\textbf{état attendu}, versionnés (Git), relus en revue de code, testés et appliqués de façon reproductible. L'infrastructure devient un actif logiciel : explicite, auditable, reproductible et gouvernable.}
+
+\df{Identité managée (Managed Identity)}{identité Azure gérée automatiquement, permettant à une ressource (VM, application) de s'authentifier auprès d'autres services \textbf{sans secret stocké} dans le code.}
+
+% =====================================================================
+\lettre{J}
+
+\df{JMESPath}{langage de requête utilisé par l'option \co{-{}-query} d'Azure CLI pour filtrer et transformer les sorties JSON : sélectionner des champs, filtrer des éléments, renommer des colonnes.}
+
+% =====================================================================
+\lettre{K}
+
+\df{Key Vault (Azure)}{coffre-fort managé pour stocker et gérer les secrets, clés et certificats. Recommandé pour ne jamais inscrire de secret en clair dans le code ou dans un fichier versionné.}
+
+\df{KQL (Kusto Query Language)}{langage d'interrogation des logs et métriques d'un Log Analytics Workspace, permettant de filtrer, corréler et analyser les données d'observabilité.}
+
+% =====================================================================
+\lettre{L}
+
+\df{Lifecycle policy (cycle de vie du stockage)}{règle automatisant la transition des blobs entre niveaux d'accès (Hot \arr{} Cool \arr{} Archive) puis leur suppression selon leur ancienneté, afin de réduire les coûts sans intervention manuelle. Utile notamment pour limiter l'accumulation des versions.}
+
+\df{Load Balancer}{service Azure répartissant le trafic réseau (\textbf{couche 4}, TCP/UDP) sur plusieurs instances derrière un point d'entrée unique (une IP ou un DNS), ce qui améliore la disponibilité et permet la montée en charge. Couplé à une sonde de santé, il retire automatiquement une instance défaillante.}
+
+\df{Log}{événement \textbf{textuel} détaillé produit par une ressource, une application ou la plateforme (erreur, changement de configuration). Le log aide à comprendre le \emph{contexte} d'un problème, là où la métrique signale qu'il existe.}
+
+\df{Log Analytics Workspace}{espace centralisé d'Azure Monitor pour stocker, interroger (en KQL) et corréler les logs et métriques de plusieurs ressources. Il constitue la base de l'observabilité et de l'audit.}
+
+\df{LRS / ZRS / GRS}{niveaux de redondance du stockage Azure : \emph{LRS} (locale, dans un datacenter), \emph{ZRS} (réparti sur plusieurs zones d'une région), \emph{GRS} (géo-redondant, vers une région secondaire). Plus la redondance est large, plus le coût et la résilience augmentent.}
+
+% =====================================================================
+\lettre{M}
+
+\df{Managed Disks (disques managés)}{disques de stockage managés attachés aux machines virtuelles (disque système ou de données). Ils sont facturés même lorsque la VM est désallouée.}
+
+\df{Management Group}{niveau de gouvernance situé au-dessus des subscriptions, permettant d'organiser plusieurs abonnements par domaine ou entité et d'y appliquer des politiques communes.}
+
+\df{Métrique}{valeur \textbf{numérique} mesurée dans le temps (CPU \%, mémoire, latence, nombre de requêtes). Idéale pour des alertes rapides sur seuil ; certaines métriques de plateforme remontent nativement, sans agent.}
+
+\df{MFA (Multi-Factor Authentication)}{authentification à plusieurs facteurs, renforçant la sécurité des comptes au-delà du simple mot de passe. Particulièrement recommandée pour les comptes à privilèges.}
+
+\df{Moindre privilège}{principe consistant à n'accorder à un utilisateur, une application ou une identité que les droits \textbf{strictement nécessaires} à sa mission, pour la durée nécessaire. Il limite l'impact d'une erreur ou d'une compromission et s'oppose à l'attribution large du rôle \co{Owner}.}
+
+\df{Module (Terraform)}{ensemble \textbf{réutilisable} de configurations Terraform (par exemple un module réseau, compute ou stockage) factorisant une logique commune pour la réemployer sur plusieurs environnements sans duplication.}
+
+\df{Monitoring}{surveillance d'indicateurs prédéfinis pour vérifier qu'un système \emph{fonctionne} (« est-ce que ça marche ? »). Le monitoring \emph{constate} ; l'observabilité \emph{explique}.}
+
+\df{MTTR (Mean Time To Repair)}{temps moyen de résolution d'un incident. Une alerte actionnable, associée à une procédure (runbook), contribue à le réduire.}
+
+% =====================================================================
+\lettre{N}
+
+\df{NSG (Network Security Group)}{ensemble de règles de filtrage du trafic réseau (priorité, source, destination, protocole, port, autoriser ou refuser), associable à un subnet ou à une interface. Les sens entrant (\emph{Inbound}) et sortant (\emph{Outbound}) sont filtrés séparément ; des règles par défaut s'appliquent, dont \co{DenyAllInBound}. Restreindre les flux (ex. SSH à l'IP d'administration) applique le moindre privilège réseau.}
+
+% =====================================================================
+\lettre{O}
+
+\df{Observabilité}{capacité à comprendre l'état \textbf{interne} d'un système à partir des signaux qu'il produit (métriques, logs, traces), c'est-à-dire à répondre au \emph{pourquoi} d'un comportement. Elle va plus loin que le monitoring et devient essentielle pour les architectures distribuées.}
+
+\df{Output (sortie Terraform)}{valeur \textbf{exposée après déploiement} par un projet Terraform (par exemple l'IP du Load Balancer, le nom du Resource Group), réutilisable par un humain, un script ou un autre module sans avoir à fouiller le portail.}
+
+% =====================================================================
+\lettre{P}
+
+\df{PaaS (Platform as a Service)}{voir \emph{IaaS / PaaS / SaaS}. Plateforme managée sur laquelle le client déploie son code et ses données sans gérer l'OS ni l'infrastructure (ex. App Service, Azure SQL Database).}
+
+\df{PIM (Privileged Identity Management)}{service permettant l'\textbf{élévation temporaire} et contrôlée des droits privilégiés (activation à la demande, durée limitée, approbation), au lieu de droits permanents.}
+
+\df{PITR (Point-In-Time Restore)}{restauration d'une base Azure SQL à un \textbf{instant passé} donné, grâce aux sauvegardes automatiques.}
+
+\df{Plan (terraform plan)}{étape qui \textbf{prévisualise} les changements en comparant l'état réel (connu via le state) à la configuration souhaitée, \emph{avant} d'agir sur Azure. Symboles à lire : \co{+} créer, \co{-} détruire, \co{\textasciitilde} modifier en place, \co{-/+} remplacer (destruction puis recréation). Une destruction ou un remplacement imprévu est un signal d'alerte : lire le plan est le garde-fou du modèle déclaratif.}
+
+\df{Private Endpoint}{interface réseau donnant accès à un service PaaS (Azure SQL, Storage) via une \textbf{IP privée du VNet}, ce qui supprime toute exposition publique du service.}
+
+\df{Provider (Terraform)}{plugin qui sait dialoguer avec l'API d'une plateforme et traduit les ressources Terraform en appels concrets. Pour Azure : \co{azurerm} (standard), \co{azapi}, \co{azuread} ; le provider \co{random} génère des valeurs aléatoires (ex. suffixe unique d'un Storage Account).}
+
+\df{Provisionnement vs exploitation}{le \emph{provisionnement} crée les ressources (TP1/TP2, Terraform). L'\emph{exploitation} commence après le déploiement : administrer, inventorier, surveiller, sécuriser et optimiser au quotidien (TP3/TP4). Construire n'est pas exploiter : une VM peut être parfaitement déployée et pourtant mal exploitée.}
+
+% =====================================================================
+\lettre{R}
+
+\df{RBAC (Role-Based Access Control)}{modèle d'attribution des droits Azure : on accorde un \textbf{rôle} à une \textbf{identité} sur un \textbf{scope} (management group, subscription, resource group ou ressource). Les droits sont hérités vers les niveaux inférieurs. C'est la base de l'application du moindre privilège.}
+
+\df{Redondance}{duplication de composants pour tolérer une panne (par exemple deux VM derrière un Load Balancer). Élément clé de la disponibilité, à compléter idéalement par le multi-zone.}
+
+\df{Région}{zone \textbf{géographique} dans laquelle des services Azure sont déployés. Elle influe sur la latence, les coûts, les services disponibles, la conformité et la résidence des données. À distinguer de la zone de disponibilité.}
+
+\df{Réservations / Savings Plans}{engagement d'usage sur 1 à 3 ans donnant droit à une réduction tarifaire, pertinent pour des charges \textbf{stables et prévisibles}.}
+
+\df{Resource Group (groupe de ressources)}{conteneur \textbf{logique} regroupant des ressources partageant un cycle de vie commun. Il sert à les administrer, leur appliquer des droits (RBAC), les taguer, suivre leurs coûts et les supprimer ensemble. Sa suppression supprime tout son contenu : il doit traduire une logique d'application, d'environnement ou de projet.}
+
+\df{Responsabilité partagée}{modèle de sécurité du cloud : le fournisseur (Microsoft) sécurise l'infrastructure physique et une partie des services ; le \textbf{client} reste responsable de la configuration, des identités, des données, des accès et de la gouvernance. Utiliser Azure ne rend pas une application sécurisée automatiquement.}
+
+\df{Ressource orpheline}{ressource facturée mais \textbf{non utilisée} (disque non attaché, IP publique non associée). À détecter et supprimer pour éliminer des « coûts invisibles ».}
+
+\df{RGPD}{Règlement général sur la protection des données. Il impose notamment de protéger les données personnelles (clients, documents) : d'où l'importance de ne jamais exposer publiquement un stockage et de chiffrer les données.}
+
+\df{Rôles RBAC (Owner, Contributor, Reader)}{rôles intégrés les plus courants : \emph{Owner} (administration complète, \emph{y compris la gestion des droits} — à limiter fortement), \emph{Contributor} (gérer les ressources sans gérer les droits), \emph{Reader} (consultation seule, adaptée à l'audit).}
+
+\df{RPO / RTO}{\emph{Recovery Point Objective} (perte de données maximale acceptable, liée à la fréquence des sauvegardes) et \emph{Recovery Time Objective} (temps de reprise maximal acceptable après un incident). Ce sont les objectifs clés d'un plan de reprise.}
+
+\df{Runbook}{procédure d'exploitation \textbf{documentée} décrivant comment réaliser une action de façon fiable : démarrer ou arrêter un environnement, vérifier la santé d'un service, restaurer un fichier, réagir à une alerte.}
+
+% =====================================================================
+\lettre{S}
+
+\df{SaaS (Software as a Service)}{voir \emph{IaaS / PaaS / SaaS}. Logiciel complet consommé comme un service, sans gérer l'infrastructure (ex. Microsoft 365).}
+
+\df{SAS (Shared Access Signature)}{jeton d'accès à \textbf{durée et portée limitées} permettant un accès délégué au stockage Azure sans partager la clé du compte.}
+
+\df{Scope (RBAC)}{niveau auquel un rôle est attribué : management group, subscription, resource group ou ressource. Plus le scope est étroit, mieux le moindre privilège est respecté.}
+
+\df{Secure Score}{indicateur synthétique de Microsoft Defender for Cloud mesurant la \textbf{posture de sécurité} (proportion de bonnes pratiques appliquées).}
+
+\df{Segmentation réseau}{découpage d'un VNet en subnets par fonction (web, données, administration) dotés de NSG distincts, afin de cloisonner les couches et de limiter les \textbf{mouvements latéraux} en cas de compromission. C'est l'application de la défense en profondeur au niveau réseau.}
+
+\df{Service managé}{service dont le fournisseur cloud assure une partie de l'administration (plateforme, correctifs, haute disponibilité, sauvegardes). Il \emph{transforme} la responsabilité du client sans la supprimer : celle-ci se recentre sur les données et la configuration.}
+
+\df{SLI / SLO / SLA}{\emph{Service Level Indicator} (indicateur mesurable, ex. taux de disponibilité), \emph{Service Level Objective} (objectif interne fixé sur cet indicateur, ex. 99,5 \%), \emph{Service Level Agreement} (engagement contractuel envers un client, avec pénalités en cas de non-respect).}
+
+\df{Soft-delete}{fonction du stockage conservant un objet (blob ou conteneur) supprimé pendant un délai défini, afin de pouvoir le restaurer (protection contre les suppressions accidentelles ou malveillantes).}
+
+\df{Sonde de santé (health probe)}{test périodique vérifiant qu'un backend répond (par exemple un code HTTP 200). Le Load Balancer ne route que vers les instances saines, retire automatiquement une instance défaillante et la réintègre dès qu'elle répond. C'est elle qui rend la redondance \emph{effective}.}
+
+\df{Sonde synthétique}{test externe interrogeant périodiquement une URL (via l'IP du Load Balancer) et vérifiant le code de réponse, le contenu et le temps de réponse. Elle mesure la disponibilité \textbf{réellement perçue par l'utilisateur} (chaîne complète), au-delà du simple état plateforme de la VM.}
+
+\df{SPOF (Single Point Of Failure)}{point de défaillance unique : composant dont la panne arrête tout le système (par exemple un serveur unique). On le supprime par la redondance (plusieurs instances derrière un Load Balancer, déploiement multi-zone).}
+
+\df{SSE (Storage Service Encryption)}{chiffrement \textbf{au repos} des données d'un Storage Account, activé par défaut (StorageV2).}
+
+\df{State (terraform.tfstate)}{fichier qui établit le lien entre les ressources déclarées dans le code et les ressources réellement créées : c'est la \textbf{source de vérité} de Terraform. Il peut contenir des secrets en clair et l'inventaire complet de l'infrastructure : à ne jamais publier, et à externaliser dans un backend distant sécurisé pour le travail en équipe.}
+
+\df{Storage Account}{compte de stockage Azure pouvant héberger plusieurs types de données (Blob, Files, Tables, Queues). Son nom doit être unique au niveau mondial (minuscules, sans tiret). On y désactive l'accès public par défaut, par défense en profondeur.}
+
+\df{Subnet (sous-réseau)}{subdivision d'un VNet organisant les ressources par fonction ou niveau d'exposition (web, données, administration), à laquelle on associe un NSG.}
+
+\df{Subscription (abonnement)}{conteneur de \textbf{facturation et de gouvernance} dans lequel sont créées les ressources ; il porte les droits et les coûts.}
+
+% =====================================================================
+\lettre{T}
+
+\df{Tag}{métadonnée \textbf{clé = valeur} associée à une ressource pour la gouvernance : attribution des coûts (FinOps), identification du propriétaire, environnement, criticité, filtrage et automatisation. Un environnement sans tags est difficile à piloter et à imputer.}
+
+\df{TDE (Transparent Data Encryption)}{chiffrement \textbf{au repos} d'une base Azure SQL, activé par défaut et transparent pour l'application.}
+
+\df{Tenant}{instance d'annuaire Microsoft Entra ID représentant une organisation et ses identités. C'est le niveau « identité » au-dessus des subscriptions.}
+
+\df{Terraform}{outil d'Infrastructure as Code \textbf{déclaratif} et \textbf{multi-cloud} développé par HashiCorp. On décrit l'état souhaité en HCL ; Terraform calcule puis applique les changements (workflow \co{init} \arr{} \co{plan} \arr{} \co{apply} \arr{} \co{destroy}).}
+
+\df{Tier (Hot / Cool / Archive)}{niveaux d'accès du Blob Storage selon la fréquence d'utilisation : \emph{Hot} (données fréquentes : stockage cher, accès peu cher), \emph{Cool} (peu consultées), \emph{Archive} (très froides : stockage minimal mais accès lent et coûteux). La lifecycle policy automatise les transitions.}
+
+\df{Trace}{signal d'observabilité suivant le parcours d'une \textbf{requête à travers plusieurs composants} d'un système distribué.}
+
+% =====================================================================
+\lettre{V}
+
+\df{Variable, local, output (Terraform)}{trois notions à distinguer. \emph{Variable} : paramètre d'entrée configurable (région, taille de VM\dots) évitant le codage en dur. \emph{Local} : valeur calculée et réutilisée en interne (préfixe de nommage, tags communs). \emph{Output} : information exposée après déploiement. En résumé : ce qui \emph{entre} / ce qui est \emph{calculé} / ce qui est \emph{exposé}.}
+
+\df{vCore}{voir \emph{DTU / vCore}. Modèle d'achat d'Azure SQL où l'on choisit séparément le nombre de cœurs et la mémoire (flexible et transparent).}
+
+\df{Versioning}{fonction du stockage conservant \textbf{chaque version} d'un blob à chaque modification, permettant de restaurer une version antérieure (après écrasement ou corruption). Couplé au soft-delete ; à encadrer par une lifecycle policy car les versions s'accumulent et sont facturées.}
+
+\df{Virtual Machine (VM)}{serveur \textbf{virtuel} (modèle IaaS) où le client choisit l'image système, la taille, le disque et le réseau. Il garde le contrôle de l'OS mais en assume l'administration (correctifs, durcissement, supervision). Les VM \emph{burstable} (série B) fonctionnent à crédits CPU : un CPU élevé prolongé épuise les crédits et bride la machine.}
+
+\df{Virtual Network (VNet)}{réseau \textbf{privé et isolé} d'Azure dans lequel communiquent les ressources. Il définit une plage d'adresses IP privées et se découpe en subnets ; l'exposition vers Internet est explicite (IP publique et Load Balancer), jamais implicite.}
+
+% =====================================================================
+\lettre{W}
+
+\df{WAF (Web Application Firewall)}{pare-feu \textbf{applicatif} (couche 7) protégeant contre les attaques web (injections SQL, XSS\dots). Disponible avec Application Gateway.}
+
+\df{Well-Architected Framework}{cadre Azure d'évaluation et de justification d'une architecture selon \textbf{cinq piliers} : Fiabilité (\emph{Reliability}), Sécurité (\emph{Security}), Optimisation des coûts (\emph{Cost Optimization}), Excellence opérationnelle (\emph{Operational Excellence}) et Efficacité des performances (\emph{Performance Efficiency}).}
+
+\df{Workflow Terraform}{cycle de vie standard d'un projet : \co{init} (initialiser, télécharger les providers), \co{fmt} (formater), \co{validate} (vérifier la syntaxe), \co{plan} (prévisualiser), \co{apply} (appliquer), \co{destroy} (supprimer). Lire le \co{plan} avant d'appliquer est le garde-fou du modèle déclaratif.}
+
+% =====================================================================
+\lettre{Z}
+
+\df{Zone de disponibilité}{voir \emph{Availability Zone}. Datacenter(s) physiquement séparé(s) au sein d'une région, pour la résilience face à une panne locale.}
+
+\vfill
+\begin{center}{\sffamily\small\color{black!45}— Fin du dictionnaire des définitions · Bloc 4 Cloud Computing · ShopEasy —}\end{center}
+
+\end{document}
